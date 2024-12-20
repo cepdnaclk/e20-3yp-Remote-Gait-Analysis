@@ -3,20 +3,22 @@ layout: home
 permalink: index.html
 
 # Please update this with your repository name and project title
-repository-name: eYY-3yp-project-template
-title: Project Template
+repository-name: e20-3yp-remote-gait-analysis
+title: Remote Gait Analysis
 ---
 
 [comment]: # "This is the standard layout for the project, but you can clean this and use your own template"
 
 # Project Title
+Remote Gait Analysis
 
 ---
 
 ## Team
--  eNumber, Name, [email](mailto:name@email.com)
--  eNumber, Name, [email](mailto:name@email.com)
--  eNumber, Name, [email](mailto:name@email.com)
+-  E/20/037, Haritha Bandara, [e20037@eng.pdn.ac.lk](mailto:e20037@eng.pdn.ac.lk)
+-  E/20/342, Chamath Rupasinghe, [e20342@eng.pdn.ac.lk](mailto:e20342@eng.pdn.ac.lk)
+-  E/20/363, Yohan Senanayake, [e20363@eng.pdn.ac.lk](mailto:e20363@eng.pdn.ac.lk)
+-  E/20/365, Chamodi Senaratne, [e20365@eng.pdn.ac.lk](mailto:e20365@eng.pdn.ac.lk)
 
 <!-- Image (photo/drawing of the final hardware) should be here -->
 
