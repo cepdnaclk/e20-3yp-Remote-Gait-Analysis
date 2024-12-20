@@ -18,22 +18,27 @@ These projects will be automatically added into [https://projects.ce.pdn.ac.lk](
 
 ```
 {
-  "title": "This is the title of the project",
+  "title": "Remote Gait Analysis,
   "team": [
     {
-      "name": "Team Member Name 1",
-      "email": "email@eng.pdn.ac.lk",
-      "eNumber": "E/yy/xxx"
+      "name": "L.R.H.I. Bandara",
+      "email": "e20037@eng.pdn.ac.lk",
+      "eNumber": "E/20/037"
     },
     {
-      "name": "Team Member Name 2",
-      "email": "email@eng.pdn.ac.lk",
-      "eNumber": "E/yy/xxx"
+      "name": "C.A. Rupasinghe",
+      "email": "e20342@eng.pdn.ac.lk",
+      "eNumber": "E/20/342"
     },
     {
-      "name": "Team Member Name 3",
-      "email": "email@eng.pdn.ac.lk",
-      "eNumber": "E/yy/xxx"
+      "name": "S.D.Y.V Senanayake",
+      "email": "e20363@eng.pdn.ac.lk",
+      "eNumber": "E/20/363"
+    },
+    {
+      "name": "C.K. Senaratne",
+      "email": "e20365@eng.pdn.ac.lk",
+      "eNumber": "E/20/365"
     }
   ],
   "supervisors": [
