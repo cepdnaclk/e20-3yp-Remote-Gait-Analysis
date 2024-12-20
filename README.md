@@ -1,8 +1,8 @@
 ___
-# DELETE THIS INSTRUCTIONS AND ADD AN INTRODUCTION ABOUT YOUR PROJECT
+# Remote Gait Analysis
 ___
 
-# eYY-3yp-project-template
+# eYY-3yp-remote-gait-analysis
 
 This is a sample repository you can use for your Embedded Systems project. Once you followed these instructions, remove the text and add a brief introduction to here.
 
