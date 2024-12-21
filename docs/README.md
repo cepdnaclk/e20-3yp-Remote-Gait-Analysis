@@ -3,7 +3,7 @@ layout: home
 permalink: index.html
 
 # Please update this with your repository name and project title
-repository-name: e20-3yp-remote-gait-analysis
+repository-name: e20-3yp-Remote-Gait-Analysis
 title: Remote Gait Analysis
 ---
 
