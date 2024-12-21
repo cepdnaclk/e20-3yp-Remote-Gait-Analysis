@@ -3,14 +3,13 @@ layout: home
 permalink: index.html
 
 # Please update this with your repository name and project title
-repository-name: e20-3yp-remote-gait-analysis
+repository-name: e20-3yp-Remote-Gait-Analysis
 title: Remote Gait Analysis
 ---
 
 [comment]: # "This is the standard layout for the project, but you can clean this and use your own template"
 
-# Project Title
-Remote Gait Analysis
+# Remote Gait Analysis
 
 ---
 
