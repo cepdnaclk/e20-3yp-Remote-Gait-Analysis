@@ -1,0 +1,36 @@
+@import "./header";
+@import "./hero";
+@import "./about";
+@import "./solutionArchitecture";
+@import "./systemDesign";
+@import "./team";
+@import "./budget";
+@import "./testing";
+@import "./commonStyles";
+@import "./variables";
+
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+  scroll-behavior: smooth;
+}
+
+html {
+  /* font-size: 10px; */
+  /* 10px / 16px = 0.625 = 62.5% */
+  /* Percentage of user's browser font-size setting */
+  font-size: 62.5%;
+}
+
+body {
+  font-family: "Rubik", sans-serif;
+  line-height: 1;
+  font-weight: 400;
+  color: $textColor;
+  font-size: 1.8rem;
+}
+
+a:link {
+  text-decoration: none;
+}

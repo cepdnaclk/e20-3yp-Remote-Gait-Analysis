@@ -1,0 +1,7 @@
+@import "./variables";
+@import "./commonStyles";
+
+.section-about {
+  min-height: 100vh;
+  @include flexCenter();
+}
