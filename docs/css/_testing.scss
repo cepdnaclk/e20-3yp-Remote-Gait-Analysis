@@ -1,0 +1,7 @@
+@import "./variables";
+@import "./commonStyles";
+
+.section-testing {
+  min-height: 100vh;
+  @include flexCenter();
+}
