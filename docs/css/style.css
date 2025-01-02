@@ -1,0 +1,225 @@
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 8rem;
+  padding: 1.2rem 4.8rem;
+  border-bottom: 3px solid #eee;
+}
+header a {
+  text-decoration: none;
+  color: inherit;
+}
+header .logo {
+  display: flex;
+  height: 100%;
+  align-items: center;
+  font-size: 3.2rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+header nav .main-nav-list {
+  list-style: none;
+  display: flex;
+  gap: 3.2rem;
+}
+header nav .main-nav-link {
+  color: #777;
+}
+header nav .main-nav-link:hover {
+  color: #4263eb;
+}
+header nav .main-nav-link.active {
+  color: #4263eb;
+  border-bottom: 2px solid #4263eb;
+}
+
+.logo-image {
+  display: block;
+  height: 100%;
+  -o-object-fit: cover;
+     object-fit: cover;
+}
+
+.sticky header {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 100;
+  background-color: rgba(255, 255, 255, 0.952);
+}
+
+.section-hero {
+  height: calc(100vh - 8rem);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.sticky .section-hero {
+  margin-top: 8rem;
+}
+
+.hero-box {
+  background-color: #fff;
+  display: flex;
+  max-width: 120rem;
+  width: 120rem;
+  align-items: center;
+}
+
+.hero-text-box {
+  padding: 0 2.4rem;
+}
+.hero-text-box h1 {
+  font-size: 4.8rem;
+  line-height: 1.5;
+  text-transform: uppercase;
+}
+.hero-text-box h2 {
+  font-weight: 400;
+  font-size: 1.8rem;
+  color: #777;
+  margin-bottom: 2.4rem;
+  letter-spacing: 0.3px;
+}
+.hero-text-box p {
+  line-height: 1.5;
+  letter-spacing: 0.1px;
+}
+
+.hero-image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  -o-object-fit: cover;
+     object-fit: cover;
+}
+
+.section-about {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.section-solution-architecture {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.section-system-design {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.section-team {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.team-section-container {
+  display: flex;
+  flex-direction: column;
+  gap: 6.4rem;
+  align-items: center;
+}
+
+.card-container {
+  display: flex;
+  gap: 3.2rem;
+}
+
+.team-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1.6rem 2.4rem;
+  box-shadow: rgba(0, 0, 0, 0.2) 0px 18px 50px -10px;
+  border-radius: 8px;
+}
+
+.img-wrapper {
+  margin-bottom: 1rem;
+}
+
+.team-img {
+  width: 15rem;
+  border-radius: 50%;
+}
+
+.name {
+  font-weight: 600;
+  margin-bottom: 2.4rem;
+}
+
+.reg-no {
+  margin-bottom: 1.2rem;
+}
+
+.social-media-links {
+  display: flex;
+  gap: 2rem;
+}
+.social-media-links a {
+  text-decoration: none;
+}
+
+.social-icon {
+  color: #777;
+}
+
+.eportfolio {
+  text-decoration: none;
+  color: #4263eb;
+}
+
+.filler {
+  flex: 1;
+}
+
+.section-budget {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.section-testing {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+  scroll-behavior: smooth;
+}
+
+html {
+  /* font-size: 10px; */
+  /* 10px / 16px = 0.625 = 62.5% */
+  /* Percentage of user's browser font-size setting */
+  font-size: 62.5%;
+}
+
+body {
+  font-family: "Rubik", sans-serif;
+  line-height: 1;
+  font-weight: 400;
+  color: #555;
+  font-size: 1.8rem;
+}
+
+a:link {
+  text-decoration: none;
+}/*# sourceMappingURL=style.css.map */
