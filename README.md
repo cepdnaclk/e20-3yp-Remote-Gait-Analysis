@@ -2,7 +2,7 @@ ___
 # Remote Gait Analysis
 ___
 
-![Logo](docs\images\logo.png "This is the logo")
+![Logo](docs/images/logo.png "This is the logo")
 
 
 # e20-3yp-remote-gait-analysis
