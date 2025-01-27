@@ -2,6 +2,13 @@
 @import "./commonStyles";
 
 .section-solution-architecture {
+  padding: 9.6rem;
   min-height: 100vh;
-  @include flexCenter();
+  @include column();
+  align-items: center;
+  gap: 6.4rem;
+}
+
+.solution-architecture-img {
+  width: 75rem;
 }
