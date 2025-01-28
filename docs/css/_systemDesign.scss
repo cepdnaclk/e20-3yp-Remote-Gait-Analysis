@@ -2,6 +2,13 @@
 @import "./commonStyles";
 
 .section-system-design {
+  padding: 9.6rem;
   min-height: 100vh;
-  @include flexCenter();
+  @include column();
+  align-items: center;
+  gap: 6.4rem;
+}
+
+.system-design-img {
+  width: 75rem;
 }
