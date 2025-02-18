@@ -2,19 +2,9 @@ import { usePatients } from "../api/patients";
 import { CircularProgress, Typography, Box, Grid, Paper } from "@mui/material";
 import PeopleIcon from "@mui/icons-material/People";
 
-
 export default function Dashboard() {
-  const [patients, setPatients] = useState(null);
-
-  useEffect(() => {
-    // Simulating a delay (API response)
-    setTimeout(() => {
-      setPatients([
-        { id: 1, name: "John Doe", age: 45 },
-        { id: 2, name: "Jane Smith", age: 38 },
-      ]);
-    }, 1000);
-  }, []);
+  // Use the custom React Query hook
+  const { data: patients, isLoading, error } = usePatients();
 
   if (isLoading) return <CircularProgress />;
   if (error) return <Typography color="error">Error: {error.message}</Typography>;
@@ -25,10 +15,6 @@ export default function Dashboard() {
       <Typography variant="h4" gutterBottom>
         🏥 Gait Analysis Dashboard
       </Typography>
-
-      {/* Loading & Error Handling */}
-      {isLoading && <CircularProgress />}
-      {error && <Typography color="error">Error: {error.message}</Typography>}
 
       {/* Summary Cards */}
       <Grid container spacing={3}>
@@ -41,8 +27,6 @@ export default function Dashboard() {
             </Box>
           </Paper>
         </Grid>
-
-        {/* Additional summary cards can go here */}
       </Grid>
 
       {/* Patient List */}
