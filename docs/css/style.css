@@ -99,15 +99,31 @@ header nav .main-nav-link.active {
 .section-about {
   min-height: 100vh;
   display: flex;
+  flex-direction: column;
+  background-color: #1c2340;
+  padding: 4.8rem;
+  gap: 3.2rem;
+  color: #eee;
+  line-height: 1.7;
   justify-content: center;
-  align-items: center;
+}
+
+.gait-cycle-image {
+  width: 75rem;
+  align-self: center;
 }
 
 .section-solution-architecture {
+  padding: 9.6rem;
   min-height: 100vh;
   display: flex;
-  justify-content: center;
+  flex-direction: column;
   align-items: center;
+  gap: 6.4rem;
+}
+
+.solution-architecture-img {
+  width: 75rem;
 }
 
 .section-system-design {
@@ -187,8 +203,9 @@ header nav .main-nav-link.active {
 .section-budget {
   min-height: 100vh;
   display: flex;
-  justify-content: center;
+  flex-direction: column;
   align-items: center;
+  gap: 6.4rem;
 }
 
 .section-testing {
