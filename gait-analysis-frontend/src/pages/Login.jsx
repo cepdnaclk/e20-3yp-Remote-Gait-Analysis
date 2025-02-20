@@ -1,3 +1,5 @@
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Box, Button, Container, TextField, Typography, Paper } from "@mui/material";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -11,6 +13,25 @@ const schema = z.object({
 
 export default function Login() {
 
+  const navigate = useNavigate();
+  const [credentials, setCredentials] = useState({ email: "", password: "" });
+
+  const handleChange = (e) => {
+    setCredentials({ ...credentials, [e.target.name]: e.target.value });
+  };
+
+  const handleLogin = (e) => {
+    e.preventDefault();
+    
+    // Simulated login (replace this with API call)
+    if (credentials.email === "admin@physio.com" && credentials.password === "password") {
+      navigate("/dashboard");
+    } else {
+      alert("Invalid credentials. Please try again.");
+    }
+  };
+
+   
   const {
     register,
     handleSubmit,
@@ -23,6 +44,7 @@ export default function Login() {
     console.log("Login Data:", data);
     // Handle authentication logic here
   };
+  
 
   return (
     <Container component="main" maxWidth="xs">
@@ -37,22 +59,34 @@ export default function Login() {
         <form onSubmit={handleSubmit(onSubmit)}>
           <TextField
             fullWidth
-            label="Email Address"
+            label="Email"
+            name="email"
+            type="email"
+            value={credentials.email}
+            onChange={handleChange}
             margin="normal"
+
+            /* 
             variant="outlined"
             {...register("email")}
             error={!!errors.email}
             helperText={errors.email?.message}
+            */
           />
           <TextField
             fullWidth
             label="Password"
+            name="password"
             type="password"
+            value={credentials.password}
+            onChange={handleChange}
             margin="normal"
+            /* 
             variant="outlined"
             {...register("password")}
             error={!!errors.password}
             helperText={errors.password?.message}
+            */
           />
           <Button
             type="submit"
