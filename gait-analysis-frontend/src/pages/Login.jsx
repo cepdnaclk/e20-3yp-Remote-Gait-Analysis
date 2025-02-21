@@ -4,7 +4,7 @@ import { Box, Button, Container, TextField, Typography, Paper } from "@mui/mater
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import Navbar from "../components/Navbar";
+
 // Form Validation Schema
 const schema = z.object({
   email: z.string().email("Invalid email format"),
@@ -12,10 +12,11 @@ const schema = z.object({
 });
 
 export default function Login() {
-
+  
   const navigate = useNavigate();
-  const [credentials, setCredentials] = useState({ email: "", password: "" });
 
+  //const [credentials, setCredentials] = useState({ email: "", password: "" });
+  /* 
   const handleChange = (e) => {
     setCredentials({ ...credentials, [e.target.name]: e.target.value });
   };
@@ -31,7 +32,7 @@ export default function Login() {
     }
   };
 
-   
+  */ 
   const {
     register,
     handleSubmit,
@@ -43,6 +44,12 @@ export default function Login() {
   const onSubmit = (data) => {
     console.log("Login Data:", data);
     // Handle authentication logic here
+    if (data.email === "admin@physio.com" && data.password === "password") {
+      navigate("/dashboard");
+    } else {
+      alert("Invalid credentials. Please try again.");
+    }
+
   };
   
 
@@ -56,14 +63,16 @@ export default function Login() {
           Log in to your account
         </Typography>
         
+        {/* Attach correct onSubmit handler */}
         <form onSubmit={handleSubmit(onSubmit)}>
           <TextField
             fullWidth
             label="Email"
             name="email"
             type="email"
-            value={credentials.email}
-            onChange={handleChange}
+            {...register("email")}
+            error={!!errors.email}
+            helperText={errors.email?.message}
             margin="normal"
 
             /* 
@@ -78,8 +87,9 @@ export default function Login() {
             label="Password"
             name="password"
             type="password"
-            value={credentials.password}
-            onChange={handleChange}
+            {...register("password")}
+            error={!!errors.password}
+            helperText={errors.password?.message}
             margin="normal"
             /* 
             variant="outlined"

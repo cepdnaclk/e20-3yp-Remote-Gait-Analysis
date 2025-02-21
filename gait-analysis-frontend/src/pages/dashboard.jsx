@@ -3,17 +3,34 @@ import { CircularProgress, Typography, Box, Grid, Paper } from "@mui/material";
 import PeopleIcon from "@mui/icons-material/People";
 
 export default function Dashboard() {
-  // Use the custom React Query hook
+
+  console.log("Dashboard Component Rendered!"); // Debugging log
+
+  // Fetch patient data using the custom hook
   const { data: patients, isLoading, error } = usePatients();
 
-  if (isLoading) return <CircularProgress />;
-  if (error) return <Typography color="error">Error: {error.message}</Typography>;
+  // Improved Loading UI
+  if (isLoading)
+    return (
+      <Box display="flex" justifyContent="center" alignItems="center" height="100vh">
+        <CircularProgress />
+        <Typography sx={{ ml: 2 }}>Loading Patient Data...</Typography>
+      </Box>
+    );
+
+  // Improved Error UI
+  if (error)
+    return (
+      <Typography color="error" align="center" mt={5}>
+        ❌ Error loading data: {error.message}
+      </Typography>
+    );
 
   return (
     <Box sx={{ padding: 3 }}>
       {/* Page Title */}
       <Typography variant="h4" gutterBottom>
-        🏥 Gait Analysis Dashboard
+        🏥 Gait Analysis Physiotherapists' Dashboard
       </Typography>
 
       {/* Summary Cards */}
@@ -23,7 +40,7 @@ export default function Dashboard() {
             <PeopleIcon sx={{ fontSize: 40, marginRight: 2 }} />
             <Box>
               <Typography variant="h6">Total Patients</Typography>
-              <Typography variant="h4">{patients ? patients.length : 0}</Typography>
+              <Typography variant="h4">{ patients?.length || 0}</Typography>
             </Box>
           </Paper>
         </Grid>
@@ -34,12 +51,19 @@ export default function Dashboard() {
         <Typography variant="h5" gutterBottom>
           👤 Recent Patients
         </Typography>
-        {patients?.map((patient) => (
-          <Paper key={patient.id} sx={{ padding: 2, marginBottom: 2 }}>
-            <Typography variant="h6">{patient.name}</Typography>
-            <Typography color="text.secondary">Age: {patient.age}</Typography>
-          </Paper>
-        ))}
+
+        {patients && patients.length > 0 ? (
+          patients.map((patient) => (
+
+            <Paper key={patient.id} sx={{ padding: 2, marginBottom: 2 }}>
+
+              <Typography variant="h6">{patient.name}</Typography>
+              <Typography color="text.secondary">Age: {patient.age}</Typography>
+            </Paper>
+          ))
+        ) : (
+          <Typography>No patients found</Typography>
+        )}
       </Box>
     </Box>
   );
