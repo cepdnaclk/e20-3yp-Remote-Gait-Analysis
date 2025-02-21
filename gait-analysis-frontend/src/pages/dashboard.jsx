@@ -1,10 +1,13 @@
 import { usePatients } from "../api/patients";
 import { CircularProgress, Typography, Box, Grid, Paper } from "@mui/material";
 import PeopleIcon from "@mui/icons-material/People";
+import { useNavigate } from "react-router-dom";
 
 export default function Dashboard() {
 
-  console.log("Dashboard Component Rendered!"); // Debugging log
+  const navigate = useNavigate(); // hook to navigate to different pages
+
+  // console.log("Dashboard Component Rendered!"); // Debugging log
 
   // Fetch patient data using the custom hook
   const { data: patients, isLoading, error } = usePatients();
@@ -55,8 +58,12 @@ export default function Dashboard() {
         {patients && patients.length > 0 ? (
           patients.map((patient) => (
 
-            <Paper key={patient.id} sx={{ padding: 2, marginBottom: 2 }}>
-
+            <Paper 
+              key={patient.id} 
+              sx={{ padding: 2, marginBottom: 2, cursor: "pointer", "&:hover": { backgroundColor: "#f5f5f5" }  }}
+              onClick={() => navigate(`/patient/${patient.id}`)} // navigate to patient profile
+            >
+              
               <Typography variant="h6">{patient.name}</Typography>
               <Typography color="text.secondary">Age: {patient.age}</Typography>
             </Paper>
