@@ -1,0 +1,17 @@
+# Ignore PlatformIO build and cache folders
+**/.pio/
+**/.vscode/
+**/build/
+**/libdeps/
+**/.cache/
+**/.clangd/
+**/.DS_Store
+
+# Ignore compiled binaries
+*.bin
+*.elf
+
+# Ignore Python virtual environment (if using one)
+**/.venv/
+
+
