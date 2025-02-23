@@ -136,6 +136,8 @@ void setup() {
   timeClient.begin();
   connectAWS();
 
+  client.setBufferSize(512);  //Increase buffer size to avoid payload limit issues
+
   // Handshake to ensure ESP32 #2 is ready
   bool sensorNodeReady = false;
   for (int i = 0; i < 20; i++) { // Retry up to 20 times
@@ -168,6 +170,7 @@ void setup() {
 
 void loop() {
     if (!client.connected()) {
+        Serial.println("MQTT Disconnected! Reconnecting...");
         connectAWS();
     }
     client.loop();
@@ -184,7 +187,7 @@ void loop() {
     String receivedData = "";
     bool dataReceived = false;
 
-    while (millis() - startTime < 100) {  // Wait up to 100ms for full response
+    while (millis() - startTime < 100) { // Wait up to 100ms for full response
         if (Serial2.available()) {
             receivedData = Serial2.readStringUntil('\n');
             if (receivedData.startsWith("{")) { // Validate JSON-like structure
@@ -194,16 +197,46 @@ void loop() {
                 String modifiedData = receivedData;
                 modifiedData.replace("{", "{ \"user_id\": \"" + user_id + "\", ");
 
-                // Check if MPU6050 data is included
-                if (modifiedData.indexOf("\"yaw\":") == -1) {
-                    Serial.println("Warning: MPU6050 data missing from payload!");
+                // Ensure all expected fields are included
+                if (modifiedData.indexOf("\"q0\":") == -1 || modifiedData.indexOf("\"yaw\":") == -1) {
+                    Serial.println("Warning: Some MPU6050 data missing from payload!");
                 }
+                
+                // Publish data to AWS IoT Core
+                Serial.println("Publishing to AWS IoT Core...");
+                Serial.println("Payload: " + modifiedData);
+                
+                //checking payload size
+                // int payloadSize = modifiedData.length();  // Get payload size in bytes
+                // Serial.print("Payload Size: ");
+                // Serial.print(payloadSize);
+                // Serial.println(" bytes");
+
+                //Confirm MQTT connection before publishing
+                // if (client.connected()) {
+                //     bool pubSuccess = client.publish("esp32/insole/data", modifiedData.c_str());
+                //     if (pubSuccess) {
+                //         Serial.println("Successfully published to AWS IoT Core.");
+                //     } else {
+                //         Serial.println("Failed to publish to AWS IoT Core!");
+                //     }
+                // } else {
+                //     Serial.println("MQTT client is not connected! Skipping publish.");
+                // }
+
+                // bool success = client.publish("esp32/insole/data", "{\"test\": \"hello\"}");
+                // if (success) {
+                //     Serial.println("Test message published successfully!");
+                // } else {
+                //     Serial.println("Test message failed!");
+                // }
 
                 // Publish data to AWS IoT Core
                 client.publish("esp32/insole/data", modifiedData.c_str());
 
+
                 dataReceived = true;
-                break;  // Exit the wait loop early once data is received
+                break; // Exit the wait loop early once data is received
             }
         }
     }
