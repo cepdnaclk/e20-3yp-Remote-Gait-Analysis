@@ -5,9 +5,10 @@ const fetchPatients = async () => {
   console.log("Fetching Patients...");
   
   const mockPatients = [
-    { id: 1, name: "John Doe", age: 45 },
-    { id: 2, name: "Jane Smith", age: 52 },
-    { id: 3, name: "Mark Johnson", age: 39 },
+    { id: 1, name: "Chamath Rupasinghe", age: 23 },
+    { id: 2, name: "Haritha Bandara", age: 24 },
+    { id: 3, name: "Yohan Johnson", age: 23 },
+    { id: 4, name: "Chamodi Senaratne", age: 23 },
   ];
 
   return new Promise((resolve) => {
