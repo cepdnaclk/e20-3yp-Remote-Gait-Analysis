@@ -117,7 +117,7 @@ MPU6050 mpu;
 
 // uncomment "OUTPUT_TEAPOT" if you want output that matches the
 // format used for the InvenSense teapot demo
-#define OUTPUT_TEAPOT
+//#define OUTPUT_TEAPOT
 
 
 
@@ -203,10 +203,10 @@ void setup() {
     devStatus = mpu.dmpInitialize();
 
     // supply your own gyro offsets here, scaled for min sensitivity
-    mpu.setXGyroOffset(54.00000);
-    mpu.setYGyroOffset(-3.00000);
-    mpu.setZGyroOffset(9.00000);
-    mpu.setZAccelOffset(1052.00000); // 1688 factory default for my test chip
+    mpu.setXGyroOffset(220);
+    mpu.setYGyroOffset(76);
+    mpu.setZGyroOffset(-85);
+    mpu.setZAccelOffset(1788); // 1688 factory default for my test chip
 
     // make sure it worked (returns 0 if so)
     if (devStatus == 0) {
@@ -292,7 +292,6 @@ void loop() {
             Serial.print(ypr[1] * 180/M_PI);
             Serial.print("\t");
             Serial.println(ypr[2] * 180/M_PI);
-            delay(1000);
         #endif
 
         #ifdef OUTPUT_READABLE_REALACCEL
