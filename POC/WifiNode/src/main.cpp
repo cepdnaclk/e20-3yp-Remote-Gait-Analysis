@@ -166,38 +166,52 @@ void setup() {
 }
 
 
-
-
-
 void loop() {
-  if (!client.connected()) {
-      connectAWS();
-  }
-  client.loop();
+    if (!client.connected()) {
+        connectAWS();
+    }
+    client.loop();
 
-  timeClient.update();
-  unsigned long timestamp = timeClient.getEpochTime();
+    timeClient.update();
+    unsigned long timestamp = timeClient.getEpochTime();
+    Serial2.printf("SYNC_TIME:%lu\n", timestamp);
+    delay(50);
 
-  Serial2.printf("SYNC_TIME:%lu\n", timestamp);
-  delay(50);
+    Serial2.println("REQ_DATA");
 
-  Serial2.println("REQ_DATA");
+    // Adjust wait time for MPU6050 processing
+    unsigned long startTime = millis();
+    String receivedData = "";
+    bool dataReceived = false;
 
-  if (Serial2.available()) {
-      String receivedData = Serial2.readStringUntil('\n');
-      if (receivedData.startsWith("{")) { // Basic validation
-          Serial.printf("Received Sensor Data: %s\n", receivedData.c_str());
+    while (millis() - startTime < 100) {  // Wait up to 100ms for full response
+        if (Serial2.available()) {
+            receivedData = Serial2.readStringUntil('\n');
+            if (receivedData.startsWith("{")) { // Validate JSON-like structure
+                Serial.printf("Received Sensor Data: %s\n", receivedData.c_str());
 
-          String modifiedData = receivedData;
-          modifiedData.replace("{", "{ \"user_id\": \"" + user_id + "\",");
-          client.publish("esp32/insole/data", modifiedData.c_str());
-      } else {
-          Serial.println("Invalid data received from ESP32 #2.");
-      }
-  } else {
-      Serial.println("No response from ESP32 #2.");
-  }
+                // Modify payload
+                String modifiedData = receivedData;
+                modifiedData.replace("{", "{ \"user_id\": \"" + user_id + "\", ");
 
-  delay(100);
+                // Check if MPU6050 data is included
+                if (modifiedData.indexOf("\"yaw\":") == -1) {
+                    Serial.println("Warning: MPU6050 data missing from payload!");
+                }
 
+                // Publish data to AWS IoT Core
+                client.publish("esp32/insole/data", modifiedData.c_str());
+
+                dataReceived = true;
+                break;  // Exit the wait loop early once data is received
+            }
+        }
+    }
+
+    if (!dataReceived) {
+        Serial.println("No response from ESP32 #2. Possible MPU6050 delay.");
+    }
+
+    delay(100);  // Keep loop execution stable
 }
+
