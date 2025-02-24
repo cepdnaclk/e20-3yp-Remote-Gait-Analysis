@@ -169,7 +169,7 @@ export default function Dashboard() {
       <Box sx={{ flexGrow: 1, padding: 3, marginLeft: "20px" }}>
         {/* ✅ Summary Cards Section (Always Visible) */}
         <Typography variant="h4" gutterBottom>
-          🏥 Welcome Back, Dr. Smith
+          🏥 Welcome Back, Dr. Keerthi Ilukkumbura
         </Typography>
         <Typography variant="subtitle1" color="text.secondary">
           Here's what's happening with your patients today.
