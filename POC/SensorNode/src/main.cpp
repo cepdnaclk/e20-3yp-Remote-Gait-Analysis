@@ -18,7 +18,12 @@ VectorInt16 aa;      // Raw acceleration
 VectorInt16 aaReal;  // Linear acceleration (gravity-free)
 VectorFloat gravity; // Gravity vector
 
-const int fsrPins[2] = {34, 32};  // Analog sensor pins
+
+// Define GPIO pins for 16 FSR sensors
+const int fsrPins[16] = {36, 39, 34, 35, 32, 33, 25, 26, 27, 14, 12, 13, 4, 0, 2, 15};
+//const int fsrPins[16] = {15, 2, 0, 4, 13, 12, 14, 27, 26, 25, 33, 32, 35, 34, 39, 36};
+
+
 unsigned long syncedTime = 0;
 unsigned long lastSyncTime = 0;
 
@@ -116,12 +121,12 @@ void loop() {
             Serial.println("Received REQ_DATA, sending sensor readings...");
             unsigned long currentTime = syncedTime + (millis() - lastSyncTime) / 1000;
 
-            int fsr1 = readFSR(fsrPins[0]);
-            int fsr2 = readFSR(fsrPins[1]);
-            
-            // Set static FSR values for unconnected sensors
-            int fsr3 = 0, fsr4 = 0, fsr5 = 0, fsr6 = 0, fsr7 = 0, fsr8 = 0;
-            int fsr9 = 0, fsr10 = 0, fsr11 = 0, fsr12 = 0, fsr13 = 0, fsr14 = 0, fsr15 = 0, fsr16 = 0;
+            // Read all 16 FSR sensors
+            int fsrValues[16];
+            for (int i = 0; i < 16; i++) {
+                fsrValues[i] = readFSR(fsrPins[i]);
+            }
+
 
             if (dmpReady && mpu.dmpGetCurrentFIFOPacket(fifoBuffer)) {
                 mpu.dmpGetQuaternion(&q, fifoBuffer);
@@ -131,11 +136,25 @@ void loop() {
                 mpu.dmpGetLinearAccel(&aaReal, &aa, &gravity); // Get gravity-free acceleration
             }
 
-            String sensorData = "{ \"timestamp\": " + String(currentTime) + 
-                                ", \"FSR_1\": " + String(fsr1) +
-                                ", \"FSR_2\": " + String(fsr2) +
-                                ", \"FSR_3\": " + String(fsr3) +
-                                ", \"FSR_4\": " + String(fsr4) +
+
+            // Construct JSON with all 16 FSR sensor readings
+            String sensorData = "{ \"timestamp\": " + String(currentTime) +
+                                ", \"FSR_1\": " + String(fsrValues[0]) +
+                                ", \"FSR_2\": " + String(fsrValues[1]) +
+                                ", \"FSR_3\": " + String(fsrValues[2]) +
+                                ", \"FSR_4\": " + String(fsrValues[3]) +
+                                ", \"FSR_5\": " + String(fsrValues[4]) +
+                                ", \"FSR_6\": " + String(fsrValues[5]) +
+                                ", \"FSR_7\": " + String(fsrValues[6]) +
+                                ", \"FSR_8\": " + String(fsrValues[7]) +
+                                ", \"FSR_9\": " + String(fsrValues[8]) +
+                                ", \"FSR_10\": " + String(fsrValues[9]) +
+                                ", \"FSR_11\": " + String(fsrValues[10]) +
+                                ", \"FSR_12\": " + String(fsrValues[11]) +
+                                ", \"FSR_13\": " + String(fsrValues[12]) +
+                                ", \"FSR_14\": " + String(fsrValues[13]) +
+                                ", \"FSR_15\": " + String(fsrValues[14]) +
+                                ", \"FSR_16\": " + String(fsrValues[15]) +
                                 ", \"yaw\": " + String(ypr[0] * 180 / M_PI) +
                                 ", \"pitch\": " + String(ypr[1] * 180 / M_PI) +
                                 ", \"roll\": " + String(ypr[2] * 180 / M_PI) +
