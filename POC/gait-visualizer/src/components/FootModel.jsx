@@ -6,7 +6,7 @@ import { Quaternion, Euler } from "three";
 function FootModel() {
   const obj = useLoader(OBJLoader, "/models/foot.obj");
   const footRef = useRef();
-  const [quaternionData, setQuaternionData] = useState(new Quaternion(0, 0, 0, 0)); // Default identity quaternion
+  const [quaternionData, setQuaternionData] = useState(new Quaternion(0, 0, 0, 1)); // Default identity quaternion
   const [isConnected, setIsConnected] = useState(false); // WebSocket connection status
 
   const DEAD_ZONE = 0.005; // Ignore small movements
@@ -19,7 +19,7 @@ function FootModel() {
       socket = new WebSocket("wss://8f8nk7hq11.execute-api.eu-north-1.amazonaws.com/POC/");
 
       socket.onopen = () => {
-        console.log("✅ WebSocket Connected");
+        console.log("WebSocket Connected");
         setIsConnected(true);
       };
 
@@ -75,8 +75,8 @@ function FootModel() {
     });
 
     if (footRef.current) {
-      footRef.current.rotation.set(-Math.PI / 2, 0, Math.PI/ 2); // Rotate 90 degrees along X-axis
-      console.log("📍 Model Pivot Position:", footRef.current.position);
+      footRef.current.rotation.set(0, 0, Math.PI/20); // Rotate 90 degrees along X-axis
+      console.log("Model Pivot Position:", footRef.current.position);
     }
   }, [obj]);
 
