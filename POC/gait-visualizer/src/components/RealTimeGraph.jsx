@@ -14,24 +14,35 @@ import useWebSocket from "../hooks/useWebSocket";
 const WS_URL = "wss://8f8nk7hq11.execute-api.eu-north-1.amazonaws.com/POC/";
 
 const RealTimeGraph = () => {
-  const sensorData = useWebSocket(WS_URL);
+  const { fsrData } = useWebSocket(WS_URL);
 
   // Generate distinct colors for 16 sensors
-  const generateLineColor = (index) => {
-    const hue = (index * 360) / 16;
-    return `hsl(${hue}, 75%, 50%)`;
-  };
+  const lineColors = Array.from({ length: 16 }, (_, i) =>
+    `hsl(${(i * 360) / 16}, 75%, 50%)` // Adjusted to be visible on white background
+  );
 
   return (
-    <div style={{ width: '100%', height: '90vh', margin: '0 auto' }}>
+    <div style={{ 
+      width: '100%', 
+      height: '85vh',
+      backgroundColor: '#ffffff', // White background
+      borderRadius: '10px',
+      padding: '20px',
+      boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
+    }}>
       <ResponsiveContainer>
         <LineChart
-          data={sensorData}
-          margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
+          data={fsrData}
+          margin={{ top: 20, right: 30, left: 30, bottom: 20 }}
         >
-          <CartesianGrid strokeDasharray="3 3" stroke="#666" />
+          <CartesianGrid 
+            strokeDasharray="3 3" 
+            stroke="#e0e0e0" // Light gray grid
+          />
+          
           <XAxis
             dataKey="time"
+            tick={{ fill: '#000000', fontSize: 12 }} // Black text
             tickFormatter={(unixTime) => 
               new Date(unixTime * 1000).toLocaleTimeString('en-US', {
                 hour: '2-digit',
@@ -39,30 +50,33 @@ const RealTimeGraph = () => {
                 second: '2-digit'
               })
             }
-            label={{
-              value: 'Time',
-              position: 'bottom',
-              offset: 0
-            }}
+            label={{ value: 'Time', position: 'bottom', fill: '#000000' }}
           />
+
           <YAxis
             domain={[-50, 50]}
-            label={{
-              value: 'Pressure Value',
-              angle: -90,
-              position: 'left'
-            }}
+            tick={{ fill: '#000000' }} // Black text
+            label={{ value: 'Pressure (N)', angle: -90, position: 'left', fill: '#000000' }}
           />
+
           <Tooltip
+            contentStyle={{
+              backgroundColor: '#ffffff', // White background
+              border: '1px solid #ddd',
+              borderRadius: '6px'
+            }}
             labelFormatter={(unixTime) => 
-              `Time: ${new Date(unixTime * 1000).toLocaleTimeString()}`
+              new Date(unixTime * 1000).toLocaleTimeString()
             }
           />
+
           <Legend
-            wrapperStyle={{ paddingTop: 20 }}
-            formatter={(value) => value.replace('_', ' ')}
+            wrapperStyle={{ paddingTop: 10 }}
+            formatter={(value) => (
+              <span style={{ color: '#000000' }}>{value.replace('_', ' ')}</span>
+            )}
           />
-          
+
           {Array.from({ length: 16 }, (_, i) => {
             const fsrKey = `FSR_${i + 1}`;
             return (
@@ -70,15 +84,16 @@ const RealTimeGraph = () => {
                 key={fsrKey}
                 type="monotone"
                 dataKey={fsrKey}
-                stroke={generateLineColor(i)}
-                strokeWidth={1.5}
+                stroke={lineColors[i]}
+                strokeWidth={2}
                 dot={false}
-                isAnimationActive={true}
+                isAnimationActive={false}
                 animationDuration={0}
                 activeDot={{
-                  r: 4,
-                  fill: generateLineColor(i),
-                  strokeWidth: 0
+                  r: 5,
+                  fill: lineColors[i],
+                  stroke: '#000000',
+                  strokeWidth: 2
                 }}
               />
             );
