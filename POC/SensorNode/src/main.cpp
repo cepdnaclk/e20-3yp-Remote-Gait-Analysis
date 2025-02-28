@@ -74,12 +74,15 @@ void setup() {
 
 
 int readFSR(int pin) {
-    int sum = 0;
-    for (int i = 0; i < 5; i++) {
-        sum += analogRead(pin);
-        delay(10);
-    }
-    return sum / 5;
+    //int sum = 0;
+    // for (int i = 0; i < 5; i++) {
+    //     sum += analogRead(pin);
+    //     delay(10);
+    // }
+    //return sum / 5;
+    int value = analogRead(pin);
+    delay(10);
+    return value;
 }
 
 void loop() {
