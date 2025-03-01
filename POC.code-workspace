@@ -1,0 +1,10 @@
+{
+	"folders": [
+		{
+			"path": "POC/WifiNode"
+		},
+		{
+			"path": "POC/SensorNode"
+		}
+	]
+}
