@@ -13,7 +13,7 @@ const FootModel = () => {
   // Configuration
   const MODEL_SCALE = 0.2;
   const POSITION = [0, -1, 0];
-  const SMOOTHING_FACTOR = 0.4;
+  const SMOOTHING_FACTOR = 0.15;
   const CORRECTION_QUAT = new Quaternion().setFromAxisAngle(
     new Vector3(1, 0, 0),
     -Math.PI / 2

@@ -1,0 +1,98 @@
+import { useRef, useEffect, useState } from "react";
+import { useFrame, useLoader } from "@react-three/fiber";
+import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader";
+import { Quaternion, Vector3 } from "three";
+
+function FootModel() {
+  const obj = useLoader(OBJLoader, "/models/foot.obj");
+  const footRef = useRef();
+  const wsRef = useRef(null);
+  
+  // State and refs for motion calculations
+  const [targetQuat] = useState(new Quaternion());
+  const posRef = useRef(new Vector3());
+  const velRef = useRef(new Vector3());
+  const lastTimeRef = useRef(0);
+  const correctionQuat = new Quaternion().setFromAxisAngle(
+    new Vector3(1, 0, 0), 
+    -Math.PI/2
+  );
+
+  // Tuning parameters
+  const DRIFT_DAMPING = 0.01; // Reduce velocity by 3% each frame
+  const ACCEL_SCALE = 5;   // Scale down acceleration values
+  const MAX_POSITION = 3;     // Prevent model from moving too far
+
+  useEffect(() => {
+    const connectWebSocket = () => {
+      wsRef.current = new WebSocket("wss://8f8nk7hq11.execute-api.eu-north-1.amazonaws.com/POC/");
+
+      wsRef.current.onmessage = (event) => {
+        try {
+          const { sensor_data, timestamp } = JSON.parse(event.data);
+          if (!sensor_data) return;
+
+          // 1. Process orientation
+          const { q0, q1, q2, q3, ax, ay, az } = sensor_data;
+          const rawQuat = new Quaternion(q1, q2, q3, q0).normalize();
+          targetQuat.copy(correctionQuat.clone().multiply(rawQuat));
+
+          // 2. Process translation
+          const deltaTime = (timestamp - lastTimeRef.current) || 0.01;
+          lastTimeRef.current = timestamp;
+
+          // Convert acceleration to Three.js coordinate system
+          const acceleration = new Vector3(
+            ax * ACCEL_SCALE,  // X remains same
+            az * ACCEL_SCALE,  // IMU Z becomes Three.js Y
+            -ay * ACCEL_SCALE  // IMU Y becomes Three.js Z (inverted)
+          );
+
+          // Integrate acceleration to velocity
+          velRef.current.add(acceleration.multiplyScalar(deltaTime));
+
+          // Apply drift damping
+          velRef.current.multiplyScalar(DRIFT_DAMPING);
+
+          // Integrate velocity to position
+          posRef.current.add(velRef.current.clone().multiplyScalar(deltaTime));
+
+          // Limit position range
+          posRef.current.clamp(
+            new Vector3(-MAX_POSITION, -MAX_POSITION, -MAX_POSITION),
+            new Vector3(MAX_POSITION, MAX_POSITION, MAX_POSITION)
+          );
+        } catch (error) {
+          console.error("Data error:", error);
+        }
+      };
+
+      wsRef.current.onclose = () => setTimeout(connectWebSocket, 5000);
+    };
+
+    connectWebSocket();
+    return () => wsRef.current?.close();
+  }, []);
+
+  useFrame(() => {
+    if (footRef.current) {
+      // Apply smoothed orientation
+      footRef.current.quaternion.slerp(targetQuat, 0.15);
+      
+      // Apply calculated position
+      footRef.current.position.copy(posRef.current);
+    }
+  });
+
+  return (
+    <primitive
+      ref={footRef}
+      object={obj}
+      scale={0.2}
+      position={[0, -1, 0]}
+      rotation={[-Math.PI/2, 0, 0]}
+    />
+  );
+}
+
+export default FootModel;
