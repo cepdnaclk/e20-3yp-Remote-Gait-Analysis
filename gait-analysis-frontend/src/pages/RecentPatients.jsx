@@ -166,7 +166,7 @@ export default function RecentPatients({ patients, isLoading, error }) {
                       color="primary"
                       onClick={(e) => {
                         e.stopPropagation(); // ✅ Prevent row click navigation
-                        navigate(`/patients/${patient.id}`);
+                        navigate(`/patients/${patient.id}`); // ✅ Navigate to real-time dashboard
                       }}
                     >
                       View Details
