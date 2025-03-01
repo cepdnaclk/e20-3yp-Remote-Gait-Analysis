@@ -1,11 +1,16 @@
-import { Box, Typography, Paper, Grid } from "@mui/material";
+import { Box, Typography, Paper, Grid, Button } from "@mui/material";
 import { useParams } from "react-router-dom"; // ✅ To get the patient ID
 import { usePatients } from "../api/patients";
 import HeatmapComponent from "../components/HeatmapComponent";
+import RealTimeGraph from "../components/RealTimeGraph";
+import YawRealTimeGraph from "../components/YawRealTimeGraph";
+import Scene from "../components/Scene";
+import { useState } from "react";
 
 export default function RealTimeDashboard() {
     const { id } = useParams(); // ✅ Get the patient ID from the URL
     const { data: patients, isLoading, error } = usePatients();
+    const [activeGraph, setActiveGraph] = useState('angles');
 
     if (isLoading)
         return <Typography>Loading Patient Data...</Typography>;
@@ -15,66 +20,57 @@ export default function RealTimeDashboard() {
     const patient = patients.find((p) => p.id === Number(id));
     if (!patient) return <Typography color="error">Patient not found</Typography>;
 
-    // Mock data for 16 sensors [FOR NOW]
-    const generateMockSensorData = () => {
-        const data = [];
-        const cellSize = 125; // 500 / 4
-        for (let i = 0; i < 16; i++) {
-
-            const col = i % 4;
-            const row = Math.floor(i / 4);
-            // Center of each cell
-            const x = col * cellSize + cellSize / 2; 
-            const y = row * cellSize + cellSize / 2; 
-            const value = Math.random() * 100; // Random pressure value
-            data.push({ x, y, value });
-        }
-        return data;
-    }; 
-    
-    const mockData = generateMockSensorData();
-    console.log("Mock Data for Heatmap:", mockData);
-
     return (
-        <Box sx={{ padding: 3 }}>
+        <Box sx={{ padding: 3, height: "100vh", overflow: "hidden" }}>
             <Typography variant="h4">Real-time Dashboard - {patient.name}</Typography>
 
-            {/* Section for displaying Heatmap, IMU Plots, Gait Graphs */}
-            <Grid container spacing={3} mt={3}>
-                {/* Heatmap */}
-                <Grid item xs={12} sm={6} md={4}>
-                    <Paper sx={{ padding: 2 }}>
+            <Grid container spacing={3} mt={3} sx={{ height: "85vh" }}>
+                {/* Heatmap - Reduce width */}
+                <Grid item xs={12} sm={3} md={3} sx={{ height: "100%" }}>
+                    <Paper sx={{ padding: 2, height: "100%", display: "flex", flexDirection: "column" }}>
                         <Typography variant="h6">Heatmap</Typography>
-                        <div id="heatmap-container">
-                            {/* Render Heatmap Component here */}
-                            <HeatmapComponent  key={patient.id} data={mockData} /> {/* Pass mock data */}
-                        </div>
+                        <Box sx={{ flexGrow: 1 }}>
+                            <HeatmapComponent key={patient.id} data={[]} /> {/* Placeholder */}
+                        </Box>
                     </Paper>
                 </Grid>
 
-                {/* IMU Plots */}
-                <Grid item xs={12} sm={6} md={4}>
-                    <Paper sx={{ padding: 2 }}>
-                        <Typography variant="h6">IMU Plots</Typography>
-                        <div id="imu-plots">
-                            {/* Insert IMU Plots component or graph here */}
-                        </div>
+                {/* Graphs - Increase width */}
+                <Grid item xs={12} sm={5} md={5} sx={{ height: "100%" }}>
+                    <Paper sx={{ padding: 2, height: "100%", display: "flex", flexDirection: "column" }}>
+                        <Typography variant="h6">Graphs</Typography>
+                        <Box sx={{ display: "flex", justifyContent: "center", gap: 1, mb: 2 }}>
+                            <Button
+                                variant={activeGraph === 'angles' ? 'contained' : 'outlined'}
+                                onClick={() => setActiveGraph('angles')}
+                                color="primary"
+                            >
+                                Angles
+                            </Button>
+                            <Button
+                                variant={activeGraph === 'pressure' ? 'contained' : 'outlined'}
+                                onClick={() => setActiveGraph('pressure')}
+                                color="secondary"
+                            >
+                                Pressure
+                            </Button>
+                        </Box>
+                        <Box sx={{ flexGrow: 1, minHeight: 0, overflow: "hidden" }}> {/* Ensure consistent height */}
+                            {activeGraph === 'angles' ? <YawRealTimeGraph /> : <RealTimeGraph />}
+                        </Box>
                     </Paper>
                 </Grid>
 
-                {/* Gait Graphs */}
-                <Grid item xs={12} sm={6} md={4}>
-                    <Paper sx={{ padding: 2 }}>
-                        <Typography variant="h6">Gait Graphs</Typography>
-                        <div id="gait-graphs">
-                            {/* Insert Gait Graphs component or chart here */}
-                        </div>
+                {/* 3D Foot Model */}
+                <Grid item xs={12} sm={4} md={4} sx={{ height: "100%" }}>
+                    <Paper sx={{ padding: 2, backgroundColor: "rgba(1, 1, 1, 0.81)", height: "100%", display: "flex", flexDirection: "column" }}>
+                        <Typography variant="h6" color="white">3D Foot Model</Typography>
+                        <Box sx={{ flexGrow: 1 }}>
+                            <Scene />
+                        </Box>
                     </Paper>
                 </Grid>
             </Grid>
         </Box>
-
     );
-
-
 }

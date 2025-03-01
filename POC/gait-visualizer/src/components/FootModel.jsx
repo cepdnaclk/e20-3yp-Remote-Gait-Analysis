@@ -1,99 +1,115 @@
 import { useRef, useEffect, useState } from "react";
 import { useFrame, useLoader } from "@react-three/fiber";
 import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader";
-import { Quaternion, Euler } from "three";
+import { Quaternion, Vector3 } from "three";
 
-function FootModel() {
-  const obj = useLoader(OBJLoader, "/models/foot.obj");
+const FootModel = () => {
   const footRef = useRef();
-  const [quaternionData, setQuaternionData] = useState(new Quaternion(0, 0, 0, 0)); // Default identity quaternion
-  const [isConnected, setIsConnected] = useState(false); // WebSocket connection status
+  const obj = useLoader(OBJLoader, "/models/foot.obj");
+  const [targetQuat, setTargetQuat] = useState(new Quaternion());
+  const wsRef = useRef(null);
+  const reconnectTimeoutRef = useRef(null);
 
-  const DEAD_ZONE = 0.005; // Ignore small movements
-  const smoothingFactor = 0.25; // Adjust to fine-tune responsiveness
+  // Configuration
+  const MODEL_SCALE = 0.2;
+  const POSITION = [0, -1, 0];
+  const SMOOTHING_FACTOR = 0.15;
+  const CORRECTION_QUAT = new Quaternion().setFromAxisAngle(
+    new Vector3(1, 0, 0),
+    -Math.PI / 2
+  );
 
-  useEffect(() => {
-    let socket;
+  const connectWebSocket = () => {
+    wsRef.current = new WebSocket("wss://8f8nk7hq11.execute-api.eu-north-1.amazonaws.com/POC/");
 
-    const connectWebSocket = () => {
-      socket = new WebSocket("wss://8f8nk7hq11.execute-api.eu-north-1.amazonaws.com/POC/");
-
-      socket.onopen = () => {
-        console.log("✅ WebSocket Connected");
-        setIsConnected(true);
-      };
-
-      socket.onmessage = (event) => {
-        try {
-          const data = JSON.parse(event.data);
-
-          if (data.sensor_data) {
-            let { q0, q1, q2, q3 } = data.sensor_data;
-
-            // Normalize quaternion only if necessary
-            const magnitude = Math.sqrt(q0 * q0 + q1 * q1 + q2 * q2 + q3 * q3);
-            if (Math.abs(magnitude - 1) > 0.001 && magnitude > 0) {
-              q0 /= magnitude;
-              q1 /= magnitude;
-              q2 /= magnitude;
-              q3 /= magnitude;
-            }
-
-            //const newQuaternion = new Quaternion(q1, q2, q3, q0);
-            const newQuaternion = new Quaternion(q1, q2, q3, q0);
-
-            // Apply dead zone filter to ignore minor changes
-            if (Math.abs(q1) > DEAD_ZONE || Math.abs(q2) > DEAD_ZONE || Math.abs(q3) > DEAD_ZONE) {
-              setQuaternionData(newQuaternion);
-            }
-          }
-        } catch (error) {
-          console.error("❌ Error parsing WebSocket data:", error);
-        }
-      };
-
-      socket.onerror = (error) => console.error("❌ WebSocket Error:", error);
-      
-      socket.onclose = () => {
-        console.warn("⚠️ WebSocket Disconnected. Reconnecting in 5s...");
-        setIsConnected(false);
-        setTimeout(connectWebSocket, 5000); // Retry connection after 5 seconds
-      };
+    wsRef.current.onopen = () => {
+      console.log("WebSocket connected");
+      if (reconnectTimeoutRef.current) {
+        clearTimeout(reconnectTimeoutRef.current);
+        reconnectTimeoutRef.current = null;
+      }
     };
 
-    connectWebSocket(); // Initial connection
+    wsRef.current.onmessage = (event) => {
+      try {
+        const { sensor_data } = JSON.parse(event.data);
+        if (!sensor_data) return;
 
-    return () => socket.close();
+        // Process quaternion data
+        const { q0, q1, q2, q3 } = sensor_data;
+        const norm = Math.sqrt(q0 ** 2 + q1 ** 2 + q2 ** 2 + q3 ** 2);
+        
+        const rawQuat = new Quaternion(
+          q1 / norm,
+          q2 / norm,
+          q3 / norm,
+          q0 / norm
+        );
+
+        const adjustedQuat = CORRECTION_QUAT.clone().multiply(rawQuat);
+        setTargetQuat(adjustedQuat);
+
+      } catch (error) {
+        console.error("Data parsing error:", error);
+      }
+    };
+
+    wsRef.current.onerror = (error) => {
+      console.error("WebSocket error:", error);
+    };
+
+    wsRef.current.onclose = () => {
+      console.log("WebSocket closed, reconnecting...");
+      if (!reconnectTimeoutRef.current) {
+        reconnectTimeoutRef.current = setTimeout(() => {
+          connectWebSocket();
+        }, 5000);
+      }
+    };
+  };
+
+  useEffect(() => {
+    connectWebSocket();
+
+    return () => {
+      // Cleanup WebSocket and reconnect attempts
+      if (wsRef.current) {
+        wsRef.current.close();
+        wsRef.current = null;
+      }
+      if (reconnectTimeoutRef.current) {
+        clearTimeout(reconnectTimeoutRef.current);
+        reconnectTimeoutRef.current = null;
+      }
+    };
   }, []);
 
-  // Center model geometry & Apply Initial Rotation
+  // Model initialization
   useEffect(() => {
     obj.traverse((child) => {
       if (child.isMesh) {
-        child.geometry.center(); // Centers the model
+        child.geometry.center();
+        child.geometry.computeVertexNormals();
       }
     });
-
-    if (footRef.current) {
-      footRef.current.rotation.set(-Math.PI / 2, 0, Math.PI/ 2); // Rotate 90 degrees along X-axis
-      console.log("📍 Model Pivot Position:", footRef.current.position);
-    }
   }, [obj]);
 
-  // Apply quaternion rotation with smoothing
+  // Smooth rotation updates
   useFrame(() => {
     if (footRef.current) {
-      footRef.current.quaternion.slerp(quaternionData, smoothingFactor);
-      console.log("📍 Current Position:", footRef.current.position);
-      console.log("🔄 Current Rotation (Euler):", footRef.current.rotation);
-      console.log("🌀 Current Rotation (Quaternion):", footRef.current.quaternion);
+      footRef.current.quaternion.slerp(targetQuat, SMOOTHING_FACTOR);
     }
   });
 
   return (
-    <primitive ref={footRef} object={obj} scale={0.2} position={[-2, 0, -1]} />
+    <primitive
+      ref={footRef}
+      object={obj}
+      scale={MODEL_SCALE}
+      position={POSITION}
+      rotation={[-Math.PI / 2, 0, 0]}
+    />
   );
-}
+};
 
 export default FootModel;
-
