@@ -31,7 +31,7 @@ const useWebSocket = (url) => {
 
           setFsrData(prev => {
             // Throttle updates to 10Hz (100ms between updates)
-            if (prev.length > 0 && (timestamp - prev[prev.length-1].time < 0.00001)) {
+            if (prev.length > 0 && (timestamp - prev[prev.length-1].time < 0.0001)) {
               return prev;
             }
             return [...prev.slice(-(MAX_HISTORY - 1)), fsrEntry];
