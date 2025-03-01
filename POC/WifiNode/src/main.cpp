@@ -245,6 +245,6 @@ void loop() {
         Serial.println("No response from ESP32 #2. Possible MPU6050 delay.");
     }
 
-    delay(100);  // Keep loop execution stable
+    delay(10);  // Keep loop execution stable
 }
 

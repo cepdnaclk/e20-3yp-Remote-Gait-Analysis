@@ -140,7 +140,7 @@ export default function Dashboard() {
       >
         <Box sx={{ padding: 2, textAlign: "center" }}>
           <Typography variant="h6" fontWeight="bold">
-            Gait-Mate
+            RehabGait
           </Typography>
         </Box>
 
