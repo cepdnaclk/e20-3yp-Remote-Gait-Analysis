@@ -58,7 +58,7 @@ export default function Settings() {
       
         <TextField fullWidth label="Name" value="Dr. Keerthi Ilukkumbura" sx={{ mt: 2 }} />
         <TextField fullWidth label="Email" value="keerthi@example.com" sx={{ mt: 2 }} />
-        <TextField fullWidth label="Phone Number" value="123-456-7890" sx={{ mt: 2 }} />
+        <TextField fullWidth label="Phone Number" value="071-466-7390" sx={{ mt: 2 }} />
       </Box>
 
       {/* Account Settings */}
