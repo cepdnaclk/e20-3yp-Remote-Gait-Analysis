@@ -37,7 +37,7 @@ export default function Navbar() {
   };
 
   return (
-    <AppBar position="fixed" sx={{ boxShadow: 2, bgcolor: "primary.main" }}>
+    <AppBar position="fixed" sx={{ boxShadow: 2, bgcolor: "rgba(255, 255, 255, 0.15)" }}>
       <Container maxWidth="lg">
         <CustomToolbar>
           {/* Logo */}
@@ -58,7 +58,7 @@ export default function Navbar() {
             <Button color="inherit" component={Link} to="/login">
               Login
             </Button>
-            <Button variant="contained" color="secondary" component={Link} to="/signup">
+            <Button color="inherit" component={Link} to="/signup">
               Sign Up
             </Button>
           </Box>
