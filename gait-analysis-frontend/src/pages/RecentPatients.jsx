@@ -127,7 +127,7 @@ export default function RecentPatients({ patients, isLoading, error }) {
                 <TableRow
                   key={patient.id}
                   sx={{ cursor: "pointer", "&:hover": { backgroundColor: "#f5f5f5" } }}
-                  onClick={() => navigate(`/patient/${patient.id}`)} // ✅ Navigate to patient profile
+                  onClick={() => navigate(`/patients/${patient.id}`)} // ✅ Navigate to patient profile
                 >
                   <TableCell>
                     <Typography>{patient.name}</Typography>
@@ -166,7 +166,7 @@ export default function RecentPatients({ patients, isLoading, error }) {
                       color="primary"
                       onClick={(e) => {
                         e.stopPropagation(); // ✅ Prevent row click navigation
-                        navigate(`/patient/${patient.id}`);
+                        navigate(`/patients/${patient.id}`); // ✅ Navigate to real-time dashboard
                       }}
                     >
                       View Details
