@@ -6,7 +6,7 @@ import { Quaternion, Euler } from "three";
 function FootModel() {
   const obj = useLoader(OBJLoader, "/models/foot.obj");
   const footRef = useRef();
-  const [quaternionData, setQuaternionData] = useState(new Quaternion(0, 0, 0, 1)); // Default identity quaternion
+  const [quaternionData, setQuaternionData] = useState(new Quaternion(0, 0, 0, 0)); // Default identity quaternion
   const [isConnected, setIsConnected] = useState(false); // WebSocket connection status
 
   const DEAD_ZONE = 0.005; // Ignore small movements
@@ -40,7 +40,7 @@ function FootModel() {
             }
 
             //const newQuaternion = new Quaternion(q1, q2, q3, q0);
-            const newQuaternion = new Quaternion(q1, q2, q3, q0);
+            const newQuaternion = new Quaternion(q1, q2, q3, -1*q0);
 
             // Apply dead zone filter to ignore minor changes
             if (Math.abs(q1) > DEAD_ZONE || Math.abs(q2) > DEAD_ZONE || Math.abs(q3) > DEAD_ZONE) {
