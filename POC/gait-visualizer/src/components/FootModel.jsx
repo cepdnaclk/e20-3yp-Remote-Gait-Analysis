@@ -102,9 +102,14 @@ const FootModel = () => {
   });
 
   return (
-    <primitive ref={footRef} object={obj} scale={0.2} position={[-2, 0, -1]} />
+    <primitive
+      ref={footRef}
+      object={obj}
+      scale={MODEL_SCALE}
+      position={POSITION}
+      rotation={[-Math.PI / 2, 0, 0]}
+    />
   );
-}
+};
 
 export default FootModel;
-
