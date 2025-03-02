@@ -22,14 +22,14 @@ const RealTimeGraph = () => {
   );
 
   return (
-    <div style={{ 
-      width: '100%', 
-      height: '85vh',
-      backgroundColor: '#ffffff', // White background
-      borderRadius: '10px',
-      padding: '20px',
-      boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
-    }}>
+    // <div style={{ 
+    //   width: '100%', 
+    //   height: '100vh',
+    //   backgroundColor: '#ffffff', // White background
+    //   borderRadius: '10px',
+    //   padding: '20px',
+    //   boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
+    // }}>
       <ResponsiveContainer>
         <LineChart
           data={fsrData}
@@ -69,8 +69,8 @@ const RealTimeGraph = () => {
               new Date(unixTime * 1000).toLocaleTimeString()
             }
           />
-
-          <Legend
+          
+          <Legend 
             wrapperStyle={{ paddingTop: 10 }}
             formatter={(value) => (
               <span style={{ color: '#000000' }}>{value.replace('_', ' ')}</span>
@@ -100,7 +100,7 @@ const RealTimeGraph = () => {
           })}
         </LineChart>
       </ResponsiveContainer>
-    </div>
+    //</div>
   );
 };
 

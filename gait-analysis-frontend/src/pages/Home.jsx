@@ -1,50 +1,46 @@
-import {
-  AppBar,
-  Toolbar,
-  Typography,
-  Button,
-  Box,
-  Container,
-  Grid,
-  Card,
-  CardContent,
-} from "@mui/material";
+import React from "react";
+import { Box, Container, Grid, Card, CardContent, Typography, Button } from "@mui/material";
+
 import { Link } from "react-router-dom";
-import MainImage from "../assets/images/gait.jpg"; // Webpack will process this correctly
+import Navbar from "../components/Navbar";
+import MainImage from "../assets/images/gait.jpg";
+import DirectionsWalkIcon from "@mui/icons-material/DirectionsWalk";
+import ShowChartIcon from "@mui/icons-material/ShowChart";
+import CloudDoneIcon from "@mui/icons-material/CloudDone";
+import EventAvailableIcon from "@mui/icons-material/EventAvailable";
 
 export default function Home() {
   return (
-    <Box>
-      {/* Navbar */}
-      <AppBar position="fixed" sx={{ backgroundColor: "#1976D2", zIndex: 3 }}>
-        <Toolbar>
-          <Typography variant="h6" sx={{ flexGrow: 1 }}>
-            Remote Gait Analysis
-          </Typography>
-          <Button color="inherit" component={Link} to="/login">
-            Login
-          </Button>
-          <Button color="inherit" component={Link} to="/signup">
-            Sign Up
-          </Button>
-        </Toolbar>
-      </AppBar>
+    <Box sx={{ width: "100vw", overflowX: "hidden" }}>
+      <Navbar />
+
+      {/* 🔹 Fix: Set minHeight instead of height to allow scrolling */}
+      <Box
+        sx={{
+          position: "absolute",
+          width: "100%",
+          minHeight: "100vh",  // ✅ Changed from height: 100vh
+          top: 0,
+          left: 0,
+          zIndex: -1,
+          background: "radial-gradient(circle, rgb(6, 40, 97), rgb(28, 32, 57))",
+        }}
+      />
 
       {/* Hero Section */}
       <Box
         sx={{
           position: "relative",
           width: "100%",
-          minHeight: "100vh",
+          minHeight: "100vh",  // ✅ Changed to minHeight
           display: "flex",
           flexDirection: "column",
           justifyContent: "center",
           alignItems: "center",
-          paddingTop: "80px", // Adjusted for fixed navbar
+          paddingTop: "80px",
           overflow: "hidden",
         }}
       >
-        {/* Background Image */}
         <img
           src={MainImage}
           alt="Gait Analysis"
@@ -57,10 +53,10 @@ export default function Home() {
             left: 0,
             right: 0,
             zIndex: 0,
+            opacity: 0.3,
           }}
         />
 
-        {/* Overlay */}
         <Box
           sx={{
             position: "absolute",
@@ -68,27 +64,31 @@ export default function Home() {
             left: 0,
             width: "100%",
             height: "100%",
-            backgroundColor: "rgba(0, 0, 0, 0.5)",
+            background: "linear-gradient(to bottom, rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.4))",
             zIndex: 1,
           }}
         />
 
-        {/* Content */}
+
         <Box
           sx={{
             position: "relative",
             zIndex: 2,
             textAlign: "center",
-            maxWidth: { xs: "90%", md: "80%" },
+
+            maxWidth: { xs: "90%", md: "70%" },
             color: "white",
+            animation: "fadeIn 1.5s ease-in-out",
+
           }}
         >
           <Typography variant="h2" fontWeight="bold">
             Remote Gait Analysis System
           </Typography>
           <Typography variant="h5" sx={{ mt: 2, mb: 3 }}>
-            Empowering physiotherapists with cutting-edge technology to monitor
-            and improve patient mobility—anytime, anywhere.
+
+            Empowering physiotherapists with cutting-edge technology to monitor and improve patient mobility Anytime, Anywhere.
+
           </Typography>
           <Button
             variant="contained"
@@ -100,47 +100,56 @@ export default function Home() {
           >
             Get Started
           </Button>
-          <Button
-            variant="contained"
-            color="inherit"
-            size="large"
-            sx={{ color: "#1565C0" }}
-          >
+
+          <Button variant="outlined" color="inherit" size="large" component={Link} to="/about" sx={{ ml: 2 }}>
+
             Learn More
           </Button>
         </Box>
       </Box>
 
       {/* Features Section */}
-      <Container sx={{ my: 6 }}>
+      <Container sx={{ my: 8 }}>
+        <Typography variant="h4" fontWeight="bold" textAlign="center" sx={{ mb: 4, color: "white", textShadow: "2px 2px 5px rgba(0, 0, 0, 0.5)" }}>
+          Why Choose RehabGait?
+        </Typography>
         <Grid container spacing={4} justifyContent="center">
-          {[
-            {
-              title: "Real-Time Monitoring",
-              desc: "Track and analyze gait patterns remotely in real-time.",
-            },
-            {
-              title: "Data Visualization",
-              desc: "View gait reports with interactive graphs and charts.",
-            },
-            {
-              title: "Secure & Cloud-Based",
-              desc: "Securely store patient data for easy access and analysis.",
-            },
-            {
-              title: "Smart Appointment Management",
-              desc: "Streamline scheduling and follow-ups.",
-            },
-          ].map((feature, index) => (
+
+          {[{
+            title: "Real-Time Monitoring", 
+            desc: "Track and analyze gait patterns remotely in real-time.", 
+            icon: <DirectionsWalkIcon fontSize="large" /> 
+          }, {
+            title: "Data Visualization", 
+            desc: "View gait reports with interactive graphs and charts.", 
+            icon: <ShowChartIcon fontSize="large" /> 
+          }, {
+            title: "Secure & Cloud-Based", 
+            desc: "Securely store patient data for easy access and analysis.", 
+            icon: <CloudDoneIcon fontSize="large" /> 
+          }, {
+            title: "Smart Appointment Management", 
+            desc: "Streamline scheduling and follow-ups.", 
+            icon: <EventAvailableIcon fontSize="large" /> 
+          }].map((feature, index) => (
+
             <Grid item xs={12} sm={6} md={4} key={index}>
               <Card
                 sx={{
                   textAlign: "center",
                   padding: 3,
-                  backgroundColor: "#d6e4ea",
+
+                  backgroundColor: "rgba(255, 255, 255, 0.6)",
+                  borderRadius: "16px",
+                  transition: "0.3s",
+                  "&:hover": { boxShadow: 6, transform: "scale(1.05)" },
                 }}
               >
                 <CardContent>
+                  <Box sx={{ display: "flex", justifyContent: "center", mb: 1, color: "#1976D2" }}>
+                    {feature.icon}
+                  </Box>
+
                   <Typography variant="h6" fontWeight="bold">
                     {feature.title}
                   </Typography>
@@ -153,18 +162,10 @@ export default function Home() {
       </Container>
 
       {/* Footer */}
-      <Box
-        sx={{
-          backgroundColor: "#1565C0",
-          color: "white",
-          textAlign: "center",
-          padding: 2,
-          mt: 5,
-        }}
-      >
-        <Typography variant="body2">
-          &copy; 2025 Gait Mate. All Rights Reserved.
-        </Typography>
+
+      <Box sx={{ backgroundColor: "black", color: "white", textAlign: "center", padding: 1, mt: 1 }}>
+        <Typography variant="body2">&copy; RehabGait 2025. All Rights Reserved.</Typography>
+
       </Box>
     </Box>
   );

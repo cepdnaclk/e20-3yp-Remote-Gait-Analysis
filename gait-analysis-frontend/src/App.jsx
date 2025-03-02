@@ -6,6 +6,7 @@ import Dashboard from "./pages/Dashboard";
 import PatientProfile from "./pages/PatientProfile";
 import RealTimeDashboard from "./pages/RealTimeDashboard";
 import Signup from "./pages/Signup";
+import AboutUs from "./pages/AboutUs";
 
 // Create a Query Client instance for managing API data fetching, caching, and state updates
 const queryClient = new QueryClient();
@@ -25,6 +26,8 @@ export default function App() {
           <Route path="/login" element={<Login />} />
           {/* SignUp Page Route */}
           <Route path="/Signup" element={<Signup />} />
+          {/* About Us Page Route */}
+          <Route path="/about" element={<AboutUs />} />
           {/* Dashboard Page Route */}
           <Route path="/dashboard" element={<Dashboard />} />
           {/* Patient Profile Page Route */}
