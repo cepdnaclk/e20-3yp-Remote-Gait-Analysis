@@ -14,6 +14,7 @@ import RealTimeGraph from "../components/RealTimeGraph";
 import YawRealTimeGraph from "../components/YawRealTimeGraph";
 import Scene from "../components/Scene";
 import { useState } from "react";
+import HeatmapWebSock3ForceOptimized from "../components/heatmap/HeatmapWebSock3ForceOptimized.jsx";
 
 export default function RealTimeDashboard() {
   const { id } = useParams(); // ✅ Get the patient ID from the URL
@@ -50,7 +51,8 @@ export default function RealTimeDashboard() {
               {/* <HeatmapComponent  key={patient.id} data={mockData} />  */}
               {/* <InsoleHeatmapPattern /> */}
               {/* <HeatmapWebSock2 /> */}
-              <HeatmapWebSock3Force />
+              <HeatmapWebSock3ForceOptimized />
+              {/* <HeatmapWebSock3Force /> */}
               {/* <WebSocketCheck /> */}
               {/* <InsoleHeatmap /> */}
               {/* Pass mock data */}
@@ -93,7 +95,9 @@ export default function RealTimeDashboard() {
               {activeGraph === "angles" ? (
                 <YawRealTimeGraph />
               ) : (
+                // <div></div>
                 <RealTimeGraph />
+                // <div></div>
               )}
             </Box>
           </Paper>

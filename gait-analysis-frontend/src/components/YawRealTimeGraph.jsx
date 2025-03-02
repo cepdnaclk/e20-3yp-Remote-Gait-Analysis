@@ -42,13 +42,13 @@
 //           margin={{ top: 20, right: 30, left: 30, bottom: 20 }}
 //         >
 //           <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
-          
+
 //           <XAxis
 //             dataKey="timestamp"
 //             tick={{ fill: '#000000', fontSize: 12 }}
 //             tickFormatter={(timestamp) => {
-//               const jsTimestamp = timestamp?.toString().length === 10 
-//                 ? timestamp * 1000 
+//               const jsTimestamp = timestamp?.toString().length === 10
+//                 ? timestamp * 1000
 //                 : timestamp;
 //               return new Date(jsTimestamp)
 //                 .toLocaleTimeString('en-US', {
@@ -63,11 +63,11 @@
 //             domain={[0, 360]}
 //             tickCount={7}
 //             tick={{ fill: '#000000' }}
-//             label={{ 
-//               value: 'Yaw (°)', 
-//               angle: -90, 
-//               position: 'left', 
-//               fill: '#000000' 
+//             label={{
+//               value: 'Yaw (°)',
+//               angle: -90,
+//               position: 'left',
+//               fill: '#000000'
 //             }}
 //           />
 
@@ -77,7 +77,7 @@
 //               border: '1px solid #ddd',
 //               borderRadius: '6px'
 //             }}
-//             labelFormatter={(timestamp) => 
+//             labelFormatter={(timestamp) =>
 //               new Date(timestamp).toLocaleTimeString([], {
 //                 hour: '2-digit',
 //                 minute: '2-digit',
@@ -96,11 +96,11 @@
 //             strokeWidth={2}
 //             dot={false}
 //             isAnimationActive={false}
-//             activeDot={{ 
-//               r: 5, 
-//               fill: "blue", 
-//               stroke: '#000000', 
-//               strokeWidth: 2 
+//             activeDot={{
+//               r: 5,
+//               fill: "blue",
+//               stroke: '#000000',
+//               strokeWidth: 2
 //             }}
 //           />
 //         </LineChart>
@@ -110,9 +110,6 @@
 // };
 
 // export default YawRealTimeGraph;
-
-
-
 
 // // YawRealTimeGraph.js
 // import React, { useState, useEffect } from "react";
@@ -158,13 +155,13 @@
 //           margin={{ top: 20, right: 30, left: 30, bottom: 20 }}
 //         >
 //           <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
-          
+
 //           <XAxis
 //             dataKey="timestamp"
 //             tick={{ fill: '#000000', fontSize: 12 }}
 //             tickFormatter={(timestamp) => {
-//               const jsTimestamp = timestamp?.toString().length === 10 
-//                 ? timestamp * 1000 
+//               const jsTimestamp = timestamp?.toString().length === 10
+//                 ? timestamp * 1000
 //                 : timestamp;
 //               return new Date(jsTimestamp)
 //                 .toLocaleTimeString('en-US', {
@@ -179,11 +176,11 @@
 //             domain={[0, 360]}
 //             tickCount={7}
 //             tick={{ fill: '#000000' }}
-//             label={{ 
-//               value: 'Yaw (°)', 
-//               angle: -90, 
-//               position: 'left', 
-//               fill: '#000000' 
+//             label={{
+//               value: 'Yaw (°)',
+//               angle: -90,
+//               position: 'left',
+//               fill: '#000000'
 //             }}
 //           />
 
@@ -193,7 +190,7 @@
 //               border: '1px solid #ddd',
 //               borderRadius: '6px'
 //             }}
-//             labelFormatter={(timestamp) => 
+//             labelFormatter={(timestamp) =>
 //               new Date(timestamp).toLocaleTimeString([], {
 //                 hour: '2-digit',
 //                 minute: '2-digit',
@@ -212,11 +209,11 @@
 //             strokeWidth={2}
 //             dot={false}
 //             isAnimationActive={false}
-//             activeDot={{ 
-//               r: 5, 
-//               fill: "blue", 
-//               stroke: '#000000', 
-//               strokeWidth: 2 
+//             activeDot={{
+//               r: 5,
+//               fill: "blue",
+//               stroke: '#000000',
+//               strokeWidth: 2
 //             }}
 //           />
 //         </LineChart>
@@ -228,7 +225,6 @@
 
 // export default YawRealTimeGraph;
 
-
 import React, { useState, useEffect } from "react";
 import {
   LineChart,
@@ -238,20 +234,21 @@ import {
   CartesianGrid,
   Tooltip,
   Legend,
-  ResponsiveContainer
+  ResponsiveContainer,
 } from "recharts";
-import useWebSocket from "../hooks/useWebSocket";
+// import useWebSocket from "../hooks/useWebSocket";
+import useWebSocketGraph from "../hooks/useWebSocketGraph";
 
 const WS_URL = "wss://8f8nk7hq11.execute-api.eu-north-1.amazonaws.com/POC/";
 const MAX_HISTORY = 30;
 
 const YawRealTimeGraph = () => {
-  const { imuData } = useWebSocket(WS_URL);
+  const { imuData } = useWebSocketGraph(WS_URL);
   const [angleHistory, setAngleHistory] = useState([]);
 
   useEffect(() => {
     if (imuData?.orientation) {
-      setAngleHistory(prev => [...prev.slice(-(MAX_HISTORY-1)), imuData]);
+      setAngleHistory((prev) => [...prev.slice(-(MAX_HISTORY - 1)), imuData]);
     }
   }, [imuData]);
 
@@ -262,47 +259,47 @@ const YawRealTimeGraph = () => {
         margin={{ top: 20, right: 30, left: 30, bottom: 20 }}
       >
         <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
-        
+
         <XAxis
           dataKey="timestamp"
-          tick={{ fill: '#000000', fontSize: 12 }}
-          tickFormatter={(unixTime) => 
-            new Date(unixTime * 1000).toLocaleTimeString('en-US', {
-              hour: '2-digit',
-              minute: '2-digit',
-              second: '2-digit'
+          tick={{ fill: "#000000", fontSize: 12 }}
+          tickFormatter={(unixTime) =>
+            new Date(unixTime * 1000).toLocaleTimeString("en-US", {
+              hour: "2-digit",
+              minute: "2-digit",
+              second: "2-digit",
             })
           }
-          label={{ value: 'Time', position: 'bottom', fill: '#000000'  }}
+          label={{ value: "Time", position: "bottom", fill: "#000000" }}
         />
 
         <YAxis
           domain={[-180, 360]}
           tickCount={7}
-          tick={{ fill: '#000000' }}
-          label={{ 
-            value: 'Angle (°)', 
-            angle: -90, 
-            position: 'left', 
-            fill: '#000000' 
+          tick={{ fill: "#000000" }}
+          label={{
+            value: "Angle (°)",
+            angle: -90,
+            position: "left",
+            fill: "#000000",
           }}
         />
 
         <Tooltip
           contentStyle={{
-            backgroundColor: '#ffffff',
-            border: '1px solid #ddd',
-            borderRadius: '6px'
+            backgroundColor: "#ffffff",
+            border: "1px solid #ddd",
+            borderRadius: "6px",
           }}
           formatter={(value, name) => [
             `${value.toFixed(2)}°`,
-            name.replace('orientation.', '')
+            name.replace("orientation.", ""),
           ]}
-          labelFormatter={(timestamp) => 
+          labelFormatter={(timestamp) =>
             new Date(timestamp).toLocaleTimeString([], {
-              hour: '2-digit',
-              minute: '2-digit',
-              second: '2-digit'
+              hour: "2-digit",
+              minute: "2-digit",
+              second: "2-digit",
             })
           }
         />
