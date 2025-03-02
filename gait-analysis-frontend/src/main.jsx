@@ -4,6 +4,7 @@ import App from "./App";
 import { ThemeProvider } from "@mui/material/styles";
 import theme from "./theme";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import "./index.css";
 
 // Create a Query Client instance
 const queryClient = new QueryClient();

@@ -10,20 +10,28 @@ import EventAvailableIcon from "@mui/icons-material/EventAvailable";
 
 export default function Home() {
   return (
-    <Box
-      sx={{
-        background: "radial-gradient(circle, rgb(6, 40, 97), rgb(28, 32, 57))",
-        minHeight: "100vh",
-      }}
-    >
+    <Box sx={{ width: "100vw", overflowX: "hidden" }}>
       <Navbar />
-      
+
+      {/* 🔹 Fix: Set minHeight instead of height to allow scrolling */}
+      <Box
+        sx={{
+          position: "absolute",
+          width: "100%",
+          minHeight: "100vh",  // ✅ Changed from height: 100vh
+          top: 0,
+          left: 0,
+          zIndex: -1,
+          background: "radial-gradient(circle, rgb(6, 40, 97), rgb(28, 32, 57))",
+        }}
+      />
+
       {/* Hero Section */}
       <Box
         sx={{
           position: "relative",
           width: "100%",
-          minHeight: "100vh",
+          minHeight: "100vh",  // ✅ Changed to minHeight
           display: "flex",
           flexDirection: "column",
           justifyContent: "center",
@@ -78,8 +86,7 @@ export default function Home() {
           <Button variant="contained" color="primary" size="large" component={Link} to="/signup" sx={{ mr: 2 }}>
             Get Started
           </Button>
-          <Button variant="outlined" color="inherit" size="large" component={Link} to="/about" sx={{ ml: 2,"&:hover": {
-              backgroundColor: "rgba(255, 255, 255, 0.15)", }}}>
+          <Button variant="outlined" color="inherit" size="large" component={Link} to="/about" sx={{ ml: 2 }}>
             Learn More
           </Button>
         </Box>
@@ -135,7 +142,7 @@ export default function Home() {
       </Container>
 
       {/* Footer */}
-      <Box sx={{ backgroundColor: "#0d47a1", color: "white", textAlign: "center", padding: 3, mt: 5 }}>
+      <Box sx={{ backgroundColor: "black", color: "white", textAlign: "center", padding: 1, mt: 1 }}>
         <Typography variant="body2">&copy; RehabGait 2025. All Rights Reserved.</Typography>
       </Box>
     </Box>
