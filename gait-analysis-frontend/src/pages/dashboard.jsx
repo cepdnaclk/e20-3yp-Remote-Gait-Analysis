@@ -89,7 +89,7 @@ export default function Dashboard() {
     );
 
   return (
-    <Box sx={{ display: "flex", height: "100vh", bgcolor: "#F5F5F5" }}>
+    <Box sx={{ display: "flex", minheight: "100vh", bgcolor: "rgb(208, 218, 223)" }}>
       
       {/* Sidebar */}
       <Drawer
