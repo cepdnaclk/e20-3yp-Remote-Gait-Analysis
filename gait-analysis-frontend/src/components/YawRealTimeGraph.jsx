@@ -1,231 +1,4 @@
-// import React, { useState, useEffect } from "react";
-// import {
-//   LineChart,
-//   Line,
-//   XAxis,
-//   YAxis,
-//   CartesianGrid,
-//   Tooltip,
-//   Legend,
-//   ResponsiveContainer
-// } from "recharts";
-// import useWebSocket from "../hooks/useWebSocket";
-
-// const WS_URL = "wss://8f8nk7hq11.execute-api.eu-north-1.amazonaws.com/POC/";
-// const MAX_HISTORY = 30;
-
-// const YawRealTimeGraph = () => {
-//   const { imuData } = useWebSocket(WS_URL);
-//   const [yawHistory, setYawHistory] = useState([]);
-
-//   useEffect(() => {
-//     if (imuData?.orientation?.yaw !== undefined) {
-//       setYawHistory(prev => {
-//         const newHistory = [...prev, imuData];
-//         return newHistory.slice(-MAX_HISTORY);
-//       });
-//     }
-//   }, [imuData]);
-
-//   return (
-//     <div style={{
-//       width: '100%',
-//       height: '85vh',
-//       backgroundColor: '#ffffff',
-//       borderRadius: '10px',
-//       padding: '20px',
-//       boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
-//     }}>
-//       <ResponsiveContainer>
-//         <LineChart
-//           data={yawHistory}
-//           margin={{ top: 20, right: 30, left: 30, bottom: 20 }}
-//         >
-//           <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
-
-//           <XAxis
-//             dataKey="timestamp"
-//             tick={{ fill: '#000000', fontSize: 12 }}
-//             tickFormatter={(timestamp) => {
-//               const jsTimestamp = timestamp?.toString().length === 10
-//                 ? timestamp * 1000
-//                 : timestamp;
-//               return new Date(jsTimestamp)
-//                 .toLocaleTimeString('en-US', {
-//                   minute: '2-digit',
-//                   second: '2-digit'
-//                 });
-//             }}
-//             label={{ value: 'Time', position: 'bottom', fill: '#000000' }}
-//           />
-
-//           <YAxis
-//             domain={[0, 360]}
-//             tickCount={7}
-//             tick={{ fill: '#000000' }}
-//             label={{
-//               value: 'Yaw (°)',
-//               angle: -90,
-//               position: 'left',
-//               fill: '#000000'
-//             }}
-//           />
-
-//           <Tooltip
-//             contentStyle={{
-//               backgroundColor: '#ffffff',
-//               border: '1px solid #ddd',
-//               borderRadius: '6px'
-//             }}
-//             labelFormatter={(timestamp) =>
-//               new Date(timestamp).toLocaleTimeString([], {
-//                 hour: '2-digit',
-//                 minute: '2-digit',
-//                 second: '2-digit'
-//               })
-//             }
-//           />
-
-//           <Legend wrapperStyle={{ paddingTop: 10 }} />
-
-//           <Line
-//             name="Yaw Angle"
-//             type="monotone"
-//             dataKey="orientation.yaw"
-//             stroke="blue"
-//             strokeWidth={2}
-//             dot={false}
-//             isAnimationActive={false}
-//             activeDot={{
-//               r: 5,
-//               fill: "blue",
-//               stroke: '#000000',
-//               strokeWidth: 2
-//             }}
-//           />
-//         </LineChart>
-//       </ResponsiveContainer>
-//     </div>
-//   );
-// };
-
-// export default YawRealTimeGraph;
-
-// // YawRealTimeGraph.js
-// import React, { useState, useEffect } from "react";
-// import {
-//   LineChart,
-//   Line,
-//   XAxis,
-//   YAxis,
-//   CartesianGrid,
-//   Tooltip,
-//   Legend,
-//   ResponsiveContainer
-// } from "recharts";
-// import useWebSocket from "../hooks/useWebSocket";
-
-// const WS_URL = "wss://8f8nk7hq11.execute-api.eu-north-1.amazonaws.com/POC/";
-// const MAX_HISTORY = 30;
-
-// const YawRealTimeGraph = () => {
-//   const { imuData } = useWebSocket(WS_URL);
-//   const [yawHistory, setYawHistory] = useState([]);
-
-//   useEffect(() => {
-//     if (imuData?.orientation?.yaw !== undefined) {
-//       setYawHistory(prev => [...prev.slice(-(MAX_HISTORY-1)), imuData]);
-//     }
-//   }, [imuData]);
-
-//   return (
-//     // <div style={{
-//     //   width: '100%',
-//     //   height: '100%', // Changed to 100%
-//     //   backgroundColor: '#ffffff',
-//     //   borderRadius: '10px',
-//     //   padding: '20px',
-//     //   boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
-//     // }}>
-//       <ResponsiveContainer width="100%" height="100%">
-//         {/* Rest of the component remains the same */}
-//         {/* <ResponsiveContainer> */}
-//         <LineChart
-//           data={yawHistory}
-//           margin={{ top: 20, right: 30, left: 30, bottom: 20 }}
-//         >
-//           <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
-
-//           <XAxis
-//             dataKey="timestamp"
-//             tick={{ fill: '#000000', fontSize: 12 }}
-//             tickFormatter={(timestamp) => {
-//               const jsTimestamp = timestamp?.toString().length === 10
-//                 ? timestamp * 1000
-//                 : timestamp;
-//               return new Date(jsTimestamp)
-//                 .toLocaleTimeString('en-US', {
-//                   minute: '2-digit',
-//                   second: '2-digit'
-//                 });
-//             }}
-//             label={{ value: 'Time', position: 'bottom', fill: '#000000' }}
-//           />
-
-//           <YAxis
-//             domain={[0, 360]}
-//             tickCount={7}
-//             tick={{ fill: '#000000' }}
-//             label={{
-//               value: 'Yaw (°)',
-//               angle: -90,
-//               position: 'left',
-//               fill: '#000000'
-//             }}
-//           />
-
-//           <Tooltip
-//             contentStyle={{
-//               backgroundColor: '#ffffff',
-//               border: '1px solid #ddd',
-//               borderRadius: '6px'
-//             }}
-//             labelFormatter={(timestamp) =>
-//               new Date(timestamp).toLocaleTimeString([], {
-//                 hour: '2-digit',
-//                 minute: '2-digit',
-//                 second: '2-digit'
-//               })
-//             }
-//           />
-
-//           <Legend wrapperStyle={{ paddingTop: 10 }} />
-
-//           <Line
-//             name="Yaw Angle"
-//             type="monotone"
-//             dataKey="orientation.yaw"
-//             stroke="blue"
-//             strokeWidth={2}
-//             dot={false}
-//             isAnimationActive={false}
-//             activeDot={{
-//               r: 5,
-//               fill: "blue",
-//               stroke: '#000000',
-//               strokeWidth: 2
-//             }}
-//           />
-//         </LineChart>
-//       {/* </ResponsiveContainer> */}
-//       </ResponsiveContainer>
-//     //</div>
-//   );
-// };
-
-// export default YawRealTimeGraph;
-
-import React, { useState, useEffect } from "react";
+import React, { useMemo, useCallback, useRef, useEffect } from "react";
 import {
   LineChart,
   Line,
@@ -236,24 +9,56 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
-// import useWebSocket from "../hooks/useWebSocket";
 import useWebSocketGraph from "../hooks/useWebSocketGraph";
 
 const WS_URL = "wss://8f8nk7hq11.execute-api.eu-north-1.amazonaws.com/POC/";
 const MAX_HISTORY = 30;
 
+// Predefined line colors for angle data
+const lineColors = {
+  yaw: "#8884d8",
+  pitch: "#82ca9d",
+  roll: "#ffc658",
+};
+
 const YawRealTimeGraph = () => {
   const { imuData } = useWebSocketGraph(WS_URL);
-  const [angleHistory, setAngleHistory] = useState([]);
+  const angleHistoryRef = useRef([]);
+  const [angleHistory, setAngleHistory] = React.useState([]);
 
+  // Use a ref to track the last update time to reduce state updates
+  const lastUpdateTimeRef = useRef(0);
+
+  // More efficient update function that uses batch processing
+  const updateAngleHistory = useCallback((newData) => {
+    // Only update state if we have meaningful changes (throttle)
+    const currentTime = Date.now();
+    if (currentTime - lastUpdateTimeRef.current < 100) {
+      // 10Hz update rate
+      return;
+    }
+
+    lastUpdateTimeRef.current = currentTime;
+
+    // Update the ref and state in one go
+    const newHistory = [
+      ...angleHistoryRef.current.slice(-(MAX_HISTORY - 1)),
+      newData,
+    ];
+    angleHistoryRef.current = newHistory;
+    setAngleHistory(newHistory);
+  }, []);
+
+  // Process imuData changes with debouncing
   useEffect(() => {
     if (imuData?.orientation) {
-      setAngleHistory((prev) => [...prev.slice(-(MAX_HISTORY - 1)), imuData]);
+      updateAngleHistory(imuData);
     }
-  }, [imuData]);
+  }, [imuData, updateAngleHistory]);
 
-  return (
-    <ResponsiveContainer width="100%" height="100%">
+  // Memoize the chart to prevent unnecessary re-renders
+  const memoizedChart = useMemo(
+    () => (
       <LineChart
         data={angleHistory}
         margin={{ top: 20, right: 30, left: 30, bottom: 20 }}
@@ -292,11 +97,11 @@ const YawRealTimeGraph = () => {
             borderRadius: "6px",
           }}
           formatter={(value, name) => [
-            `${value.toFixed(2)}°`,
+            `${value?.toFixed(2)}°`,
             name.replace("orientation.", ""),
           ]}
           labelFormatter={(timestamp) =>
-            new Date(timestamp).toLocaleTimeString([], {
+            new Date(timestamp * 1000).toLocaleTimeString([], {
               hour: "2-digit",
               minute: "2-digit",
               second: "2-digit",
@@ -311,7 +116,7 @@ const YawRealTimeGraph = () => {
           name="Yaw"
           type="monotone"
           dataKey="orientation.yaw"
-          stroke="#8884d8"
+          stroke={lineColors.yaw}
           strokeWidth={2}
           dot={false}
           isAnimationActive={false}
@@ -323,7 +128,7 @@ const YawRealTimeGraph = () => {
           name="Pitch"
           type="monotone"
           dataKey="orientation.pitch"
-          stroke="#82ca9d"
+          stroke={lineColors.pitch}
           strokeWidth={2}
           dot={false}
           isAnimationActive={false}
@@ -335,15 +140,22 @@ const YawRealTimeGraph = () => {
           name="Roll"
           type="monotone"
           dataKey="orientation.roll"
-          stroke="#ffc658"
+          stroke={lineColors.roll}
           strokeWidth={2}
           dot={false}
           isAnimationActive={false}
           activeDot={{ r: 5 }}
         />
       </LineChart>
+    ),
+    [angleHistory]
+  );
+
+  return (
+    <ResponsiveContainer width="100%" height="100%">
+      {memoizedChart}
     </ResponsiveContainer>
   );
 };
 
-export default YawRealTimeGraph;
+export default React.memo(YawRealTimeGraph);
