@@ -12,54 +12,40 @@ import {
   ListItemText,
   Card,
   CardContent,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions, 
-  Paper, 
-  TextField, 
-  Button, 
-  IconButton, 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableContainer, 
-  TableHead, 
-  TableRow 
+  Paper,
+  TextField,
+  Button,
+  IconButton,
+  Avatar,
+  Chip,
+  Collapse
 } from "@mui/material";
+
 import PeopleIcon from "@mui/icons-material/People";
 import AddIcon from "@mui/icons-material/Add";
-import DeleteIcon from "@mui/icons-material/Delete";
-import SearchIcon from "@mui/icons-material/Search";
-import DashboardIcon from "@mui/icons-material/Dashboard";
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 import DescriptionIcon from "@mui/icons-material/Description";
 import SettingsIcon from "@mui/icons-material/Settings";
 import ChatIcon from "@mui/icons-material/Chat";
+import DashboardIcon from "@mui/icons-material/Dashboard";
+import MenuIcon from "@mui/icons-material/Menu";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 
-import RecentPatients from "./RecentPatients"; // Import the recent patients section
-import Appointments from "./Appointments"; // Placeholder for Appointments component
-import Reports from "./Reports"; // Placeholder for Reports component
-import Messages from "./Messages"; // Placeholder for Messages component
-import Settings from "./Settings"; // Placeholder for Settings component
-
-import { useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import RecentPatients from "./RecentPatients";
+import Appointments from "./Appointments";
+import Reports from "./Reports";
+import Messages from "./Messages";
+import Settings from "./Settings";
+import NavbarAuth from "../components/NavbarAuth";
 
 export default function Dashboard() {
-
-  const navigate = useNavigate(); // hook to navigate to different pages
-
-  // console.log("Dashboard Component Rendered!"); // Debugging log
-
-  // Fetch patient data using the custom hook
+  const navigate = useNavigate();
   const { data: patients, isLoading, error } = usePatients();
-
-  // Track the selected menu item
   const [selectedSection, setSelectedSection] = useState("Dashboard");
+  const [sidebarOpen, setSidebarOpen] = useState(true);
 
-  // Sidebar menu items
   const menuItems = [
     { text: "Dashboard", icon: <DashboardIcon /> },
     { text: "Patients", icon: <PeopleIcon /> },
@@ -69,11 +55,10 @@ export default function Dashboard() {
     { text: "Settings", icon: <SettingsIcon /> },
   ];
 
-  // function to render the selected section
   const renderContent = () => {
     switch (selectedSection) {
       case "Dashboard":
-      case "Patients": // Show RecentPatients on both "Dashboard" and "Patients"
+      case "Patients":
         return <RecentPatients patients={patients} isLoading={isLoading} error={error} />;
       case "Appointments":
         return <Appointments />;
@@ -88,24 +73,6 @@ export default function Dashboard() {
     }
   };
 
-  // Search query state
-  const [searchQuery, setSearchQuery] = useState("");
-  const [openModal, setOpenModal] = useState(false);
-  const [newPatient, setNewPatient] = useState({
-    name: "",
-    id: "",
-    age: "",
-    status: "Pending",
-    lastReport: new Date().toISOString().split("T")[0], // Default to today's date
-  });
-
-  // Handle new patient modal open/close 
-  const handleOpenModal = () => setOpenModal(true);
-  const handleCloseModal = () => setOpenModal(false);
-
-  
-
-  // Improved Loading UI
   if (isLoading)
     return (
       <Box display="flex" justifyContent="center" alignItems="center" height="100vh">
@@ -114,7 +81,6 @@ export default function Dashboard() {
       </Box>
     );
 
-  // Improved Error UI
   if (error)
     return (
       <Typography color="error" align="center" mt={5}>
@@ -122,27 +88,38 @@ export default function Dashboard() {
       </Typography>
     );
 
-   return (
-    <Box sx={{ display: "flex", height: "100vh" }}>
+  return (
+    <Box sx={{ display: "flex", height: "100vh", bgcolor: "#F5F5F5" }}>
+      
       {/* Sidebar */}
       <Drawer
         variant="permanent"
         sx={{
-          width: 240,
+          width: sidebarOpen ? 240 : 80,
           flexShrink: 0,
           "& .MuiDrawer-paper": {
-            width: 240,
+            width: sidebarOpen ? 240 : 80,
+            transition: "width 0.3s",
             boxSizing: "border-box",
-            backgroundColor: "#F8F9FA",
-            borderRight: "1px solid #ddd",
+            background: "linear-gradient(to bottom, rgb(28, 32, 57), rgb(6, 40, 97))",
+            color: "#fff",
           },
         }}
       >
-        <Box sx={{ padding: 2, textAlign: "center" }}>
-          <Typography variant="h6" fontWeight="bold">
-            RehabGait
-          </Typography>
+        <Box sx={{ padding: 2, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+          {sidebarOpen && (<Typography variant="h6" component={Link} to="/" sx={{ textDecoration: "none", color: "white", fontWeight: "bold" }}
+              >RehabGait</Typography>)}
+          <IconButton onClick={() => setSidebarOpen(!sidebarOpen)} sx={{ color: "#fff" }}>
+            <MenuIcon />
+          </IconButton>
         </Box>
+
+        <Collapse in={sidebarOpen}>
+          <Box sx={{ textAlign: "center", p: 2 }}>
+            <Avatar sx={{ width: 75, height: 75, margin: "auto" }}>K</Avatar>
+            <Typography variant="body1" mt={1}>Dr. Keerthi Illukkumbura</Typography>
+          </Box>
+        </Collapse>
 
         <List>
           {menuItems.map((item) => (
@@ -151,14 +128,12 @@ export default function Dashboard() {
                 selected={selectedSection === item.text}
                 onClick={() => setSelectedSection(item.text)}
                 sx={{
-                  "&.Mui-selected": { backgroundColor: "#E3F2FD", color: "#1976D2" },
-                  "&:hover": { backgroundColor: "#E3F2FD" },
+                  "&.Mui-selected": { backgroundColor: "rgba(0,0,0,0.3)", color: "rgb(198, 202, 226)" },
+                  "&:hover": { backgroundColor: "rgba(255, 255, 255, 0.2)" },
                 }}
               >
-                <ListItemIcon sx={{ color: selectedSection === item.text ? "#1976D2" : "inherit" }}>
-                  {item.icon}
-                </ListItemIcon>
-                <ListItemText primary={item.text} />
+                <ListItemIcon sx={{ color: "#fff" }}>{item.icon}</ListItemIcon>
+                {sidebarOpen && <ListItemText primary={item.text} />}
               </ListItemButton>
             </ListItem>
           ))}
@@ -166,43 +141,49 @@ export default function Dashboard() {
       </Drawer>
 
       {/* Main Content */}
-      <Box sx={{ flexGrow: 1, padding: 3, marginLeft: "20px" }}>
-        {/* ✅ Summary Cards Section (Always Visible) */}
-        <Typography variant="h4" gutterBottom>
-          🏥 Welcome Back, Dr. Keerthi Ilukkumbura
+      <Box sx={{ flexGrow: 1, padding: 3 }}>
+        <Typography variant="h4" gutterBottom fontWeight="bold" textshadow="2px 2px 5px rgba(0,0,0,0.2)">
+          Welcome Back, Dr. Keerthi Ilukkumbura
         </Typography>
-        <Typography variant="subtitle1" color="text.secondary">
-          Here's what's happening with your patients today.
+        <Typography variant="h6" color="text.secondary">
+          Here's what's happening with your patients today!
         </Typography>
 
+        {/* Summary Cards */}
         <Grid container spacing={3} mt={2}>
           <Grid item xs={12} sm={6} md={3}>
-            <Card sx={{ padding: 2, textAlign: "center", backgroundColor: "#E3F2FD" }}>
+            <Card sx={{ padding: 2, textAlign: "center", backgroundColor: "#E3F2FD", boxShadow: 3 }}>
               <CardContent>
+                <PeopleIcon fontSize="large" />
                 <Typography variant="h6">Total Patients</Typography>
                 <Typography variant="h4">{patients?.length || 0}</Typography>
               </CardContent>
             </Card>
           </Grid>
           <Grid item xs={12} sm={6} md={3}>
-            <Card sx={{ padding: 2, textAlign: "center", backgroundColor: "#E8F5E9" }}>
+            <Card sx={{ padding: 2, textAlign: "center", backgroundColor: "#E8F5E9", boxShadow: 3 }}>
               <CardContent>
+                <CalendarTodayIcon fontSize="large" />
                 <Typography variant="h6">Today's Appointments</Typography>
                 <Typography variant="h4">{Math.floor(Math.random() * 20) + 5}</Typography>
               </CardContent>
             </Card>
           </Grid>
           <Grid item xs={12} sm={6} md={3}>
-            <Card sx={{ padding: 2, textAlign: "center", backgroundColor: "#FFF3E0" }}>
+            <Card sx={{ padding: 2, textAlign: "center", backgroundColor: "#FFF3E0", boxShadow: 3 }}>
               <CardContent>
+                <DescriptionIcon fontSize="large" />
                 <Typography variant="h6">Pending Reports</Typography>
-                <Typography variant="h4">{Math.floor(Math.random() * 10) + 1}</Typography>
+                <Typography variant="h4">
+                  <Chip label={`${Math.floor(Math.random() * 10) + 1} Pending`} color="warning" />
+                </Typography>
               </CardContent>
             </Card>
           </Grid>
           <Grid item xs={12} sm={6} md={3}>
-            <Card sx={{ padding: 2, textAlign: "center", backgroundColor: "#EDE7F6" }}>
+            <Card sx={{ padding: 2, textAlign: "center", backgroundColor: "#EDE7F6", boxShadow: 3 }}>
               <CardContent>
+                <ChatIcon fontSize="large" />
                 <Typography variant="h6">New Messages</Typography>
                 <Typography variant="h4">{Math.floor(Math.random() * 10)}</Typography>
               </CardContent>
@@ -210,11 +191,9 @@ export default function Dashboard() {
           </Grid>
         </Grid>
 
-        {/* Render Selected Section */}
+        {/* Dynamic Content */}
         <Box mt={3}>{renderContent()}</Box>
       </Box>
     </Box>
   );
 }
-        
-        
