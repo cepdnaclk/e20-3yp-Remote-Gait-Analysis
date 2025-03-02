@@ -136,7 +136,7 @@ export default function Home() {
 
       {/* Footer */}
       <Box sx={{ backgroundColor: "#0d47a1", color: "white", textAlign: "center", padding: 3, mt: 5 }}>
-        <Typography variant="body2">&copy; 2025 Gait Mate. All Rights Reserved.</Typography>
+        <Typography variant="body2">&copy; RehabGait 2025. All Rights Reserved.</Typography>
       </Box>
     </Box>
   );
