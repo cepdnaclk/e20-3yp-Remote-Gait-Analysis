@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React from "react";
 import {
   LineChart,
   Line,
@@ -9,31 +9,34 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
+// import useWebSocket from "../hooks/useWebSocket";
 import useWebSocketGraph from "../hooks/useWebSocketGraph";
 
 const WS_URL = "wss://8f8nk7hq11.execute-api.eu-north-1.amazonaws.com/POC/";
 
-// Generate colors once outside component
-const lineColors = Array.from(
-  { length: 16 },
-  (_, i) => `hsl(${(i * 360) / 16}, 75%, 50%)`
-);
-
 const RealTimeGraph = () => {
   const { fsrData } = useWebSocketGraph(WS_URL);
 
-  // Memoize the LineChart with useMemo to avoid unnecessary recalculations
-  const memoizedChart = useMemo(
-    () => (
+  // Generate distinct colors for 16 sensors
+  const lineColors = Array.from(
+    { length: 16 },
+    (_, i) => `hsl(${(i * 360) / 16}, 75%, 50%)` // Adjusted to be visible on white background
+  );
+
+  return (
+    <ResponsiveContainer>
       <LineChart
         data={fsrData}
         margin={{ top: 20, right: 30, left: 30, bottom: 20 }}
       >
-        <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
+        <CartesianGrid
+          strokeDasharray="3 3"
+          stroke="#e0e0e0" // Light gray grid
+        />
 
         <XAxis
           dataKey="time"
-          tick={{ fill: "#000000", fontSize: 12 }}
+          tick={{ fill: "#000000", fontSize: 12 }} // Black text
           tickFormatter={(unixTime) =>
             new Date(unixTime * 1000).toLocaleTimeString("en-US", {
               hour: "2-digit",
@@ -45,11 +48,18 @@ const RealTimeGraph = () => {
         />
 
         <YAxis
+          //domain={[dataMin => Math.floor(dataMin - 5), dataMax => Math.ceil(dataMax + 10)]}
           domain={[
             (dataMin) => Math.max(-5, Math.floor(dataMin - 5)),
             (dataMax) => Math.ceil(dataMax + 10),
           ]}
-          tick={{ fill: "#000000" }}
+          // ticks={(fsrData && fsrData.length > 0) ? [
+          //   Math.min(0, Math.floor(Math.min(...fsrData.map(d => Math.min(...Object.values(d).filter(v => typeof v === 'number')))) - 10)),
+          //   0,
+          //   Math.ceil(Math.max(...fsrData.map(d => Math.max(...Object.values(d).filter(v => typeof v === 'number')))) + 10)
+          // ] : [0]}
+
+          tick={{ fill: "#000000" }} // Black text
           label={{
             value: "Pressure (N)",
             angle: -90,
@@ -60,7 +70,7 @@ const RealTimeGraph = () => {
 
         <Tooltip
           contentStyle={{
-            backgroundColor: "#ffffff",
+            backgroundColor: "#ffffff", // White background
             border: "1px solid #ddd",
             borderRadius: "6px",
           }}
@@ -87,6 +97,7 @@ const RealTimeGraph = () => {
               strokeWidth={2}
               dot={false}
               isAnimationActive={false}
+              animationDuration={0}
               activeDot={{
                 r: 5,
                 fill: lineColors[i],
@@ -97,11 +108,8 @@ const RealTimeGraph = () => {
           );
         })}
       </LineChart>
-    ),
-    [fsrData]
+    </ResponsiveContainer>
   );
-
-  return <ResponsiveContainer>{memoizedChart}</ResponsiveContainer>;
 };
 
-export default React.memo(RealTimeGraph);
+export default RealTimeGraph;

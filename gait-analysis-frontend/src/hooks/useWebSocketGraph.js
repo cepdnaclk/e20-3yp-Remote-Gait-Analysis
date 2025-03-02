@@ -1,47 +1,70 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 
 const useWebSocketGraph = (url) => {
   const [fsrData, setFsrData] = useState([]);
   const [imuData, setImuData] = useState(null);
   const [retryCount, setRetryCount] = useState(0);
 
+  // Use refs to avoid unnecessary re-renders
+  const fsrDataRef = useRef([]);
+  const lastUpdateTimeRef = useRef(0);
+  const socketRef = useRef(null);
+
+  // Configuration constants
+  const MAX_HISTORY = 30;
+  const UPDATE_THRESHOLD_MS = 100; // Throttle to 10Hz
+
+  // Memoized update function to prevent recreation on each render
+  const updateData = useCallback((newData) => {
+    setFsrData(newData);
+    fsrDataRef.current = newData;
+  }, []);
+
   useEffect(() => {
-    let socket;
     let reconnectTimeout;
-    const MAX_HISTORY = 30; // Keep last 30 FSR readings
 
     const connect = () => {
-      socket = new WebSocket(url);
+      if (socketRef.current?.readyState === WebSocket.OPEN) {
+        socketRef.current.close();
+      }
 
-      socket.onopen = () => console.log("🟢 WebSocket Connected");
+      socketRef.current = new WebSocket(url);
 
-      socket.onmessage = (event) => {
+      socketRef.current.onopen = () => console.log("🟢 WebSocket Connected");
+
+      socketRef.current.onmessage = (event) => {
         try {
           const { sensor_data, timestamp } = JSON.parse(event.data);
           if (!sensor_data) return;
 
-          // Process FSR Data (for graph)
+          // Throttle updates based on time
+          const currentTime = Date.now();
+          if (currentTime - lastUpdateTimeRef.current < UPDATE_THRESHOLD_MS) {
+            return;
+          }
+          lastUpdateTimeRef.current = currentTime;
+
+          // Process FSR Data (for graph) - only extract needed properties
           const fsrEntry = {
             time: timestamp,
-            ...Object.fromEntries(
-              Object.entries(sensor_data).filter(([key]) =>
-                key.startsWith("FSR_")
-              )
-            ),
           };
 
-          setFsrData((prev) => {
-            // Throttle updates to 10Hz (100ms between updates)
-            if (
-              prev.length > 0 &&
-              timestamp - prev[prev.length - 1].time < 0.0001
-            ) {
-              return prev;
+          // Only process FSR keys (avoid unnecessary object operations)
+          for (let i = 1; i <= 16; i++) {
+            const key = `FSR_${i}`;
+            if (key in sensor_data) {
+              fsrEntry[key] = sensor_data[key];
             }
-            return [...prev.slice(-(MAX_HISTORY - 1)), fsrEntry];
-          });
+          }
 
-          // Process IMU Data (for 3D model)
+          // Update FSR data more efficiently
+          const newFsrData = [
+            ...fsrDataRef.current.slice(-(MAX_HISTORY - 1)),
+            fsrEntry,
+          ];
+          updateData(newFsrData);
+
+          // Process IMU Data (for 3D model) - only if needed
           setImuData({
             timestamp,
             orientation: {
@@ -71,12 +94,15 @@ const useWebSocketGraph = (url) => {
         }
       };
 
-      socket.onerror = (error) => console.error("🔴 WebSocket Error:", error);
+      socketRef.current.onerror = (error) =>
+        console.error("🔴 WebSocket Error:", error);
 
-      socket.onclose = () => {
+      socketRef.current.onclose = () => {
         console.log("🟠 WebSocket Disconnected");
+        socketRef.current = null;
+
         reconnectTimeout = setTimeout(() => {
-          setRetryCount((c) => c + 1); // Trigger reconnection
+          setRetryCount((c) => c + 1);
         }, 5000);
       };
     };
@@ -85,9 +111,12 @@ const useWebSocketGraph = (url) => {
 
     return () => {
       clearTimeout(reconnectTimeout);
-      socket?.close();
+      if (socketRef.current) {
+        socketRef.current.close();
+        socketRef.current = null;
+      }
     };
-  }, [url, retryCount]);
+  }, [url, retryCount, updateData]);
 
   return { fsrData, imuData };
 };
