@@ -1,6 +1,16 @@
 import { Box, Typography, Paper, Grid, Button } from "@mui/material";
 import { useParams } from "react-router-dom"; // ✅ To get the patient ID
 import { usePatients } from "../api/patients";
+
+// import HeatmapComponent from "../components/HeatmapComponent";
+import InsoleHeatmap from "../components/heatmap/InsoleHeatmap.jsx";
+import InsoleHeatmapPattern from "../components/heatmap/InsoleHeatmapPattern.jsx";
+import HeatmapWebSock2 from "../components/heatmap/HeatmapWebSock2.jsx";
+import WebSocketCheck from "../components/heatmap/WebSockCheck.jsx";
+import HeatmapWebSock3Force from "../components/heatmap/HeatmapWebSock3Force.jsx";
+
+
+
 import HeatmapComponent from "../components/HeatmapComponent";
 import RealTimeGraph from "../components/RealTimeGraph";
 import YawRealTimeGraph from "../components/YawRealTimeGraph";
@@ -12,65 +22,75 @@ export default function RealTimeDashboard() {
     const { data: patients, isLoading, error } = usePatients();
     const [activeGraph, setActiveGraph] = useState('angles');
 
-    if (isLoading)
-        return <Typography>Loading Patient Data...</Typography>;
-    if (error)
-        return <Typography color="error">Error loading patient data</Typography>;
 
-    const patient = patients.find((p) => p.id === Number(id));
-    if (!patient) return <Typography color="error">Patient not found</Typography>;
+  if (isLoading) return <Typography>Loading Patient Data...</Typography>;
+  if (error)
+    return <Typography color="error">Error loading patient data</Typography>;
 
-    return (
-        <Box sx={{ padding: 3, height: "100vh", overflow: "hidden" }}>
-            <Typography variant="h4">Real-time Dashboard - {patient.name}</Typography>
+  const patient = patients.find((p) => p.id === Number(id));
+  if (!patient) return <Typography color="error">Patient not found</Typography>;
 
-            <Grid container spacing={3} mt={3} sx={{ height: "85vh" }}>
-                {/* Heatmap - Reduce width */}
-                <Grid item xs={12} sm={3} md={3} sx={{ height: "100%" }}>
-                    <Paper sx={{ padding: 2, height: "100%", display: "flex", flexDirection: "column" }}>
-                        <Typography variant="h6">Heatmap</Typography>
-                        <Box sx={{ flexGrow: 1 }}>
-                            <HeatmapComponent key={patient.id} data={[]} /> {/* Placeholder */}
-                        </Box>
-                    </Paper>
-                </Grid>
 
-                {/* Graphs - Increase width */}
-                <Grid item xs={12} sm={5} md={5} sx={{ height: "100%" }}>
-                    <Paper sx={{ padding: 2, height: "100%", display: "flex", flexDirection: "column" }}>
-                        <Typography variant="h6">Graphs</Typography>
-                        <Box sx={{ display: "flex", justifyContent: "center", gap: 1, mb: 2 }}>
-                            <Button
-                                variant={activeGraph === 'angles' ? 'contained' : 'outlined'}
-                                onClick={() => setActiveGraph('angles')}
-                                color="primary"
-                            >
-                                Angles
-                            </Button>
-                            <Button
-                                variant={activeGraph === 'pressure' ? 'contained' : 'outlined'}
-                                onClick={() => setActiveGraph('pressure')}
-                                color="secondary"
-                            >
-                                Pressure
-                            </Button>
-                        </Box>
-                        <Box sx={{ flexGrow: 1, minHeight: 0, overflow: "hidden" }}> {/* Ensure consistent height */}
-                            {activeGraph === 'angles' ? <YawRealTimeGraph /> : <RealTimeGraph />}
-                        </Box>
-                    </Paper>
-                </Grid>
+  return (
+      <Box sx={{ padding: 3, height: "100vh", overflow: "hidden" }}>
+          <Typography variant="h4">Real-time Dashboard - {patient.name}</Typography>
 
-                {/* 3D Foot Model */}
-                <Grid item xs={12} sm={4} md={4} sx={{ height: "100%" }}>
-                    <Paper sx={{ padding: 2, backgroundColor: "rgba(1, 1, 1, 0.81)", height: "100%", display: "flex", flexDirection: "column" }}>
-                        <Typography variant="h6" color="white">3D Foot Model</Typography>
-                        <Box sx={{ flexGrow: 1 }}>
-                            <Scene />
-                        </Box>
-                    </Paper>
-                </Grid>
-            </Grid>
-        </Box>
-    );
+          <Grid container spacing={3} mt={3} sx={{ height: "85vh" }}>
+              {/* Heatmap - Reduce width */}
+              <Grid item xs={12} sm={3} md={3} sx={{ height: "100%" }}>
+                  <Paper sx={{ padding: 2, height: "100%", display: "flex", flexDirection: "column" }}>
+                      <Typography variant="h6">Heatmap</Typography>
+                      <Box sx={{ flexGrow: 1 }}>
+                          {/*<HeatmapComponent key={patient.id} data={[]} />*/} {/* Placeholder */}
+                          {/* Render Heatmap Component here */}
+                          {/* <HeatmapComponent  key={patient.id} data={mockData} />  */}
+                          {/* <InsoleHeatmapPattern /> */}
+                          {/* <HeatmapWebSock2 /> */}
+                          <HeatmapWebSock3Force />
+                          {/* <WebSocketCheck /> */}
+                          {/* <InsoleHeatmap /> */}
+                          {/* Pass mock data */}
+                      </Box>
+                  </Paper>
+              </Grid>
+
+              {/* Graphs - Increase width */}
+              <Grid item xs={12} sm={5} md={5} sx={{ height: "100%" }}>
+                  <Paper sx={{ padding: 2, height: "100%", display: "flex", flexDirection: "column" }}>
+                      <Typography variant="h6">Graphs</Typography>
+                      <Box sx={{ display: "flex", justifyContent: "center", gap: 1, mb: 2 }}>
+                          <Button
+                              variant={activeGraph === 'angles' ? 'contained' : 'outlined'}
+                              onClick={() => setActiveGraph('angles')}
+                              color="primary"
+                          >
+                              Angles
+                          </Button>
+                          <Button
+                              variant={activeGraph === 'pressure' ? 'contained' : 'outlined'}
+                              onClick={() => setActiveGraph('pressure')}
+                              color="secondary"
+                          >
+                              Pressure
+                          </Button>
+                      </Box>
+                      <Box sx={{ flexGrow: 1, minHeight: 0, overflow: "hidden" }}> {/* Ensure consistent height */}
+                          {activeGraph === 'angles' ? <YawRealTimeGraph /> : <RealTimeGraph />}
+                      </Box>
+                  </Paper>
+              </Grid>
+
+              {/* 3D Foot Model */}
+              <Grid item xs={12} sm={4} md={4} sx={{ height: "100%" }}>
+                  <Paper sx={{ padding: 2, backgroundColor: "rgba(1, 1, 1, 0.81)", height: "100%", display: "flex", flexDirection: "column" }}>
+                      <Typography variant="h6" color="white">3D Foot Model</Typography>
+                      <Box sx={{ flexGrow: 1 }}>
+                          <Scene />
+                      </Box>
+                  </Paper>
+              </Grid>
+          </Grid>
+      </Box>
+  );
 }
+
