@@ -266,17 +266,14 @@ const YawRealTimeGraph = () => {
         <XAxis
           dataKey="timestamp"
           tick={{ fill: '#000000', fontSize: 12 }}
-          tickFormatter={(timestamp) => {
-            const jsTimestamp = timestamp?.toString().length === 10 
-              ? timestamp * 1000 
-              : timestamp;
-            return new Date(jsTimestamp)
-              .toLocaleTimeString('en-US', {
-                minute: '2-digit',
-                second: '2-digit'
-              });
-          }}
-          label={{ value: 'Time', position: 'bottom', fill: '#000000' }}
+          tickFormatter={(unixTime) => 
+            new Date(unixTime * 1000).toLocaleTimeString('en-US', {
+              hour: '2-digit',
+              minute: '2-digit',
+              second: '2-digit'
+            })
+          }
+          label={{ value: 'Time', position: 'bottom', fill: '#000000'  }}
         />
 
         <YAxis
