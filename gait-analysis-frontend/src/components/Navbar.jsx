@@ -47,7 +47,7 @@ export default function Navbar() {
             to="/"
             sx={{ textDecoration: "none", color: "white", fontWeight: "bold" }}
           >
-            Gait Mate
+            RehabGait
           </Typography>
 
           {/* Desktop Navigation */}

@@ -88,7 +88,7 @@ export default function Home() {
       {/* Features Section */}
       <Container sx={{ my: 8 }}>
         <Typography variant="h4" fontWeight="bold" textAlign="center" sx={{ mb: 4, color: "white", textShadow: "2px 2px 5px rgba(0, 0, 0, 0.5)" }}>
-          Why Choose Gait Mate?
+          Why Choose RehabGait?
         </Typography>
         <Grid container spacing={4} justifyContent="center">
           {[{
