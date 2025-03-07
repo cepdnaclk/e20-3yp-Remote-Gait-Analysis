@@ -1,0 +1,370 @@
+/* GaitMate Enhanced Styles
+   This CSS file contains improved styles for the GaitMate website
+*/
+
+:root {
+    --primary-color: #4e73df;
+    --secondary-color: #1cc8c8;
+    --dark-color: #2e59d9;
+    --light-color: #f8f9fc;
+    --gray-color: #858796;
+    --gradient: linear-gradient(135deg, var(--primary-color), var(--dark-color));
+  }
+  
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  body {
+    font-family: 'Rubik', sans-serif;
+    line-height: 1.6;
+    color: #333;
+    background-color: var(--light-color);
+  }
+  
+  /* Header Styles */
+  header {
+    background-color: white;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    padding: 1rem 5%;
+    position: fixed;
+    width: 100%;
+    top: 0;
+    z-index: 1000;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .logo {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--primary-color);
+  }
+  
+  .logo span {
+    margin-right: 10px;
+  }
+  
+  .logo-image {
+    height: 40px;
+  }
+  
+  .main-nav-list {
+    display: flex;
+    list-style: none;
+    gap: 2rem;
+  }
+  
+  .main-nav-link {
+    text-decoration: none;
+    color: var(--gray-color);
+    font-weight: 500;
+    transition: all 0.3s ease;
+    padding: 0.5rem 1rem;
+    border-radius: 5px;
+  }
+  
+  .main-nav-link:hover {
+    color: var(--primary-color);
+    background-color: rgba(78, 115, 223, 0.1);
+  }
+  
+  /* Hero Section */
+  .section-hero {
+    padding: 10rem 5% 5rem;
+    background-image: var(--gradient);
+    color: white;
+  }
+  
+  .hero-box {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  
+  .hero-text-box {
+    flex: 1;
+  }
+  
+  .hero-text-box h1 {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+  }
+  
+  .hero-text-box h2 {
+    font-size: 1.8rem;
+    margin-bottom: 1.5rem;
+    color: var(--secondary-color);
+  }
+  
+  .hero-text-box p {
+    font-size: 1.2rem;
+    line-height: 1.6;
+  }
+  
+  .hero-image-box {
+    flex: 1;
+  }
+  
+  .hero-image {
+    width: 100%;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  }
+  
+  /* About Section */
+  .section-about {
+    padding: 5rem 5%;
+    max-width: 1200px;
+    margin: 0 auto;
+    text-align: center;
+  }
+  
+  .section-about h1 {
+    margin-bottom: 2rem;
+    color: var(--primary-color);
+    font-size: 2.5rem;
+  }
+  
+  .gait-cycle-image {
+    max-width: 600px;
+    margin-bottom: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .section-about p {
+    font-size: 1.1rem;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+  
+  /* Solution Architecture & System Design Sections */
+  .section-solution-architecture {
+    padding: 5rem 5%;
+    background-color: white;
+  }
+  
+  .section-solution-architecture h1 {
+    text-align: center;
+    margin-bottom: 3rem;
+    color: var(--primary-color);
+    font-size: 2.5rem;
+  }
+  
+  .sol-arch-img-container {
+    max-width: 1000px;
+    margin: 0 auto;
+  }
+  
+  .solution-architecture-img {
+    width: 100%;
+    border-radius: 8px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Budget Section */
+  .section-budget {
+    padding: 5rem 5%;
+    background-color: var(--light-color);
+  }
+  
+  .section-budget h1 {
+    text-align: center;
+    margin-bottom: 3rem;
+    color: var(--primary-color);
+    font-size: 2.5rem;
+  }
+  
+  .budget-img-container {
+    max-width: 800px;
+    margin: 0 auto;
+  }
+  
+  .budget {
+    width: 100%;
+    border-radius: 8px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Video Section */
+  .section-demo {
+    padding: 5rem 5%;
+    background-color: white;
+    text-align: center;
+  }
+  
+  .section-demo h1 {
+    margin-bottom: 2rem;
+    color: var(--primary-color);
+    font-size: 2.5rem;
+  }
+  
+  .section-demo p {
+    max-width: 800px;
+    margin: 0 auto 2rem;
+    font-size: 1.1rem;
+  }
+  
+  .video-container {
+    max-width: 800px;
+    margin: 0 auto;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  
+  .demo-video {
+    width: 100%;
+    display: block;
+  }
+  
+  /* Team Section */
+  .section-team {
+    padding: 5rem 5%;
+    background-color: var(--light-color);
+  }
+  
+  .team-section-container {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  
+  .team-section-container h2 {
+    text-align: center;
+    margin-bottom: 3rem;
+    color: var(--primary-color);
+    font-size: 2.5rem;
+  }
+  
+  .card-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+  }
+  
+  .team-card {
+    background-color: white;
+    border-radius: 10px;
+    padding: 2rem;
+    text-align: center;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  .team-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+  }
+  
+  .img-wrapper {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    overflow: hidden;
+    margin: 0 auto 1.5rem;
+    border: 4px solid var(--primary-color);
+  }
+  
+  .team-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  .name {
+    font-weight: 700;
+    font-size: 1.2rem;
+    margin-bottom: 0.5rem;
+    color: var(--primary-color);
+  }
+  
+  .reg-no {
+    color: var(--gray-color);
+    margin-bottom: 0.5rem;
+  }
+  
+  .eportfolio {
+    color: var(--dark-color);
+    text-decoration: underline;
+    font-weight: 500;
+  }
+  
+  .social-media-links {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+  
+  .social-media-links a {
+    color: var(--gray-color);
+    transition: color 0.3s ease;
+  }
+  
+  .social-media-links a:hover {
+    color: var(--primary-color);
+  }
+  
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .hero-box {
+      flex-direction: column;
+    }
+    
+    .main-nav {
+      display: none;
+    }
+    
+    .hero-text-box h1 {
+      font-size: 2.5rem;
+    }
+    
+    .hero-text-box h2 {
+      font-size: 1.5rem;
+    }
+    
+    .card-container {
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    }
+  }
+  
+  /* Mobile Navigation Toggle (if needed) */
+  .mobile-nav-toggle {
+    display: none;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1.5rem;
+    color: var(--primary-color);
+  }
+  
+  @media (max-width: 768px) {
+    .mobile-nav-toggle {
+      display: block;
+    }
+    
+    .main-nav.active {
+      display: block;
+      position: absolute;
+      top: 70px;
+      left: 0;
+      width: 100%;
+      background: white;
+      padding: 1rem;
+      box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+    }
+    
+    .main-nav.active .main-nav-list {
+      flex-direction: column;
+      gap: 1rem;
+    }
+  }
