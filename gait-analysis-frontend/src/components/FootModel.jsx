@@ -1,26 +1,46 @@
-import { useRef, useEffect, useState } from "react";
+import { useRef, useEffect, useMemo, useCallback } from "react";
 import { useFrame, useLoader } from "@react-three/fiber";
 import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader";
-import { Quaternion, Vector3 } from "three";
+import { Quaternion, Matrix4 } from "three";
 
 const FootModel = () => {
+  // Configuration constants
+  const CONFIG = useMemo(
+    () => ({
+      MODEL_SCALE: 0.2,
+      POSITION: [0, -1, 0],
+      SMOOTHING_FACTOR: 0.9, // Increased from 0.15 to 0.9 for much faster response
+      WS_URL: "wss://8f8nk7hq11.execute-api.eu-north-1.amazonaws.com/POC/",
+      RECONNECT_DELAY: 5000,
+    }),
+    []
+  );
+
+  // Coordinate system correction
+  // BNO055 has Z up, X forward, Y right
+  // Three.js has Y up, Z forward, X right
+  const COORDINATE_CORRECTION = useMemo(() => {
+    // This matrix transforms from BNO055 (Z-up) to Three.js (Y-up)
+    // It rotates -90 degrees around X to move Z-up to Y-up
+    const correctionMatrix = new Matrix4().makeRotationX(-Math.PI / 2);
+    const correctionQuat = new Quaternion().setFromRotationMatrix(
+      correctionMatrix
+    );
+    return correctionQuat;
+  }, []);
+
   const footRef = useRef();
   const obj = useLoader(OBJLoader, "/models/foot.obj");
-  const [targetQuat, setTargetQuat] = useState(new Quaternion());
+
+  // Use ref instead of state for better performance
+  const targetQuatRef = useRef(new Quaternion());
   const wsRef = useRef(null);
   const reconnectTimeoutRef = useRef(null);
 
-  // Configuration
-  const MODEL_SCALE = 0.2;
-  const POSITION = [0, -1, 0];
-  const SMOOTHING_FACTOR = 0.15;
-  const CORRECTION_QUAT = new Quaternion().setFromAxisAngle(
-    new Vector3(1, 0, 0),
-    -Math.PI / 2
-  );
+  const connectWebSocket = useCallback(() => {
+    if (wsRef.current?.readyState === WebSocket.OPEN) return;
 
-  const connectWebSocket = () => {
-    wsRef.current = new WebSocket("wss://8f8nk7hq11.execute-api.eu-north-1.amazonaws.com/POC/");
+    wsRef.current = new WebSocket(CONFIG.WS_URL);
 
     wsRef.current.onopen = () => {
       console.log("WebSocket connected");
@@ -35,20 +55,22 @@ const FootModel = () => {
         const { sensor_data } = JSON.parse(event.data);
         if (!sensor_data) return;
 
-        // Process quaternion data
         const { q0, q1, q2, q3 } = sensor_data;
-        const norm = Math.sqrt(q0 ** 2 + q1 ** 2 + q2 ** 2 + q3 ** 2);
-        
-        const rawQuat = new Quaternion(
-          q1 / norm,
-          q2 / norm,
-          q3 / norm,
-          q0 / norm
+
+        // Skip unnecessary normalization if your sensor data is already reliable
+        // If normalization is critical for your application, keep it
+
+        // BNO055 quaternion format is (w, x, y, z)
+        const sensorQuat = new Quaternion(q1, q2, q3, q0);
+
+        // Apply coordinate system correction
+        const adjustedQuat = new Quaternion().multiplyQuaternions(
+          COORDINATE_CORRECTION,
+          sensorQuat
         );
 
-        const adjustedQuat = CORRECTION_QUAT.clone().multiply(rawQuat);
-        setTargetQuat(adjustedQuat);
-
+        // Update ref directly instead of using setState for better performance
+        targetQuatRef.current.copy(adjustedQuat);
       } catch (error) {
         console.error("Data parsing error:", error);
       }
@@ -63,11 +85,12 @@ const FootModel = () => {
       if (!reconnectTimeoutRef.current) {
         reconnectTimeoutRef.current = setTimeout(() => {
           connectWebSocket();
-        }, 5000);
+        }, CONFIG.RECONNECT_DELAY);
       }
     };
-  };
+  }, [CONFIG, COORDINATE_CORRECTION]);
 
+  // Initialize WebSocket connection
   useEffect(() => {
     connectWebSocket();
 
@@ -82,9 +105,9 @@ const FootModel = () => {
         reconnectTimeoutRef.current = null;
       }
     };
-  }, []);
+  }, [connectWebSocket]);
 
-  // Model initialization
+  // Initialize model - only runs once when obj is loaded
   useEffect(() => {
     obj.traverse((child) => {
       if (child.isMesh) {
@@ -94,10 +117,17 @@ const FootModel = () => {
     });
   }, [obj]);
 
-  // Smooth rotation updates
+  // Apply rotation updates in animation frame
   useFrame(() => {
     if (footRef.current) {
-      footRef.current.quaternion.slerp(targetQuat, SMOOTHING_FACTOR);
+      // Option 1: For super responsive (no smoothing)
+      // footRef.current.quaternion.copy(targetQuatRef.current);
+
+      // Option 2: With minimal smoothing for slightly better visual quality
+      footRef.current.quaternion.slerp(
+        targetQuatRef.current,
+        CONFIG.SMOOTHING_FACTOR
+      );
     }
   });
 
@@ -105,9 +135,8 @@ const FootModel = () => {
     <primitive
       ref={footRef}
       object={obj}
-      scale={MODEL_SCALE}
-      position={POSITION}
-      rotation={[-Math.PI / 2, 0, 0]}
+      scale={CONFIG.MODEL_SCALE}
+      position={CONFIG.POSITION}
     />
   );
 };

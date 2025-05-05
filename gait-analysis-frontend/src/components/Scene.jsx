@@ -1,6 +1,6 @@
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
-import FootModel from "./FootModel"; // Import the separate component
+import FootModel from "./FootModel";
 
 function Scene() {
   return (
