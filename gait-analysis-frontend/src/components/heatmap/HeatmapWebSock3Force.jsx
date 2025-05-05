@@ -69,8 +69,8 @@ const HeatmapWebSock3Force = () => {
     // Color thresholds (values and corresponding colors)
     colorThresholds: [
       { value: 0, color: { r: 0, g: 0, b: 255 } }, // Blue
-      { value: 2, color: { r: 0, g: 255, b: 0 } }, // Green
-      { value: 6, color: { r: 255, g: 255, b: 0 } }, // Yellow
+      { value: 1, color: { r: 0, g: 255, b: 0 } }, // Green
+      { value: 4, color: { r: 255, g: 255, b: 0 } }, // Yellow
       { value: 10, color: { r: 255, g: 165, b: 0 } }, // Orange
     ],
     // Grid dimensions

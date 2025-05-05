@@ -79,7 +79,7 @@ const YawRealTimeGraph = () => {
         />
 
         <YAxis
-          domain={[-180, 360]}
+          domain={[-360, 360]}
           tickCount={7}
           tick={{ fill: "#000000" }}
           label={{
