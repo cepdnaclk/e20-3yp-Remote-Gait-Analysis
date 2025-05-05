@@ -147,7 +147,7 @@ const FootOrientationGraph = () => {
           label={xAxisLabelProps}
         />
         <YAxis
-          domain={[-180, 360]}
+          domain={[-360, 360]}
           tickCount={7}
           tick={yAxisTickProps}
           label={yAxisLabelProps}
