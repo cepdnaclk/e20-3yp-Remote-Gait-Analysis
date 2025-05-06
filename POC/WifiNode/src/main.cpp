@@ -140,7 +140,7 @@ void setup() {
 
   // Handshake to ensure ESP32 #2 is ready
   bool sensorNodeReady = false;
-  for (int i = 0; i < 20; i++) { // Retry up to 20 times
+  for (int i = 0; i < 200; i++) { // Retry up to 20 times
       Serial.println("Sending PING to ESP32 #2...");
       Serial2.println("PING");  // Request handshake
       delay(500);  
