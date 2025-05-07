@@ -9,7 +9,7 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.3yp</groupId>
-	<artifactId>gaitMate-backend</artifactId>
+	<artifactId>gait-analysis-backend</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>gait</name>
 	<description>Backend for gait-analysis-system</description>
