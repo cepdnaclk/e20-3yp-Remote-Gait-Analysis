@@ -20,7 +20,6 @@ public class AuthController {
     private final AuthenticationService authenticationService;
 
     @PostMapping("/signin")
-
     @Operation(
             summary = "Authenticate an existing user" ,
             description = "Allows the user to log in with user name and password and returns a JWT token and user information",
@@ -46,7 +45,7 @@ public class AuthController {
     @Operation(summary = "SignUp", description = "Create a new user")
 //    @RequestBody(description = "Data transfer object for Signing up", required = true)
     public ResponseEntity<UserInfoResponse> registerUser(@Valid @RequestBody SignupRequest signupRequest){
-        UserInfoResponse response = authenticationService.registerUser(signupRequest);
+        UserInfoResponse response = authenticationService.registerUserAndLogin(signupRequest);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 

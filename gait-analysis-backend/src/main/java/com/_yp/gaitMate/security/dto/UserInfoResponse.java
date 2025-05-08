@@ -19,15 +19,13 @@ public class UserInfoResponse {
     private String jwtToken;
     private String email;
     private String username;
+    @Setter
     private List<String> roles;
 
-    public void setRoles(Set<Role> roles) {
+    public void setRolesFromSetOfRoles(Set<Role> roles) {
         this.roles =roles.stream()
                 .map(role -> role.getRoleName().name())
                 .collect(Collectors.toList());
     }
 
-    public void setRoles(List<String> roles) {
-        this.roles = roles;
-    }
 }

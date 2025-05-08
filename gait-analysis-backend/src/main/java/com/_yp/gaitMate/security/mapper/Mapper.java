@@ -23,7 +23,7 @@ public class Mapper {
         userInfoResponse.setId(user.getUserId());
         userInfoResponse.setEmail(user.getEmail());
         userInfoResponse.setUsername(user.getUsername());
-        userInfoResponse.setRoles(user.getRoles());
+        userInfoResponse.setRolesFromSetOfRoles(user.getRoles());
         return userInfoResponse;
     }
 

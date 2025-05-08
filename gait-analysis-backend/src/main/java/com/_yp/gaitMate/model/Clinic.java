@@ -7,6 +7,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,7 +31,7 @@ public class Clinic {
     /**
      * Name of the clinic.
      */
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String name;
 
     @Column(nullable = false)
@@ -40,7 +41,7 @@ public class Clinic {
     private String phoneNumber;
 
     @Column(nullable = false)
-    private LocalDate createdAt;
+    private LocalDateTime createdAt;
 
     /**
      * User account associated with the clinic for authentication.

@@ -11,14 +11,11 @@ import com._yp.gaitMate.security.model.User;
 import com._yp.gaitMate.security.model.UserDetailsImpl;
 import com._yp.gaitMate.security.repository.RoleRepository;
 import com._yp.gaitMate.security.repository.UserRepository;
-import com._yp.gaitMate.security.service.AuthenticationService;
 import com._yp.gaitMate.security.utils.AuthUtil;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -72,7 +69,18 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     @Override
-    public UserInfoResponse registerUser(SignupRequest signupRequest) {
+    public UserInfoResponse registerUserAndLogin(SignupRequest signupRequest) {
+        registerUser(signupRequest);
+        // Login just after registering
+        LoginRequest loginRequest = new LoginRequest();
+        loginRequest.setPassword(signupRequest.getPassword());
+        loginRequest.setUsername(signupRequest.getUsername());
+
+        return authenticateUser(loginRequest);
+    }
+
+    @Override
+    public User registerUser(SignupRequest signupRequest) {
         // check the availability of the username and email
         if (userRepository.existsByUsername(signupRequest.getUsername())){
             throw new ApiException("username is already taken!");
@@ -128,16 +136,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         user.setRoles(roles);
         userRepository.save(user);
 
-        // Login just after registering
-        LoginRequest loginRequest = new LoginRequest();
-        loginRequest.setPassword(signupRequest.getPassword());
-        loginRequest.setUsername(signupRequest.getUsername());
-
-        return authenticateUser(loginRequest);
-
-        // Log in
-
-
+        return user;
     }
 
 
