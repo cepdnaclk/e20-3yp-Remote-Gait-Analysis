@@ -1,0 +1,40 @@
+spring:
+  datasource:
+    url: {SPRING_DATASOURCE_URL}
+    username: {SPRING_DATASOURCE_USERNAME}
+    password: {SPRING_DATASOURCE_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    defer-datasource-initialization: true  #This ensures the execution happens after Hibernate creates the tables
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+    database: postgresql
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+
+jwt:
+  secret: {JWT_SECRET}
+  expiration:
+    ms: 432000000
+
+# http://localhost:8080/swagger-ui.html
+
+
+#client:
+#  domains:
+#        list:
+#          - apple
+#          - banana
+
+
+#logging:
+#  level:
+#    org:
+#      springframework: DEBUG
+#      hibernate.SQL: DEBUG
+#    com:
+#      _yp:
+#        gaitMate: DEBUG
