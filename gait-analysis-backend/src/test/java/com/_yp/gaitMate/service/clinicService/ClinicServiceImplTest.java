@@ -150,5 +150,8 @@ class ClinicServiceImplTest {
         verify(clinicRepository).findById(99L);
         verifyNoInteractions(clinicMapper);
     }
+
+
+    // TODO: Test getMyClinc and getAllClinics endpoints
 }
 

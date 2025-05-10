@@ -109,4 +109,7 @@ class ClinicControllerTest {
         assertThat(body.getCreatedAt()).isNotNull();
     }
 
+
+    // TODO: Test getMyClinc and getAllClinics endpoints
+
 }

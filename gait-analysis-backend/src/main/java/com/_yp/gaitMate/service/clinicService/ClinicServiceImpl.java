@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -72,5 +73,24 @@ public class ClinicServiceImpl implements ClinicService {
 
         return clinicMapper.toClinicInfoResponse(clinic);
     }
+
+    @Override
+    public ClinicInfoResponse getMyClinicProfile() {
+        Long userId = authUtil.loggedInUserId();
+
+        Clinic clinic = clinicRepository.findByUser_UserId(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("Clinic", "userId", userId));
+
+        return clinicMapper.toClinicInfoResponse(clinic);
+    }
+
+
+    @Override
+    public List<ClinicInfoResponse> getAllClinics() {
+        return clinicRepository.findAll().stream()
+                .map(clinicMapper::toClinicInfoResponse)
+                .toList();
+    }
+
 }
 

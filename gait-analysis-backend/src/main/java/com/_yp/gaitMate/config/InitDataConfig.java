@@ -15,6 +15,7 @@ import java.util.Set;
 
 @Configuration
 public class InitDataConfig {
+    // NOTE: Comment the @Bean line when doing the integration testing
     @Bean
     public CommandLineRunner initData(RoleRepository roleRepository, UserRepository userRepository, PasswordEncoder passwordEncoder) {
         return args -> {

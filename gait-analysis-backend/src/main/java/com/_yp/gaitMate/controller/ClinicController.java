@@ -12,6 +12,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api")
 @RequiredArgsConstructor
@@ -50,4 +52,40 @@ public class ClinicController {
         ClinicInfoResponse response = clinicService.getClinicById(id);
         return ResponseEntity.ok(response);
     }
+
+
+    @GetMapping("/clinics/me")
+    @PreAuthorize("hasRole('CLINIC')")
+    @Operation(
+            summary = "Get the logged-in clinic's own profile",
+            description = "Returns the profile details of the currently authenticated clinic.",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Clinic profile retrieved successfully"),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized"),
+                    @ApiResponse(responseCode = "403", description = "Forbidden")
+            }
+    )
+    public ResponseEntity<ClinicInfoResponse> getMyClinicProfile() {
+        ClinicInfoResponse response = clinicService.getMyClinicProfile();
+        return ResponseEntity.ok(response);
+    }
+
+
+    @GetMapping("/clinics")
+    @Operation(
+            summary = "Get all clinics",
+            description = "Returns a list of all registered clinics. Accessible to any authenticated user.",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "List of clinics returned"),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized")
+            }
+    )
+    public ResponseEntity<List<ClinicInfoResponse>> getAllClinics() {
+        List<ClinicInfoResponse> clinics = clinicService.getAllClinics();
+        return ResponseEntity.ok(clinics);
+    }
+
+
+    // TODO: update, delete
+
 }
