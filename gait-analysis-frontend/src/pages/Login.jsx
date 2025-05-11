@@ -6,6 +6,8 @@ import { styled } from '@mui/material/styles';
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
+import axios from "axios";
+
 
 // Form Validation Schema
 const schema = z.object({
@@ -48,15 +50,32 @@ export default function Login() {
     resolver: zodResolver(schema),
   });
 
-  const onSubmit = (data) => {
-    console.log("Login Data:", data);
-    // Handle authentication logic here
-    if (data.email === "admin@physio.com" && data.password === "password") {
-      navigate("/dashboard");
-    } else {
-      alert("Invalid credentials. Please try again.");
-    }
-  };
+const onSubmit = async (data) => {
+  try {
+    const response = await axios.post("/api/auth/signin", {
+      email: data.email,
+      password: data.password
+    });
+  
+    const { token, roles } = response.data;
+  
+    // Save to localStorage
+    localStorage.setItem("token", token);
+    localStorage.setItem("roles", JSON.stringify(roles));
+  
+    // Redirect based on role
+    if (roles.includes("ROLE_ROOT")) navigate("/root/dashboard");
+    else if (roles.includes("ROLE_CLINIC_ADMIN")) navigate("/clinic/dashboard");
+    else if (roles.includes("ROLE_DOCTOR")) navigate("/doctor/dashboard");
+    else if (roles.includes("ROLE_PATIENT")) navigate("/patient/dashboard");
+    else alert("Unknown role, access denied");
+  
+  } catch (err) {
+    console.error(err);
+    alert("Invalid login. Check email and password.");
+  }
+};
+  
 
   return (
     <React.Fragment>
