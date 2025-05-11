@@ -38,6 +38,13 @@ public class Doctor {
     @Column(nullable = false)
     private String phoneNumber;
 
+    /**
+     * Specialization of the doctor (e.g., physiotherapy, rehabilitation).
+     */
+    @Column(nullable = false)
+    private String specialization;
+
+    private String profilePicture;
 
     /**
      * Timestamp of when the doctor was added.

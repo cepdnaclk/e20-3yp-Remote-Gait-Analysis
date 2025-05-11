@@ -12,6 +12,7 @@ import com._yp.gaitMate.security.model.UserDetailsImpl;
 import com._yp.gaitMate.security.repository.RoleRepository;
 import com._yp.gaitMate.security.repository.UserRepository;
 import com._yp.gaitMate.security.utils.AuthUtil;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -69,6 +70,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     @Override
+    @Transactional
     public UserInfoResponse registerUserAndLogin(SignupRequest signupRequest) {
         registerUser(signupRequest);
         // Login just after registering
@@ -80,6 +82,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     @Override
+    @Transactional
     public User registerUser(SignupRequest signupRequest) {
         // check the availability of the username and email
         if (userRepository.existsByUsername(signupRequest.getUsername())){

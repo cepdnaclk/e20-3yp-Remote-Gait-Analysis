@@ -1,30 +1,20 @@
 package com._yp.gaitMate.controller;
 
 
-import com._yp.gaitMate.GaitApplication;
+import com._yp.gaitMate.controller.config.IntegrationTestSupport;
 import com._yp.gaitMate.dto.ApiResponse;
 import com._yp.gaitMate.dto.clinic.ClinicInfoResponse;
 import com._yp.gaitMate.dto.clinic.CreateClinicRequest;
-import com._yp.gaitMate.security.dto.LoginRequest;
-import com._yp.gaitMate.security.dto.UserInfoResponse;
-import com._yp.gaitMate.service.clinicService.ClinicService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.*;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.Arrays;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 
 /**
@@ -34,51 +24,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
  * - ROLE_ADMIN with username 'admin'
  * - A Clinic entity with ID = 301 (e.g., 'Sunrise Clinic')
  */
-@ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = GaitApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-class ClinicControllerTest {
-    @LocalServerPort
-    private int port;
-
-    @Autowired
-    private TestRestTemplate restTemplate;
-
-    @Autowired
-    private  ClinicService clinicService;
-
-    private HttpHeaders headers;
-
-    private String getBaseUrl(){
-        return "http://localhost:" + port;
-    }
-
-
-
-    private HttpHeaders loginAndGetAuthHeaders(String username, String password) {
-        String loginUrl = getBaseUrl() + "/api/auth/signin";
-
-        LoginRequest request = LoginRequest.builder()
-                .username(username)
-                .password(password)
-                .build();
-
-        ResponseEntity<UserInfoResponse> response = restTemplate.postForEntity(
-                loginUrl,
-                request,
-                UserInfoResponse.class
-        );
-
-        assertEquals(HttpStatus.OK, response.getStatusCode(), "Login request failed for " + username);
-        assertNotNull(response.getBody(), "Response body is null for " + username);
-        assertNotNull(response.getBody().getJwtToken(), "JWT token missing for " + username);
-
-        HttpHeaders authHeaders = new HttpHeaders();
-        authHeaders.setContentType(MediaType.APPLICATION_JSON);
-        authHeaders.setBearerAuth(response.getBody().getJwtToken());
-        return authHeaders;
-    }
-
-
+class ClinicControllerTest extends IntegrationTestSupport {
     /**
      * This is the test class for POST /api/clinics
      */
@@ -103,31 +49,31 @@ class ClinicControllerTest {
 
             HttpEntity<String> entity = new HttpEntity<>(new ObjectMapper().writeValueAsString(req), adminHeaders);
 
-            ResponseEntity<String> rawResponse = restTemplate.postForEntity(
-                    getBaseUrl() + PATH,
-                    entity,
-                    String.class // Capture as plain text for debugging
+//            ResponseEntity<String> rawResponse = restTemplate.postForEntity(
+//                    getBaseUrl() + PATH,
+//                    entity,
+//                    String.class // Capture as plain text for debugging
+//            );
+
+//            System.out.println("Error Response: " + rawResponse.getBody());
+//            System.out.println("Status: " + rawResponse.getStatusCode());
+
+            ResponseEntity<ClinicInfoResponse> response = restTemplate.postForEntity(
+                    getBaseUrl() + PATH, entity, ClinicInfoResponse.class
             );
 
-            System.out.println("Error Response: " + rawResponse.getBody());
-            System.out.println("Status: " + rawResponse.getStatusCode());
+            // Assertions
+            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
 
-//            ResponseEntity<ClinicInfoResponse> response = restTemplate.postForEntity(
-//                    getBaseUrl() + PATH, entity, ClinicInfoResponse.class
-//            );
-//
-//            // Assertions
-//            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
-//
-//            ClinicInfoResponse body = response.getBody();
-//            assertThat(body).isNotNull();
-//
-//            // Field-wise assertions
-//            assertThat(body.getId()).isNotNull();
-//            assertThat(body.getName()).isEqualTo("NewCare Clinic");
-//            assertThat(body.getEmail()).isEqualTo("newcare@example.com");
-//            assertThat(body.getPhoneNumber()).isEqualTo("0722222222");
-//            assertThat(body.getCreatedAt()).isNotNull();
+            ClinicInfoResponse body = response.getBody();
+            assertThat(body).isNotNull();
+
+            // Field-wise assertions
+            assertThat(body.getId()).isNotNull();
+            assertThat(body.getName()).isEqualTo("NewCare Clinic");
+            assertThat(body.getEmail()).isEqualTo("newcare@example.com");
+            assertThat(body.getPhoneNumber()).isEqualTo("0722222222");
+            assertThat(body.getCreatedAt()).isNotNull();
 
         }
 
