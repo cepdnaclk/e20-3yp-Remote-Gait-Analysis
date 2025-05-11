@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Diagram>
+  <ID>DATABASE</ID>
+  <OriginalElement>bd1d1ea6-f506-4fb2-87a4-f19954e8b27c.DATABASE:db</OriginalElement>
+  <nodes>
+    <node x="532.6587887740031" y="1013.9822747415069">bd1d1ea6-f506-4fb2-87a4-f19954e8b27c.TABLE:db.public.processed_test_results</node>
+    <node x="139.87813884785783" y="990.6809453471196">bd1d1ea6-f506-4fb2-87a4-f19954e8b27c.TABLE:db.public.raw_sensor_data</node>
+    <node x="-643.3537666174298" y="94.37518463810932">bd1d1ea6-f506-4fb2-87a4-f19954e8b27c.TABLE:db.public.staff_member</node>
+    <node x="-303.09970457902523" y="106.37518463810926">bd1d1ea6-f506-4fb2-87a4-f19954e8b27c.TABLE:db.public.clinic</node>
+    <node x="705.0443131462334" y="-84.59675036927622">bd1d1ea6-f506-4fb2-87a4-f19954e8b27c.TABLE:db.public.role</node>
+    <node x="366.4039881831611" y="177.13441654357462">bd1d1ea6-f506-4fb2-87a4-f19954e8b27c.TABLE:db.public.patient</node>
+    <node x="-183.73855243722278" y="592.0">bd1d1ea6-f506-4fb2-87a4-f19954e8b27c.TABLE:db.public.sensorkit</node>
+    <node x="366.4039881831611" y="708.9350073855243">bd1d1ea6-f506-4fb2-87a4-f19954e8b27c.TABLE:db.public.test_session</node>
+    <node x="763.3995568685377" y="768.9350073855243">bd1d1ea6-f506-4fb2-87a4-f19954e8b27c.TABLE:db.public.feedback</node>
+    <node x="399.4039881831611" y="-84.09675036927621">bd1d1ea6-f506-4fb2-87a4-f19954e8b27c.TABLE:db.public.user_role</node>
+    <node x="35.7636632200888" y="-108.59675036927622">bd1d1ea6-f506-4fb2-87a4-f19954e8b27c.TABLE:db.public.users</node>
+  </nodes>
+  <notes />
+  <edges>
+    <edge source="bd1d1ea6-f506-4fb2-87a4-f19954e8b27c.TABLE:db.public.sensorkit" target="bd1d1ea6-f506-4fb2-87a4-f19954e8b27c.TABLE:db.public.clinic" relationship="REFERENCES">
+      <point x="-4.4756277722513005E-4" y="-80.0" />
+      <point x="-88.739" y="317.0" />
+      <point x="-194.6" y="317.0" />
+      <point x="-2.9542097476564777E-4" y="91.99981536189074" />
+    </edge>
+    <edge source="bd1d1ea6-f506-4fb2-87a4-f19954e8b27c.TABLE:db.public.user_role" target="bd1d1ea6-f506-4fb2-87a4-f19954e8b27c.TABLE:db.public.users" relationship="REFERENCES">
+      <point x="1.1816838878075941E-5" y="43.49975036927621" />
+      <point x="462.404" y="67.0" />
+      <point x="127.764" y="67.0" />
+      <point x="3.3677991119418493E-4" y="67.99975036927623" />
+    </edge>
+    <edge source="bd1d1ea6-f506-4fb2-87a4-f19954e8b27c.TABLE:db.public.staff_member" target="bd1d1ea6-f506-4fb2-87a4-f19954e8b27c.TABLE:db.public.clinic" relationship="REFERENCES">
+      <point x="108.5" y="-5.684341886080802E-14" />
+      <point x="-108.5" y="0.0" />
+    </edge>
+    <edge source="bd1d1ea6-f506-4fb2-87a4-f19954e8b27c.TABLE:db.public.test_session" target="bd1d1ea6-f506-4fb2-87a4-f19954e8b27c.TABLE:db.public.feedback" relationship="REFERENCES">
+      <point x="94.0" y="0.0" />
+      <point x="-95.5" y="0.0" />
+    </edge>
+    <edge source="bd1d1ea6-f506-4fb2-87a4-f19954e8b27c.TABLE:db.public.test_session" target="bd1d1ea6-f506-4fb2-87a4-f19954e8b27c.TABLE:db.public.patient" relationship="REFERENCES">
+      <point x="29.5" y="-116.0" />
+      <point x="15.0" y="176.0" />
+    </edge>
+    <edge source="bd1d1ea6-f506-4fb2-87a4-f19954e8b27c.TABLE:db.public.clinic" target="bd1d1ea6-f506-4fb2-87a4-f19954e8b27c.TABLE:db.public.users" relationship="REFERENCES">
+      <point x="-2.9542097476564777E-4" y="-92.00018463810926" />
+      <point x="-194.6" y="67.0" />
+      <point x="127.764" y="67.0" />
+      <point x="3.3677991119418493E-4" y="67.99975036927623" />
+    </edge>
+    <edge source="bd1d1ea6-f506-4fb2-87a4-f19954e8b27c.TABLE:db.public.test_session" target="bd1d1ea6-f506-4fb2-87a4-f19954e8b27c.TABLE:db.public.processed_test_results" relationship="REFERENCES">
+      <point x="79.75480059084202" y="116.0" />
+      <point x="-126.5" y="-128.0" />
+    </edge>
+    <edge source="bd1d1ea6-f506-4fb2-87a4-f19954e8b27c.TABLE:db.public.patient" target="bd1d1ea6-f506-4fb2-87a4-f19954e8b27c.TABLE:db.public.users" relationship="REFERENCES">
+      <point x="1.1816838878075941E-5" y="-176.00041654357463" />
+      <point x="474.904" y="67.0" />
+      <point x="127.764" y="67.0" />
+      <point x="3.3677991119418493E-4" y="67.99975036927623" />
+    </edge>
+    <edge source="bd1d1ea6-f506-4fb2-87a4-f19954e8b27c.TABLE:db.public.test_session" target="bd1d1ea6-f506-4fb2-87a4-f19954e8b27c.TABLE:db.public.raw_sensor_data" relationship="REFERENCES">
+      <point x="0.0" y="116.0" />
+      <point x="460.4039881831611" y="1034.6809453471196" />
+      <point x="86.5" y="0.0" />
+    </edge>
+    <edge source="bd1d1ea6-f506-4fb2-87a4-f19954e8b27c.TABLE:db.public.user_role" target="bd1d1ea6-f506-4fb2-87a4-f19954e8b27c.TABLE:db.public.role" relationship="REFERENCES">
+      <point x="63.0" y="-1.4210854715202004E-14" />
+      <point x="-93.0" y="0.0" />
+    </edge>
+    <edge source="bd1d1ea6-f506-4fb2-87a4-f19954e8b27c.TABLE:db.public.patient" target="bd1d1ea6-f506-4fb2-87a4-f19954e8b27c.TABLE:db.public.sensorkit" relationship="REFERENCES">
+      <point x="0.0" y="176.0" />
+      <point x="474.9039881831611" y="672.0" />
+      <point x="95.0" y="0.0" />
+    </edge>
+    <edge source="bd1d1ea6-f506-4fb2-87a4-f19954e8b27c.TABLE:db.public.patient" target="bd1d1ea6-f506-4fb2-87a4-f19954e8b27c.TABLE:db.public.clinic" relationship="REFERENCES">
+      <point x="-108.49998818316112" y="-4.165435746017465E-4" />
+      <point x="-30.0" y="353.134" />
+      <point x="-30.0" y="317.0" />
+      <point x="-194.6" y="317.0" />
+      <point x="-2.9542097476564777E-4" y="91.99981536189074" />
+    </edge>
+  </edges>
+  <settings layout="Hierarchic Compact" zoom="0.4839170836311651" showDependencies="false" x="165.49999999999977" y="590.5" />
+  <SelectedNodes>
+    <node>bd1d1ea6-f506-4fb2-87a4-f19954e8b27c.TABLE:db.public.staff_member</node>
+  </SelectedNodes>
+  <Categories>
+    <Category>Columns</Category>
+    <Category>Comments</Category>
+    <Category>Key columns</Category>
+    <Category>Virtual foreign keys</Category>
+  </Categories>
+</Diagram>
+
