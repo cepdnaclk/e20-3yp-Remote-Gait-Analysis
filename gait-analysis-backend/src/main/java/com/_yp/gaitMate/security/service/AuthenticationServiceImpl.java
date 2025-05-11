@@ -117,6 +117,9 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         Role clinicRole = roleRepository.findByRoleName(AppRole.ROLE_CLINIC)
                 .orElseThrow(() -> new ApiException("Role is not found"));
 
+        Role doctorRole = roleRepository.findByRoleName(AppRole.ROLE_DOCTOR)
+                .orElseThrow(() -> new ApiException("Role is not found"));
+
         strRoles.forEach(role -> {
             switch (role) {
                 case "ROLE_PATIENT":
@@ -127,6 +130,9 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                     break;
                 case "ROLE_CLINIC":
                     roles.add(clinicRole);
+                    break;
+                case "ROLE_DOCTOR":
+                    roles.add(doctorRole);
                     break;
                 default:
                     throw new ApiException("Invalid role!");

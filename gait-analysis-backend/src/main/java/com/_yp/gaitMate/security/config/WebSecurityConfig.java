@@ -97,6 +97,7 @@ public class WebSecurityConfig {
                                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
                                 .requestMatchers("/api/clinic/**").hasRole("CLINIC")
                                 .requestMatchers("/api/patient/**").hasRole("PATIENT")
+                                .requestMatchers("/api/doctor/**").hasRole("DOCTOR")
 
                                 .requestMatchers("/error/**").permitAll()
                                 .anyRequest().authenticated())
