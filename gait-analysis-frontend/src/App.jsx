@@ -8,6 +8,12 @@ import RealTimeDashboard from "./pages/RealTimeDashboard";
 import Signup from "./pages/Signup";
 import AboutUs from "./pages/AboutUs";
 
+// SEMESTER 6
+import RoleBasedRoute from "./components/RoleBasedRoute";
+import RootDashboard from "./pages/root/RootDashboard";
+import AddClinicAdmin from "./pages/root/AddClinicAdmin";
+import Unauthorized from "./pages/Unauthorized";
+
 // Create a Query Client instance for managing API data fetching, caching, and state updates
 const queryClient = new QueryClient();
 
@@ -34,6 +40,21 @@ export default function App() {
           <Route path="/patients/:id" element={<PatientProfile />} />
           {/* Real-time Dashboard Page Route */}
           <Route path="/patients/:id/realtime" element={<RealTimeDashboard />} />
+
+          {/* Root (Superadmin) Pages */}
+          <Route path="/root/dashboard" element={
+            <RoleBasedRoute allowedRoles={["ROLE_ROOT"]}>
+            <RootDashboard />
+            </RoleBasedRoute>
+          } />
+          <Route path="/root/add-clinic" element={
+            <RoleBasedRoute allowedRoles={["ROLE_ROOT"]}>
+            <AddClinicAdmin />
+            </RoleBasedRoute>
+          } />
+
+          {/* Unauthorized Access */}
+          <Route path="/unauthorized" element={<Unauthorized />} />   
 
         </Routes>
       </Router>
