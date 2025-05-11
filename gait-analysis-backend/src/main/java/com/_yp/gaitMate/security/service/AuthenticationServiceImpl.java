@@ -109,16 +109,16 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
 
         Role patientRole = roleRepository.findByRoleName(AppRole.ROLE_PATIENT)
-                .orElseThrow(() -> new ApiException("Role is not found"));
+                .orElseThrow(() -> new ApiException("ROLE_PATIENT is not found"));
 
         Role adminRole = roleRepository.findByRoleName(AppRole.ROLE_ADMIN)
-                .orElseThrow(() -> new ApiException("Role is not found"));
+                .orElseThrow(() -> new ApiException("ROLE_ADMIN is not found"));
 
         Role clinicRole = roleRepository.findByRoleName(AppRole.ROLE_CLINIC)
-                .orElseThrow(() -> new ApiException("Role is not found"));
+                .orElseThrow(() -> new ApiException("ROLE_CLINIC is not found"));
 
         Role doctorRole = roleRepository.findByRoleName(AppRole.ROLE_DOCTOR)
-                .orElseThrow(() -> new ApiException("Role is not found"));
+                .orElseThrow(() -> new ApiException("ROLE_DOCTOR is not found"));
 
         strRoles.forEach(role -> {
             switch (role) {

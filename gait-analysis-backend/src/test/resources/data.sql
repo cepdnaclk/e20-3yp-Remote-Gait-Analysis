@@ -19,7 +19,7 @@
 INSERT INTO role(role_id, role_name) VALUES (1, 'ROLE_ADMIN');
 INSERT INTO role(role_id, role_name) VALUES (2, 'ROLE_CLINIC');
 INSERT INTO role(role_id, role_name) VALUES (3, 'ROLE_PATIENT');
--- INSERT INTO role(role_id, role_name) VALUES (3, 'ROLE_DOCTOR');
+INSERT INTO role(role_id, role_name) VALUES (4, 'ROLE_DOCTOR');
 
 -- ADMIN user
 -- password-password
