@@ -4,4 +4,5 @@ public enum AppRole {
     ROLE_PATIENT,
     ROLE_CLINIC,
     ROLE_ADMIN,
+    ROLE_DOCTOR
 }
