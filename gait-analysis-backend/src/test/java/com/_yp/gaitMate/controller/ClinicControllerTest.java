@@ -87,9 +87,9 @@ class ClinicControllerTest extends IntegrationTestSupport {
             // Insert first clinic
             CreateClinicRequest req1 = CreateClinicRequest.builder()
                     .name("DuplicateClinic")
-                    .email("dup1@example.com")
+                    .email("cldup1@example.com")
                     .phoneNumber("0700000001")
-                    .username("dup_user1")
+                    .username("cldup_user1")
                     .password("pass123")
                     .build();
 
@@ -101,9 +101,9 @@ class ClinicControllerTest extends IntegrationTestSupport {
             // Try to insert another clinic with same name
             CreateClinicRequest req2 = CreateClinicRequest.builder()
                     .name("DuplicateClinic") // same name
-                    .email("dup2@example.com")
+                    .email("cldup2@example.com")
                     .phoneNumber("0700000002")
-                    .username("dup_user2")
+                    .username("cldup_user2")
                     .password("pass123")
                     .build();
 
@@ -128,9 +128,9 @@ class ClinicControllerTest extends IntegrationTestSupport {
         void createClinic_shouldFail_whenUserNotAuthenticated() throws Exception {
             CreateClinicRequest req = CreateClinicRequest.builder()
                     .name("UnauthorizedClinic")
-                    .email("unauth@example.com")
+                    .email("clunauth@example.com")
                     .phoneNumber("0777777777")
-                    .username("unauth_user")
+                    .username("clunauth_user")
                     .password("pass123")
                     .build();
 

@@ -10,6 +10,7 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.H2Dialect
+        format_sql: true
     generate-ddl: true
     show-sql: true
     defer-datasource-initialization: true  #This ensures the execution happens after Hibernate creates the tables
