@@ -1,4 +1,4 @@
-import { usePatients } from "../api/patients";
+import { usePatients } from "../../api/patients";
 import { 
   CircularProgress, 
   Typography, 
@@ -33,14 +33,14 @@ import NotificationsIcon from "@mui/icons-material/Notifications";
 
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import RecentPatients from "./RecentPatients";
-import Appointments from "./Appointments";
-import Reports from "./Reports";
-import Messages from "./Messages";
-import Settings from "./Settings";
-import NavbarAuth from "../components/NavbarAuth";
+import RecentPatients from "../RecentPatients";
+import Appointments from "../Appointments";
+import Reports from "../Reports";
+import Messages from "../Messages";
+import Settings from "../Settings";
+import NavbarAuth from "../../components/NavbarAuth";
 
-export default function Dashboard() {
+export default function DoctorDashboard() {
   const navigate = useNavigate();
   const { data: patients, isLoading, error } = usePatients();
   const [selectedSection, setSelectedSection] = useState("Dashboard");
