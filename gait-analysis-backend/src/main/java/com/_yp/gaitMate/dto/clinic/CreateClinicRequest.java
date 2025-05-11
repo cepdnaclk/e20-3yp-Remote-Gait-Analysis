@@ -29,9 +29,11 @@ public class CreateClinicRequest {
     private String email;
 
     @NotBlank
+    @Size(min = 4, max = 20)
     private String username;
 
     @NotBlank
+    @Size(min = 6, max = 20)
     private String password;
 }
 

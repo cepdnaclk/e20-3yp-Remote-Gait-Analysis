@@ -65,11 +65,7 @@ public class Clinic {
     @OneToMany(mappedBy = "clinic", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<SensorKit> sensorKits = new ArrayList<>();;
 
-    /**
-     * Staff members associated with the clinic.
-     */
-    @JsonIgnore
     @OneToMany(mappedBy = "clinic", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<StaffMember> staffMembers = new ArrayList<>();;
+    private List<Doctor> doctors = new ArrayList<>();
 }
 
