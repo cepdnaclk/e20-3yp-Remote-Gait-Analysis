@@ -5,16 +5,21 @@ import com._yp.gaitMate.controller.config.IntegrationTestSupport;
 import com._yp.gaitMate.dto.ApiResponse;
 import com._yp.gaitMate.dto.clinic.ClinicInfoResponse;
 import com._yp.gaitMate.dto.clinic.CreateClinicRequest;
+import com._yp.gaitMate.repository.ClinicRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
+import org.springframework.test.context.jdbc.Sql;
 
 import java.util.Arrays;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.springframework.test.context.jdbc.Sql.ExecutionPhase.BEFORE_TEST_CLASS;
 
 
 /**
@@ -24,6 +29,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * - ROLE_ADMIN with username 'admin'
  * - A Clinic entity with ID = 301 (e.g., 'Sunrise Clinic')
  */
+@Sql(scripts = "/test-data/clinic-test-data.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+@Sql(scripts = "/test-data/clean.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
 class ClinicControllerTest extends IntegrationTestSupport {
     /**
      * This is the test class for POST /api/clinics
@@ -38,6 +45,7 @@ class ClinicControllerTest extends IntegrationTestSupport {
         @DisplayName("Should succeed when request is valid and user is ADMIN")
         void createClinic_shouldSucceed_whenRequestIsValidAndUserIsADMIN() throws Exception {
             HttpHeaders adminHeaders = loginAndGetAuthHeaders("admin", "password");
+
 
             CreateClinicRequest req = CreateClinicRequest.builder()
                     .name("NewCare Clinic")
@@ -82,7 +90,6 @@ class ClinicControllerTest extends IntegrationTestSupport {
         @DisplayName("Should fail when clinic name already exists")
         void createClinic_shouldFail_whenClinicNameAlreadyExists() throws Exception {
             HttpHeaders adminHeaders = loginAndGetAuthHeaders("admin", "password");
-
 
             // Insert first clinic
             CreateClinicRequest req1 = CreateClinicRequest.builder()
