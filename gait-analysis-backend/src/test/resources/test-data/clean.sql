@@ -1,0 +1,11 @@
+DELETE FROM test_session;
+DELETE FROM raw_sensor_data;
+DELETE FROM processed_test_results;
+DELETE FROM feedback;
+DELETE FROM patient;
+DELETE FROM sensorkit;
+DELETE FROM doctor;
+DELETE FROM clinic;
+DELETE FROM user_role;
+DELETE FROM users;
+DELETE FROM role;

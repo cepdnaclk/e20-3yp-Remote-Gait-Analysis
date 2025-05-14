@@ -16,7 +16,7 @@ spring:
     defer-datasource-initialization: true  #This ensures the execution happens after Hibernate creates the tables
   sql:
     init:
-      mode: always
+      mode: never
 
 
 
