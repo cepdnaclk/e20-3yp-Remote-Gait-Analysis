@@ -4,6 +4,7 @@ import com._yp.gaitMate.security.model.User;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,9 +32,14 @@ public class Patient {
     private String name;
 
     /**
+     * National Identity Card number
+     */
+    @Column(name = "nic_number", nullable = false)
+    private String nic;
+
+    /**
      * Link to the patient's profile picture (optional).
      */
-    @Column(nullable = false)
     private String profilePicture;
 
     @Column(nullable = false)
@@ -65,7 +71,7 @@ public class Patient {
     private Gender gender;
 
     @Column(name = "created_at", nullable = false)
-    private LocalDate createdAt;
+    private LocalDateTime createdAt;
 
     /**
      * Associated user account.
@@ -106,4 +112,12 @@ public class Patient {
         FEMALE,
         OTHER
     }
+
+
+    public void assignSensorKit(SensorKit kit) {
+        this.sensorKit = kit;
+        kit.setPatient(this);
+    }
+
+
 }

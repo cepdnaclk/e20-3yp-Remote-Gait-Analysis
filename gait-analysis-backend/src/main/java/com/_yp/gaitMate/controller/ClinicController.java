@@ -94,7 +94,8 @@ public class ClinicController {
                     )
             }
     )
-    public ResponseEntity<ClinicInfoResponse> createClinic(@RequestBody @Valid CreateClinicRequest request) {
+    public ResponseEntity<ClinicInfoResponse> createClinic(
+            @RequestBody @Valid CreateClinicRequest request) {
         ClinicInfoResponse response = clinicService.createClinic(request);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
