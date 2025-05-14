@@ -16,5 +16,5 @@ public class ApiResponse {
     private String message;
 
 //    @Schema(description = "Status indicating whether the API call was successful (true) or failed (false)", example = "true")
-    private boolean status;
+    private Boolean status;
 }

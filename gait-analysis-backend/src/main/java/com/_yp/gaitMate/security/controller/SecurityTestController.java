@@ -28,4 +28,9 @@ public class SecurityTestController {
     public ResponseEntity<String> checkAdminEndpoint(){
         return ResponseEntity.ok("Admin endpoint works");
     }
+
+    @GetMapping("/doctor/test")
+    public ResponseEntity<String> checkDoctorEndpoint(){
+        return ResponseEntity.ok("Doctor endpoint works");
+    }
 }

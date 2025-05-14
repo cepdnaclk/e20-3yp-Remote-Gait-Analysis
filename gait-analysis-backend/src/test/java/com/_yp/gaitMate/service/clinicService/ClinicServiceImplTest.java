@@ -153,5 +153,6 @@ class ClinicServiceImplTest {
 
 
     // TODO: Test getMyClinc and getAllClinics endpoints
+    // TODO: Nest the related tests
 }
 

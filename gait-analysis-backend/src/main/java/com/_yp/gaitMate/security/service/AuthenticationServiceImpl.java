@@ -12,6 +12,7 @@ import com._yp.gaitMate.security.model.UserDetailsImpl;
 import com._yp.gaitMate.security.repository.RoleRepository;
 import com._yp.gaitMate.security.repository.UserRepository;
 import com._yp.gaitMate.security.utils.AuthUtil;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -69,6 +70,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     @Override
+    @Transactional
     public UserInfoResponse registerUserAndLogin(SignupRequest signupRequest) {
         registerUser(signupRequest);
         // Login just after registering
@@ -80,6 +82,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     @Override
+    @Transactional
     public User registerUser(SignupRequest signupRequest) {
         // check the availability of the username and email
         if (userRepository.existsByUsername(signupRequest.getUsername())){
@@ -109,13 +112,16 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
 
         Role patientRole = roleRepository.findByRoleName(AppRole.ROLE_PATIENT)
-                .orElseThrow(() -> new ApiException("Role is not found"));
+                .orElseThrow(() -> new ApiException("ROLE_PATIENT is not found"));
 
         Role adminRole = roleRepository.findByRoleName(AppRole.ROLE_ADMIN)
-                .orElseThrow(() -> new ApiException("Role is not found"));
+                .orElseThrow(() -> new ApiException("ROLE_ADMIN is not found"));
 
         Role clinicRole = roleRepository.findByRoleName(AppRole.ROLE_CLINIC)
-                .orElseThrow(() -> new ApiException("Role is not found"));
+                .orElseThrow(() -> new ApiException("ROLE_CLINIC is not found"));
+
+        Role doctorRole = roleRepository.findByRoleName(AppRole.ROLE_DOCTOR)
+                .orElseThrow(() -> new ApiException("ROLE_DOCTOR is not found"));
 
         strRoles.forEach(role -> {
             switch (role) {
@@ -127,6 +133,9 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                     break;
                 case "ROLE_CLINIC":
                     roles.add(clinicRole);
+                    break;
+                case "ROLE_DOCTOR":
+                    roles.add(doctorRole);
                     break;
                 default:
                     throw new ApiException("Invalid role!");

@@ -16,7 +16,8 @@ import java.util.Set;
 @Configuration
 public class InitDataConfig {
     // NOTE: Comment the @Bean line when doing the integration testing
-    @Bean
+    //@Profile("!test") // Only active when the "test" profile is NOT active
+//    @Bean
     public CommandLineRunner initData(RoleRepository roleRepository, UserRepository userRepository, PasswordEncoder passwordEncoder) {
         return args -> {
             // Retrieve or create roles
@@ -38,25 +39,37 @@ public class InitDataConfig {
                         return roleRepository.save(newAdminRole);
                     });
 
+            Role doctorRole = roleRepository.findByRoleName(AppRole.ROLE_DOCTOR)
+                    .orElseGet(() -> {
+                        Role newDoctorRole = new Role(AppRole.ROLE_DOCTOR);
+                        return roleRepository.save(newDoctorRole);
+                    });
+
             Set<Role> patientRoles = Set.of(patientRole);
             Set<Role> clinicRoles = Set.of(clinicRole);
-            Set<Role> adminRoles = Set.of( adminRole);
+            Set<Role> adminRoles = Set.of(adminRole);
+            Set<Role> doctorRoles = Set.of(doctorRole);
 
 
             // Create users if not already present
             if (!userRepository.existsByUsername("patient1")) {
-                User patient1 = new User("patient1", "patient1@example.com", passwordEncoder.encode("patientpassword"));
-                userRepository.save(patient1);
+                User patient_user = new User("patient1", "patient1@example.com", passwordEncoder.encode("patientpassword"));
+                userRepository.save(patient_user);
             }
 
             if (!userRepository.existsByUsername("clinic1")) {
-                User clinic1 = new User("clinic1", "clinic1@example.com", passwordEncoder.encode("clinicpassword"));
-                userRepository.save(clinic1);
+                User clinic_user = new User("clinic1", "clinic1@example.com", passwordEncoder.encode("clinicpassword"));
+                userRepository.save(clinic_user);
             }
 
             if (!userRepository.existsByUsername("admin1")) {
-                User admin1 = new User("admin1", "admin1@example.com", passwordEncoder.encode("adminpassword"));
-                userRepository.save(admin1);
+                User admin_user = new User("admin1", "admin1@example.com", passwordEncoder.encode("adminpassword"));
+                userRepository.save(admin_user);
+            }
+
+            if (!userRepository.existsByUsername("doctor1")) {
+                User doctor_user = new User("doctor1", "doctor1@example.com", passwordEncoder.encode("doctorpassword"));
+                userRepository.save(doctor_user);
             }
 
             // Update roles for existing users
@@ -74,6 +87,18 @@ public class InitDataConfig {
                 user.setRoles(adminRoles);
                 userRepository.save(user);
             });
+
+            userRepository.findByUsername("doctor1").ifPresent(user -> {
+                user.setRoles(doctorRoles);
+                userRepository.save(user);
+            });
+
+
+
+            // Create a clinic and attach the clinic_user with it
+
+
+            // create a doctor and attach the clinic and the doctor_user to it
         };
     }
 }
