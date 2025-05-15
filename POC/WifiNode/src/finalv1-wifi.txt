@@ -10,21 +10,14 @@ const char* ssid = "Yohan's Galaxy A52";
 const char* password = "11111111";
 const char* mqtt_server = "a18e6b70jffugd-ats.iot.eu-north-1.amazonaws.com";
 const String DEVICE_ID = "esp-001";
+bool stopStreaming = false;   //recive from AWS IOT core
 
-bool stopStreaming = true;
-bool calibrationComplete = false;
-bool streamingActive = false;
 
 // Time settings
 WiFiUDP ntpUDP;
 NTPClient timeClient(ntpUDP, "pool.ntp.org", 0, 60000);
 const unsigned long TIME_SYNC_INTERVAL_MS = 5000;
 const unsigned long SENSOR_INTERVAL_MS = 100;
-const unsigned long DEVICE_ALIVE_INTERVAL_MS = 30000;
-
-unsigned long lastTimeSync = 0;
-unsigned long lastSensorRequest = 0;
-unsigned long lastAliveSent = 0;
 
 WiFiClientSecure espClient;
 PubSubClient client(espClient);
@@ -135,40 +128,27 @@ void connectAWS() {
   }
 }
 
-void publishDeviceAlive() {
-  unsigned long ts = timeClient.getEpochTime();
-  String topic = "device/" + DEVICE_ID + "/status/alive";
-  String payload = "{ \"type\": \"device_alive\", \"device_id\": \"" + DEVICE_ID + "\", \"status\": true, \"timestamp\": " + String(ts) + " }";
-  client.publish(topic.c_str(), payload.c_str());
-  Serial.println("Published device_alive heartbeat.");
-}
-
 void mqttCallback(char* topic, byte* payload, unsigned int length) {
   String message;
-  for (unsigned int i = 0; i < length; i++) message += (char)payload[i];
+  for (unsigned int i = 0; i < length; i++) {
+    message += (char)payload[i];
+  }
 
   Serial.println("MQTT Command Received: " + message);
 
-  if (message.indexOf("\"command\":") != -1) {
-    if (message.indexOf("check_calibration") != -1) {
-      Serial2.println("REQ_CAL_STATUS");
-      Serial.println("requesting cal status");
-    } else if (message.indexOf("start_calibration") != -1) {
-      Serial2.println("START_CALIBRATION");
-      calibrationComplete = false;
-    } else if (message.indexOf("capture_orientation") != -1) {
-      Serial2.println("CAPTURE_ORIENTATION");
-    } else if (message.indexOf("start_streaming") != -1) {
-      Serial.println("Start streaming session...");
-      stopStreaming = false;
-      streamingActive = true;
-    } else if (message.indexOf("stop_streaming") != -1) {
-      Serial.println("Stop streaming session...");
-      stopStreaming = true;
-      streamingActive = false;
-    }
+  if (message.indexOf("\"command\":") != -1 && message.indexOf("stop_streaming") != -1) {
+    Serial.println("Received stop_streaming command. Ending session...");
+    stopStreaming = true;
+    //Serial2.println("STOP_STREAMING");
+  }
+
+  if (message.indexOf("\"command\":") != -1 && message.indexOf("start_streaming") != -1) {
+    Serial.println("Received start_streaming command. starting session...");
+    stopStreaming = false;
+    //Serial2.println("STAT_STREAMING");
   }
 }
+
 
 void setup() {
   Serial.begin(115200);
@@ -177,21 +157,24 @@ void setup() {
   connectWiFi();
   timeClient.begin();
   connectAWS();
-  client.setBufferSize(1024);
-  client.setCallback(mqttCallback);
+  client.setBufferSize(1024); // Allow large MQTT messages
 
+  client.setCallback(mqttCallback);
   String commandTopic = "device/" + DEVICE_ID + "/command";
   client.subscribe(commandTopic.c_str());
   Serial.println("Subscribed to command topic: " + commandTopic);
 
-  // Sensor Node Handshake
+
+  // Handshake with sensor node
   bool sensorNodeReady = false;
-  for (int i = 0; i < 20; i++) {
+  for (int i = 0; i < 200; i++) {
     Serial2.println("PING");
     delay(500);
     if (Serial2.available()) {
       String response = Serial2.readStringUntil('\n');
       response.trim();
+      Serial.print("Sensor response: ");
+      Serial.println(response);
       if (response == "ACK") {
         sensorNodeReady = true;
         break;
@@ -200,53 +183,58 @@ void setup() {
   }
 
   if (!sensorNodeReady) {
-    Serial.println("Sensor Node not responding to PING.");
+    Serial.println("Sensor Node not responding to PING. Halting.");
     while (true) delay(1000);
   }
 
-  publishDeviceAlive();  // First heartbeat
-  lastAliveSent = millis();
+  // Start calibration
+  Serial2.println("START_CALIBRATION");
+  Serial.println("Sent START_CALIBRATION to sensor");
+
+  bool calibrationComplete = false;
+  while (!calibrationComplete) {
+    if (Serial2.available()) {
+      String calLine = Serial2.readStringUntil('\n');
+      calLine.trim();
+      if (calLine.startsWith("{") && calLine.indexOf("\"type\": \"cal_status\"") != -1) {
+        Serial.println("Calibration Status: " + calLine);
+        String topic = "device/" + DEVICE_ID + "/status";
+        client.publish(topic.c_str(), calLine.c_str());
+
+        if (calLine.indexOf("\"completed\": true") != -1) {
+          Serial.println("Calibration complete.");
+          calibrationComplete = true;
+          break;
+        }
+      }
+    }
+  }
 }
 
+unsigned long lastTimeSync = 0;
+unsigned long lastSensorRequest = 0;
+
 void loop() {
-  if (!client.connected()) connectAWS();
+  if (!client.connected()) {
+    Serial.println("MQTT disconnected. Reconnecting...");
+    connectAWS();
+  }
   client.loop();
 
   unsigned long now = millis();
 
-  // Time sync
+  // Sync time every 5 seconds
   if (now - lastTimeSync >= TIME_SYNC_INTERVAL_MS) {
     timeClient.update();
     unsigned long epoch = timeClient.getEpochTime();
     Serial2.printf("SYNC_TIME:%lu\n", epoch);
+    Serial.println("Sent SYNC_TIME");
     lastTimeSync = now;
   }
 
-  // Periodic device_alive status
-  if (now - lastAliveSent >= DEVICE_ALIVE_INTERVAL_MS) {
-    publishDeviceAlive();
-    lastAliveSent = now;
-  }
-
-  // Read sensor messages and publish without modification
-  if (Serial2.available()) {
-    String line = Serial2.readStringUntil('\n');
-    line.trim();
-
-    if (line.startsWith("{") && line.indexOf("\"type\":") != -1) {
-      if (line.indexOf("\"type\": \"cal_status\"") != -1) {
-        client.publish(("device/" + DEVICE_ID + "/status/calibration").c_str(), line.c_str());
-      } else if (line.indexOf("\"type\": \"orientation_captured\"") != -1) {
-        client.publish(("device/" + DEVICE_ID + "/status/orientation").c_str(), line.c_str());
-      } else {
-        Serial.println("Received unknown typed message: " + line);
-      }
-    }
-  }
-
-  // Sensor data request loop
-  if (!stopStreaming && streamingActive && (millis() - lastSensorRequest >= SENSOR_INTERVAL_MS)) {
-    lastSensorRequest = millis();
+  // Request sensor data every 100ms only if stop_streaming command is not recived
+  if (!stopStreaming && (now - lastSensorRequest >= SENSOR_INTERVAL_MS)) {
+    lastSensorRequest = now;
     Serial2.println("REQ_DATA");
 
     String sensorData = "";
@@ -260,9 +248,12 @@ void loop() {
     }
 
     if (sensorData.startsWith("{") && sensorData.indexOf("timestamp") != -1) {
-      // Just forward it directly (sensor already embeds device_id & timestamp)
+      Serial.println("Sensor Data: " + sensorData);
+      String payload = "{ \"device_id\": \"" + DEVICE_ID + "\", " + sensorData.substring(1);
       String topic = "device/" + DEVICE_ID + "/sensor_data";
-      client.publish(topic.c_str(), sensorData.c_str());
+      client.publish(topic.c_str(), payload.c_str());
+    } else {
+      Serial.println("Sensor data timeout or invalid.");
     }
   }
 }
