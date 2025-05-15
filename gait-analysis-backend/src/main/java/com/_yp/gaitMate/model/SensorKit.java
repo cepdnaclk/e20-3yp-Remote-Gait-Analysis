@@ -48,7 +48,7 @@ public class SensorKit {
      * The clinic to which this sensor kit is assigned.
      */
     @ManyToOne
-    @JoinColumn(name = "clinicId", nullable = false)
+    @JoinColumn(name = "clinicId")
     private Clinic clinic;
 
     /**
@@ -66,7 +66,8 @@ public class SensorKit {
     public enum Status {
         IN_USE,
         AVAILABLE,
-        FAULTY
+        FAULTY,
+        IN_STOCK
     }
 
 }
