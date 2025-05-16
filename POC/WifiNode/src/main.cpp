@@ -220,6 +220,7 @@ void loop() {
     unsigned long epoch = timeClient.getEpochTime();
     Serial2.printf("SYNC_TIME:%lu\n", epoch);
     lastTimeSync = now;
+    Serial.println("Time Synced");
   }
 
   // Periodic device_alive status
