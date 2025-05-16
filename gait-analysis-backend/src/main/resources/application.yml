@@ -6,7 +6,7 @@ spring:
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: update
     defer-datasource-initialization: true  #This ensures the execution happens after Hibernate creates the tables
     show-sql: true
     properties:
@@ -24,6 +24,10 @@ jwt:
     ms: 432000000
 
 # http://localhost:8080/swagger-ui.html
+
+logging:
+  level:
+    org.springframework.security: DEBUG
 
 
 #client:
