@@ -131,17 +131,20 @@ public class WebSecurityConfig {
         ));
     }
 
+
     @Bean
-    public CorsConfigurationSource corsConfigurationSource(){
+    public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
 
-//        configuration.setAllowedOrigins(List.of("http://localhost:42000"));
-        configuration.setAllowedOrigins(clientDomains);
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE"));
+        configuration.setAllowedOrigins(List.of("http://localhost:5173")); // ✅ update to actual frontend origin
+        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS")); // ✅ add OPTIONS
+        configuration.setAllowedHeaders(List.of("*")); // ✅ allow content-type and any custom headers
+        configuration.setAllowCredentials(true); // ✅ needed if using Authorization headers or cookies
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
     }
+
 
 }

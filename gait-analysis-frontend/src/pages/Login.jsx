@@ -8,10 +8,17 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import axios from "axios";
 
+import BASE_URL from '../config';
+
 
 // Form Validation Schema
+//const schema = z.object({
+  //email: z.string().email("Invalid email format"),
+  //password: z.string().min(6, "Password must be at least 6 characters"),
+//});
+
 const schema = z.object({
-  email: z.string().email("Invalid email format"),
+  username: z.string().min(3, "Username must be at least 3 characters"),
   password: z.string().min(6, "Password must be at least 6 characters"),
 });
 
@@ -52,14 +59,15 @@ export default function Login() {
 
 const onSubmit = async (data) => {
   try {
-    const response = await axios.post("/api/auth/signin", {
-      email: data.email,
+    const response = await axios.post(`${BASE_URL}/api/auth/signin`, {
+      username: data.username,
       password: data.password
     });
   
-    const { token, roles } = response.data;
+    
   
     // Save to localStorage
+    const { jwtToken: token, roles} = response.data;
     localStorage.setItem("token", token);
     localStorage.setItem("roles", JSON.stringify(roles));
   
@@ -72,7 +80,7 @@ const onSubmit = async (data) => {
   
   } catch (err) {
     console.error(err);
-    alert("Invalid login. Check email and password.");
+    alert("Invalid login. Check username and password.");
   }
 };
   
@@ -87,18 +95,18 @@ const onSubmit = async (data) => {
           </Typography>
           <Box component="form" onSubmit={handleSubmit(onSubmit)} sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
             <FormControl>
-              <FormLabel htmlFor="email">Email</FormLabel>
+              <FormLabel htmlFor="username">Username</FormLabel>
               <TextField
                 required
                 fullWidth
-                id="email"
-                placeholder="your@email.com"
-                name="email"
-                autoComplete="email"
+                id="username"
+                placeholder="your username"
+                name="username"
+                autoComplete="username"
                 variant="outlined"
-                error={!!errors.email}
-                helperText={errors.email?.message}
-                {...register("email")}
+                error={!!errors.username}
+                helperText={errors.username?.message}
+                {...register("username")}
               />
             </FormControl>
             <FormControl>
