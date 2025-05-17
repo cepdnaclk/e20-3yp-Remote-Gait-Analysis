@@ -17,7 +17,7 @@ import java.util.Set;
 public class InitDataConfig {
     // NOTE: Comment the @Bean line when doing the integration testing
     //@Profile("!test") // Only active when the "test" profile is NOT active
-//    @Bean
+    @Bean
     public CommandLineRunner initData(RoleRepository roleRepository, UserRepository userRepository, PasswordEncoder passwordEncoder) {
         return args -> {
             // Retrieve or create roles
@@ -72,6 +72,12 @@ public class InitDataConfig {
                 userRepository.save(doctor_user);
             }
 
+            if (!userRepository.existsByUsername("admin")) {
+                User superAdmin = new User("admin", "admin@example.com", passwordEncoder.encode("password123")); // <- real working password
+                //superAdmin.setRoles(adminRoles);
+                userRepository.save(superAdmin);
+            }
+
             // Update roles for existing users
             userRepository.findByUsername("patient1").ifPresent(user -> {
                 user.setRoles(patientRoles);
@@ -92,6 +98,11 @@ public class InitDataConfig {
                 user.setRoles(doctorRoles);
                 userRepository.save(user);
             });
+
+
+
+
+
 
 
 
