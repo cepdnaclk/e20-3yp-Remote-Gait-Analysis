@@ -32,6 +32,15 @@ mqtt:
     accessKey: {MQTT_AWS_ACCESS_KEY}
     accessId: {MQTT_AWS_ACCESS_ID}
 
+
+microservices:
+  data:
+    processing:
+      url: http://localhost:8000/process-session
+
+
+
+
 # http://localhost:8080/swagger-ui.html
 
 

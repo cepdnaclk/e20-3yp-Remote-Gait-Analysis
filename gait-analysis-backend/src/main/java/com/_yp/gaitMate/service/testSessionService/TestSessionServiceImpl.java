@@ -1,6 +1,7 @@
 package com._yp.gaitMate.service.testSessionService;
 
 import com._yp.gaitMate.dto.ApiResponse;
+import com._yp.gaitMate.dto.testSession.ProcessingRequestDto;
 import com._yp.gaitMate.dto.testSession.StartTestSessionResponse;
 import com._yp.gaitMate.dto.testSession.TestSessionActionDto;
 import com._yp.gaitMate.exception.ApiException;
@@ -28,6 +29,8 @@ public class TestSessionServiceImpl implements TestSessionService {
     private final TestSessionRepository testSessionRepository;
     private final AuthUtil authUtil;
     private final MqttPublisher mqttPublisher;
+    private final DataProcessingService dataProcessingService;
+
 
     @Override
     public StartTestSessionResponse startSession(TestSessionActionDto request) {
@@ -97,11 +100,22 @@ public class TestSessionServiceImpl implements TestSessionService {
         session.setStatus(TestSession.Status.PROCESSING);
         testSessionRepository.save(session);
 
-        log.info("Session stopped successfully in the database.");
+        log.info("✅ Session stopped successfully in the database.");
 
-        // 8. Try publishing MQTT STOP command
+        // 8. publish MQTT STOP command
         SensorKit sensorKit = patient.getSensorKit();
         sendStopCommandToSensor(sensorKit);
+
+        // 9. Trigger asynchronous processing
+        ProcessingRequestDto processingRequest = ProcessingRequestDto.builder()
+                .sensorId(sensorKit.getId())
+                .startTime(session.getStartTime().toString())
+                .endTime(session.getEndTime().toString())
+                .sessionId(session.getId())
+                .build();
+
+        dataProcessingService.sendProcessingRequest(processingRequest);
+        log.info("🚀 Processing request dispatched asynchronously for session {}", session.getId());
 
         return new ApiResponse("Processing started", true);
     }
@@ -128,7 +142,7 @@ public class TestSessionServiceImpl implements TestSessionService {
 
         } catch (Exception e) {
             log.error("❌ Failed to send STOP command via MQTT: {}", e.getMessage());
-            throw new ApiException("❌ Session stopped, but failed to notify SensorKit via MQTT: " + e.getMessage());
+            throw new ApiException("Session stopped, but failed to notify SensorKit via MQTT: " + e.getMessage());
         }
     }
 
