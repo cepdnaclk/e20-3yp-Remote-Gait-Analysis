@@ -15,18 +15,18 @@ public class IoTMessage extends AWSIotMessage {
     @Override
     public void onSuccess() {
         // called when message publishing succeeded
-        log.info("Message published successfully");
+        log.info("✅Message published successfully");
     }
 
     @Override
     public void onFailure() {
         // called when message publishing failed
-        log.error("Message publishing failed");
+        log.error("🔴Message publishing failed");
     }
 
     @Override
     public void onTimeout() {
         // called when message publishing timed out
-        log.error("Message publishing timed out");
+        log.error("🔴Message publishing timed out");
     }
 }

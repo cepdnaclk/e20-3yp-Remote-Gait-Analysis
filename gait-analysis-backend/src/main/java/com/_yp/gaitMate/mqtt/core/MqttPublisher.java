@@ -1,17 +1,14 @@
 package com._yp.gaitMate.mqtt.core;
 
-import com.amazonaws.services.iot.client.AWSIotException;
-import com.amazonaws.services.iot.client.AWSIotMqttClient;
-import com.amazonaws.services.iot.client.AWSIotQos;
+import com.amazonaws.services.iot.client.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 /**
- * Handles publishing messages to AWS IoT Core via MQTT.
- * This service can be reused for sending commands, alerts, or updates to IoT devices.
+ * Publishes messages to AWS IoT Core using either blocking or non-blocking (async) mode.
  */
-@Service
+@Component
 @RequiredArgsConstructor
 @Slf4j
 public class MqttPublisher {
@@ -19,23 +16,40 @@ public class MqttPublisher {
     private final MqttClientProvider mqttClientProvider;
 
     /**
-     * Publishes a message to the given topic with QOS1.
+     * Publishes a message asynchronously using the given topic and QoS.
+     * Success/failure will be handled by the IoTMessage callbacks.
      *
      * @param topic   the topic to publish to
-     * @param payload the JSON payload
+     * @param payload the payload to send (typically JSON)
+     * @param qos     the desired Quality of Service
      */
-    public void publish(String topic, String payload) {
+    public void publishAsync(String topic, String payload, AWSIotQos qos) {
         try {
             AWSIotMqttClient client = mqttClientProvider.getClient();
 
-            log.info("📤 Publishing to [{}] payload: {}", topic, payload);
+            log.info("📤 [ASYNC] Publishing to [{}] payload: {}", topic, payload);
 
-            IoTMessage message = new IoTMessage(topic, AWSIotQos.QOS1, payload);
-
-            client.publish(message, 3000);
-
+            IoTMessage message = new IoTMessage(topic, qos, payload);
+            client.publish(message, 3000); // timeout in ms
         } catch (AWSIotException e) {
-            log.error("❌ Failed to publish message: {}", e.getMessage(), e);
+            log.error("❌ [ASYNC] Failed to publish message: {}", e.getMessage(), e);
         }
+    }
+
+    /**
+     * Publishes a message using blocking mode. Throws if the publishing fails.
+     *
+     * @param topic   the topic to publish to
+     * @param payload the payload to send (typically JSON)
+     * @param qos     the desired Quality of Service
+     * @throws AWSIotException if publishing fails
+     */
+    public void publishBlocking(String topic, String payload, AWSIotQos qos) throws AWSIotException {
+        AWSIotMqttClient client = mqttClientProvider.getClient();
+
+        log.info("📤 [BLOCKING] Publishing to [{}] payload: {}", topic, payload);
+
+        client.publish(topic, qos, payload); // blocking call
+        log.info("✅ Published to [{}] successfully", topic);
     }
 }

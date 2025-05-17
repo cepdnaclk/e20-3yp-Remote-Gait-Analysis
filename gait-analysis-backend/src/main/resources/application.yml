@@ -8,7 +8,7 @@ spring:
     hibernate:
       ddl-auto: create-drop
     defer-datasource-initialization: true  #This ensures the execution happens after Hibernate creates the tables
-    show-sql: true
+    show-sql: false
     properties:
       hibernate:
         format_sql: true

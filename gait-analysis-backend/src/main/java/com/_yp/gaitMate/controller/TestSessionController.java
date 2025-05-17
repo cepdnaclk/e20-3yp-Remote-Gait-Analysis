@@ -1,5 +1,6 @@
 package com._yp.gaitMate.controller;
 
+import com._yp.gaitMate.dto.ApiResponse;
 import com._yp.gaitMate.dto.testSession.TestSessionActionDto;
 import com._yp.gaitMate.dto.testSession.StartTestSessionResponse;
 import com._yp.gaitMate.service.testSessionService.TestSessionService;
@@ -31,5 +32,17 @@ public class TestSessionController {
 
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
+
+    @PreAuthorize("hasRole('PATIENT')")
+    @PutMapping("/{sessionId}")
+    public ResponseEntity<ApiResponse> stopTestSession(
+            @PathVariable Long sessionId,
+            @RequestBody @Valid TestSessionActionDto request) {
+
+        ApiResponse response = testSessionService.stopSession(sessionId, request);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+
 }
 

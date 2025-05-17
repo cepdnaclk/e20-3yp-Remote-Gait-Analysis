@@ -1,15 +1,20 @@
 package com._yp.gaitMate.service.testSessionService;
 
+import com._yp.gaitMate.dto.ApiResponse;
 import com._yp.gaitMate.dto.testSession.StartTestSessionResponse;
 import com._yp.gaitMate.dto.testSession.TestSessionActionDto;
 import com._yp.gaitMate.exception.ApiException;
 import com._yp.gaitMate.model.Patient;
 import com._yp.gaitMate.model.SensorKit;
 import com._yp.gaitMate.model.TestSession;
+import com._yp.gaitMate.mqtt.core.MqttPublisher;
 import com._yp.gaitMate.repository.PatientRepository;
 import com._yp.gaitMate.repository.TestSessionRepository;
 import com._yp.gaitMate.security.utils.AuthUtil;
+import com.amazonaws.services.iot.client.AWSIotQos;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -18,58 +23,32 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 public class TestSessionServiceImpl implements TestSessionService {
 
+    private static final Logger log = LoggerFactory.getLogger(TestSessionServiceImpl.class);
     private final PatientRepository patientRepository;
     private final TestSessionRepository testSessionRepository;
     private final AuthUtil authUtil;
+    private final MqttPublisher mqttPublisher;
 
     @Override
     public StartTestSessionResponse startSession(TestSessionActionDto request) {
-        // 1. Get the currently logged-in user's ID
-        Long userId = authUtil.loggedInUserId();
+        // 1. Validate action
+        validateAction(request.getAction(), "START");
 
-        // 2. Find the corresponding patient for this user
-        Patient patient = patientRepository.findByUser_UserId(userId)
-                .orElseThrow(() -> new ApiException("Patient not found for user ID: " + userId));
+        // 2. Get current patient from user context
+        Patient patient = getLoggedInPatient();
 
-        // 3. Get the patient's assigned SensorKit
-        SensorKit sensorKit = patient.getSensorKit();
+        // 3. Validate sensor kit
+        SensorKit sensorKit = validateSensorKit(patient);
 
-        // 4. Ensure the patient has a sensor kit assigned
-        if (sensorKit == null) {
-            throw new ApiException("Patient is not assigned a sensorKit");
-        }
-
-        // 5. Prevent starting a new session if one is already active for this patient
-        Boolean hasActiveSession = testSessionRepository.existsByPatientAndStatus(patient, TestSession.Status.ACTIVE);
-        if (hasActiveSession) {
+        // 4. Ensure no active session exists
+        if (testSessionRepository.existsByPatientAndStatus(patient, TestSession.Status.ACTIVE)) {
             throw new ApiException("There is already an active test session for this patient");
         }
 
-        // 6. Ensure the sensor kit is calibrated before starting a session
-        if (!sensorKit.getIsCalibrated()) {
-            throw new ApiException("SensorKit is not calibrated");
-        }
+        // 5. Validate timestamp
+        LocalDateTime startTime = validateTimestampCloseToNow(request.getTimestamp());
 
-        // 7. Validate the incoming action is "START"
-        if (!"START".equalsIgnoreCase(request.getAction())) {
-            throw new ApiException("Unsupported action: " + request.getAction());
-        }
-
-        // 8. Parse the timestamp from the request and compare to server time
-        LocalDateTime serverTime = LocalDateTime.now();
-        LocalDateTime startTime = LocalDateTime.parse(request.getTimestamp());
-
-        long diffInSeconds = Math.abs(java.time.Duration.between(serverTime, startTime).getSeconds());
-
-        // 9. Reject if the timestamp is not within ±2 seconds of server time
-        if (diffInSeconds > 2) {
-            System.out.println(serverTime.toString());
-            System.out.println(diffInSeconds);
-
-            throw new ApiException("Start time must be within ±2 seconds of server time");
-        }
-
-        // 10. Build and save the new test session
+        // 6. Build and save new test session
         TestSession session = TestSession.builder()
                 .startTime(startTime)
                 .status(TestSession.Status.ACTIVE)
@@ -78,9 +57,135 @@ public class TestSessionServiceImpl implements TestSessionService {
 
         session = testSessionRepository.save(session);
 
-        // 11. Return the response with the newly created session ID
+        // 7. Return response
         return StartTestSessionResponse.builder()
                 .sessionId(session.getId())
                 .build();
+    }
+
+    @Override
+    public ApiResponse stopSession(Long sessionId, TestSessionActionDto request) {
+        // 1. Validate action
+        validateAction(request.getAction(), "STOP");
+
+        // 2. Get current patient from user context
+        Patient patient = getLoggedInPatient();
+
+        // 3. Find test session by ID
+        TestSession session = testSessionRepository.findById(sessionId)
+                .orElseThrow(() -> new ApiException("Test session not found for ID: " + sessionId));
+
+        // 4. Check session ownership
+        if (!session.getPatient().getId().equals(patient.getId())) {
+            throw new ApiException("Unauthorized: You do not own this session");
+        }
+
+        // 5. Ensure session is ACTIVE
+        if (!TestSession.Status.ACTIVE.equals(session.getStatus())) {
+            throw new ApiException("Session is not active");
+        }
+
+        // 6. Validate timestamp
+        LocalDateTime stopTime = validateTimestampCloseToNow(request.getTimestamp());
+
+        if (!stopTime.isAfter(session.getStartTime())) {
+            throw new ApiException("Stop time must be after the session start time");
+        }
+
+        // 7. Update and save session
+        session.setEndTime(stopTime);
+        session.setStatus(TestSession.Status.PROCESSING);
+        testSessionRepository.save(session);
+
+        log.info("Session stopped successfully in the database.");
+
+        // 8. Try publishing MQTT STOP command
+        SensorKit sensorKit = patient.getSensorKit();
+        sendStopCommandToSensor(sensorKit);
+
+        return new ApiResponse("Processing started", true);
+    }
+
+    // =====================================
+    // 🔽 PRIVATE HELPERS
+    // =====================================
+
+
+    /**
+     * Publishes a STOP command to the sensor's MQTT topic.
+     * Does not throw if publishing fails — returns fallback response instead.
+     *
+     * @param sensorKit the sensor assigned to the patient
+     * @return null if successful, or an ApiResponse indicating failure
+     */
+    private void sendStopCommandToSensor(SensorKit sensorKit) {
+        try {
+            Long sensorId = sensorKit.getId();
+            String topic = "sensors/" + sensorId + "/command";
+            String payload = "{ \"action\": \"STOP\" }";
+
+            mqttPublisher.publishBlocking(topic, payload, AWSIotQos.QOS1);
+
+        } catch (Exception e) {
+            log.error("❌ Failed to send STOP command via MQTT: {}", e.getMessage());
+            throw new ApiException("❌ Session stopped, but failed to notify SensorKit via MQTT: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Validates that the action matches the expected keyword.
+     */
+    private void validateAction(String inputAction, String expectedAction) {
+        if (!expectedAction.equalsIgnoreCase(inputAction)) {
+            throw new ApiException("Unsupported action: " + inputAction);
+        }
+    }
+
+    /**
+     * Gets the currently logged-in patient based on the JWT user ID.
+     */
+    private Patient getLoggedInPatient() {
+        Long userId = authUtil.loggedInUserId();
+
+        return patientRepository.findByUser_UserId(userId)
+                .orElseThrow(() -> new ApiException("Patient not found for user ID: " + userId));
+    }
+
+    /**
+     * Validates that the patient has a usable sensor kit.
+     */
+    private SensorKit validateSensorKit(Patient patient) {
+        SensorKit sensorKit = patient.getSensorKit();
+
+        if (sensorKit == null) {
+            throw new ApiException("Patient is not assigned a sensorKit");
+        }
+
+        if (!sensorKit.getStatus().equals(SensorKit.Status.IN_USE)) {
+            throw new ApiException("Invalid sensor-kit status: " + sensorKit.getStatus().name());
+        }
+
+        if (!sensorKit.getIsCalibrated()) {
+            throw new ApiException("SensorKit is not calibrated");
+        }
+
+        return sensorKit;
+    }
+
+    /**
+     * Parses and validates that the timestamp is close to server time (±2 seconds).
+     */
+    private LocalDateTime validateTimestampCloseToNow(String timestampStr) {
+        LocalDateTime parsed = LocalDateTime.parse(timestampStr);
+        LocalDateTime now = LocalDateTime.now();
+
+        long diffInSeconds = Math.abs(java.time.Duration.between(now, parsed).getSeconds());
+
+        // ⚠️ Uncomment this if needed for testing
+        if (diffInSeconds > 2) {
+            throw new ApiException("Timestamp must be within ±2 seconds of server time");
+        }
+
+        return parsed;
     }
 }

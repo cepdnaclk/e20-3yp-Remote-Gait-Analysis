@@ -10,6 +10,8 @@ import com._yp.gaitMate.model.SensorKit;
 import com._yp.gaitMate.repository.ClinicRepository;
 import com._yp.gaitMate.repository.SensorKitRepository;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -19,6 +21,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class SensorKitServiceImpl implements SensorKitService {
 
+    private static final Logger log = LoggerFactory.getLogger(SensorKitServiceImpl.class);
     private final SensorKitRepository sensorKitRepository;
     private final SensorKitMapper sensorKitMapper;
 
@@ -61,6 +64,10 @@ public class SensorKitServiceImpl implements SensorKitService {
     public void setCalibrationStatus(Long sensorKitId, Boolean isCalibrated) {
         SensorKit sensorKit = sensorKitRepository.findById(sensorKitId)
                 .orElseThrow(() -> new ResourceNotFoundException("SensorKit", "id", sensorKitId));
+
+        if (!sensorKit.getStatus().equals(SensorKit.Status.IN_USE)){
+            log.warn("⚠️ Attempted to calibrate SensorKit [{}] with invalid status: {}", sensorKitId, sensorKit.getStatus());
+        }
 
         sensorKit.setIsCalibrated(isCalibrated);
         sensorKitRepository.save(sensorKit);
