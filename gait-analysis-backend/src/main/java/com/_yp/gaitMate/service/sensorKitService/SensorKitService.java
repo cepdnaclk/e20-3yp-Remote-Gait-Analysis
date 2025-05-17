@@ -15,5 +15,5 @@ public interface SensorKitService {
 
     void deleteSensorKit(Long id);
 
-    void setClibrationStatus(Long sensorKitId, Boolean isCalibrated);
+    void setCalibrationStatus(Long sensorKitId, Boolean isCalibrated);
 }

@@ -58,7 +58,7 @@ public class SensorKitServiceImpl implements SensorKitService {
     }
 
     @Override
-    public void setClibrationStatus(Long sensorKitId, Boolean isCalibrated) {
+    public void setCalibrationStatus(Long sensorKitId, Boolean isCalibrated) {
         SensorKit sensorKit = sensorKitRepository.findById(sensorKitId)
                 .orElseThrow(() -> new ResourceNotFoundException("SensorKit", "id", sensorKitId));
 
