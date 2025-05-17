@@ -93,6 +93,8 @@ public class WebSecurityConfig {
                                 .requestMatchers("/swagger-ui/**").permitAll()
                                 .requestMatchers("/swagger-ui.html").permitAll()
 
+                                .requestMatchers("/api/results").permitAll() // TODO: remove later
+
                                 .requestMatchers("/api/public/**").permitAll()
                                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
                                 .requestMatchers("/api/clinic/**").hasRole("CLINIC")

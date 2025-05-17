@@ -67,25 +67,25 @@ VALUES (404, 'Dr. Dan', 'doctor4@example.com', '0771234033', 'Sports', CURRENT_T
 
 -- 6 for clinic1, 6 for clinic2, 4 unassigned
 -- ID: 601–616, Serial: 1601–1616
-INSERT INTO sensorkit(id, serial_no, firmware_version, status, clinic_id) VALUES
-(601, 1601, 1, 'IN_USE', 301),
-(602, 1602, 1, 'IN_USE', 301),
-(603, 1603, 1, 'IN_USE', 301),
-(604, 1604, 1, 'IN_USE', 301),
-(605, 1605, 1, 'AVAILABLE', 301),
-(606, 1606, 1, 'AVAILABLE', 301),
+INSERT INTO sensorkit(id, serial_no, firmware_version, status, clinic_id, is_calibrated) VALUES
+(601, 1601, 1, 'IN_USE', 301, TRUE),
+(602, 1602, 1, 'IN_USE', 301, FALSE),
+(603, 1603, 1, 'IN_USE', 301, FALSE),
+(604, 1604, 1, 'IN_USE', 301, FALSE),
+(605, 1605, 1, 'AVAILABLE', 301, FALSE),
+(606, 1606, 1, 'AVAILABLE', 301, FALSE),
 
-(607, 1607, 1, 'IN_USE', 302),
-(608, 1608, 1, 'IN_USE', 302),
-(609, 1609, 1, 'IN_USE', 302),
-(610, 1610, 1, 'IN_USE', 302),
-(611, 1611, 1, 'AVAILABLE', 302),
-(612, 1612, 1, 'AVAILABLE', 302),
+(607, 1607, 1, 'IN_USE', 302, FALSE),
+(608, 1608, 1, 'IN_USE', 302, FALSE),
+(609, 1609, 1, 'IN_USE', 302, FALSE),
+(610, 1610, 1, 'IN_USE', 302, FALSE),
+(611, 1611, 1, 'AVAILABLE', 302, FALSE),
+(612, 1612, 1, 'AVAILABLE', 302, FALSE),
 
-(613, 1613, 1, 'IN_STOCK', NULL),
-(614, 1614, 1, 'IN_STOCK', NULL),
-(615, 1615, 1, 'IN_STOCK', NULL),
-(616, 1616, 1, 'IN_STOCK', NULL);
+(613, 1613, 1, 'IN_STOCK', NULL, FALSE),
+(614, 1614, 1, 'IN_STOCK', NULL, FALSE),
+(615, 1615, 1, 'IN_STOCK', NULL, FALSE),
+(616, 1616, 1, 'IN_STOCK', NULL, FALSE);
 
 -- ==============================
 --          PATIENTS
