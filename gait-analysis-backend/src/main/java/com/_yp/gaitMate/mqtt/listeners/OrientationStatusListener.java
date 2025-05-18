@@ -9,21 +9,19 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 /**
- * Listener for calibration status updates published by ESP32 devices.
+ * Listener for orientation capture status updates published by ESP32 devices.
  *
  * <p>This listens to the MQTT topic pattern:</p>
  * <pre>
- * device/{DEVICE_ID}/status/calibration
+ * device/{DEVICE_ID}/status/orientation
  * </pre>
  *
  * <p>Expected JSON payload format:</p>
  * <pre>
  * {
- *   "type": "cal_status",
+ *   "type": "orientation_captured",
  *   "device_id": 34,
- *   "status": true,
- *   .
- *   .
+ *   "status": true
  * }
  * </pre>
  *
@@ -31,29 +29,27 @@ import org.springframework.stereotype.Component;
  * <ul>
  *   <li>Parse device ID from the topic</li>
  *   <li>Validate and process the JSON payload</li>
- *   <li>Update SensorKit calibration status in the database</li>
  *   <li>Send WebSocket message to the linked frontend user</li>
  * </ul>
  */
 @Component
 @Slf4j
-public class CalibrationStatusListener extends AbstractTopicListener {
+public class OrientationStatusListener extends AbstractTopicListener {
 
     private final SensorKitService sensorKitService;
     private final NotificationService notificationService;
 
-    public CalibrationStatusListener(SensorKitService sensorKitService, NotificationService notificationService) {
-        super("device/+/status/calibration", AWSIotQos.QOS1);
+    public OrientationStatusListener(SensorKitService sensorKitService, NotificationService notificationService) {
+        super("device/+/status/orientation", AWSIotQos.QOS1);
         this.sensorKitService = sensorKitService;
         this.notificationService = notificationService;
     }
 
     @Override
-    public void handleMessage(String topic, String payload) {
+    public void handleMessage(String topic, String payload) throws Exception {
         try {
-            NotificationMessage message = ListenerUtil.extractAndValidateMessage(topic, payload, "cal_status");
-
-            sensorKitService.setCalibrationStatus(message.getDeviceId(), message.getStatus());
+            NotificationMessage message = ListenerUtil.extractAndValidateMessage(
+                    topic, payload, "orientation_captured");
 
             String username = sensorKitService.getUsernameBySensorKitId(message.getDeviceId());
             if (username == null) {
@@ -62,10 +58,10 @@ public class CalibrationStatusListener extends AbstractTopicListener {
             }
 
             notificationService.sendToUser(username, message);
-            log.info("Calibration status update sent to user [{}] for device [{}]", username, message.getDeviceId());
+            log.info("Orientation update sent to user [{}] for device [{}]", username, message.getDeviceId());
 
         } catch (IllegalArgumentException e) {
-            log.warn("Failed to handle calibration status message: {}", e.getMessage());
+            log.warn("Failed to handle orientation status message: {}", e.getMessage());
         }
     }
 }

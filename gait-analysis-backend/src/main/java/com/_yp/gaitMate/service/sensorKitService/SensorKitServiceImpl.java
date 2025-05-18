@@ -72,5 +72,19 @@ public class SensorKitServiceImpl implements SensorKitService {
         sensorKit.setIsCalibrated(isCalibrated);
         sensorKitRepository.save(sensorKit);
     }
+
+    @Override
+    public String getUsernameBySensorKitId(Long sensorKitId) {
+        SensorKit sensorKit = sensorKitRepository.findById(sensorKitId)
+                .orElseThrow(() -> new ResourceNotFoundException("SensorKit", "id", sensorKitId));
+
+        if (sensorKit.getPatient() == null || sensorKit.getPatient().getUser() == null) {
+            log.error("No patient or user is linked to SensorKit {}", sensorKitId);
+            return null;
+        }
+
+        return sensorKit.getPatient().getUser().getUsername();
+    }
+
 }
 

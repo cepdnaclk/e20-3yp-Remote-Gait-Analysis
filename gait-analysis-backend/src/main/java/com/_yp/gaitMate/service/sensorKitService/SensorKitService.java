@@ -16,4 +16,7 @@ public interface SensorKitService {
     void deleteSensorKit(Long id);
 
     void setCalibrationStatus(Long sensorKitId, Boolean isCalibrated);
+
+    String getUsernameBySensorKitId(Long sensorKitId);
+
 }
