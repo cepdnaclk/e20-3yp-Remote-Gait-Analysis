@@ -46,7 +46,7 @@ public class CommandServiceImpl implements CommandService{
         }
 
         Long sensorId = sensorKit.getId();
-        String topic = "devices/" + sensorId + "/command";
+        String topic = "device/" + sensorId + "/command";
 
         // 2. Determine action and publish
         String commandStr = request.getCommand().toUpperCase();

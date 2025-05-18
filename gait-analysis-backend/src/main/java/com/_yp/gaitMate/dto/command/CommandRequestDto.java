@@ -18,6 +18,7 @@ public class CommandRequestDto {
         CHECK_CALIBRATION,
         START_CALIBRATION,
         CAPTURE_ORIENTATION,
-        BEGIN_STREAMING
+        START_STREAMING,
+        STOP_STREAMING,
     }
 }
