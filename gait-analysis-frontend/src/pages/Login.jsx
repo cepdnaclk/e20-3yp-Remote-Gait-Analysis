@@ -72,7 +72,7 @@ const onSubmit = async (data) => {
     localStorage.setItem("roles", JSON.stringify(roles));
   
     // Redirect based on role
-    if (roles.includes("ROLE_ROOT")) navigate("/root/dashboard");
+    if (roles.includes("ROLE_ADMIN")) navigate("/root/dashboard");
     else if (roles.includes("ROLE_CLINIC_ADMIN")) navigate("/clinic/dashboard");
     else if (roles.includes("ROLE_DOCTOR")) navigate("/doctor/dashboard");
     else if (roles.includes("ROLE_PATIENT")) navigate("/patient/dashboard");

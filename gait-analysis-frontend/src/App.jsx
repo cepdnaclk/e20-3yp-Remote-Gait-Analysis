@@ -50,7 +50,7 @@ export default function App() {
 
           {/* Root (Superadmin) Pages */}
           <Route path="/root/dashboard" element={
-            <RoleBasedRoute allowedRoles={["ROLE_ROOT"]}>
+            <RoleBasedRoute allowedRoles={["ROLE_ADMIN"]}>
             <RootDashboard />
             </RoleBasedRoute>
           } />
