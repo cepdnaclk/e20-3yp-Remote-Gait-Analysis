@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface SensorKitRepository extends JpaRepository<SensorKit, Long> {
+    Boolean existsBySerialNo(Long serialNo);
 }

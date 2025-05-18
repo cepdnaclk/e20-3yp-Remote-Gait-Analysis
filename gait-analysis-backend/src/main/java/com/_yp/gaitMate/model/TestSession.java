@@ -76,7 +76,8 @@ public class TestSession {
     public enum Status {
         ACTIVE,
         PROCESSING,
-        COMPLETED
+        COMPLETED,
+        FAILED
     }
 }
 
