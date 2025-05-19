@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8" />
+    <title>Status Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.6.1/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <style>
+        .status-card {
+            border-left: 6px solid gray;
+            padding: 1rem;
+            border-radius: 8px;
+            background-color: #2c2c2c;
+            margin-bottom: 1rem;
+            color: white;
+        }
+        .status-true {
+            border-left-color: #28a745;
+            background-color: #1f3d26;
+        }
+        .status-false {
+            border-left-color: #dc3545;
+            background-color: #3d1f1f;
+        }
+        .disabled-overlay {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 100;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 1.2rem;
+        }
+    </style>
+</head>
+
+<body>
+<div class="container my-4">
+    <h2>Status Dashboard</h2>
+    <div id="greeting" class="my-2"></div>
+
+    <div id="login-div">
+        <form id="login-form" class="d-flex gap-2">
+            <input type="text" class="form-control" placeholder="Username" id="login-username" required />
+            <input type="password" class="form-control" placeholder="Password" id="password" required />
+            <button class="btn btn-primary">Login</button>
+        </form>
+    </div>
+
+    <div id="control-panel" class="d-none">
+        <div class="d-flex justify-content-between my-3">
+            <div>
+                <button id="connect" class="btn btn-success">Connect</button>
+                <button id="logout" class="btn btn-outline-light ms-2">Logout</button>
+            </div>
+            <span id="connection-status" class="text-danger"></span>
+        </div>
+
+        <div class="d-flex flex-wrap gap-2 mb-3">
+            <button class="btn btn-warning command-btn" data-command="CHECK_CALIBRATION">Check Calibration</button>
+            <button class="btn btn-warning command-btn" data-command="START_CALIBRATION">Start Calibration</button>
+            <button class="btn btn-warning command-btn" data-command="CAPTURE_ORIENTATION">Capture Orientation</button>
+<!--            <button class="btn btn-warning command-btn" data-command="BEGIN_STREAMING">Begin Streaming</button>-->
+        </div>
+
+        <div id="status-cards">
+            <!-- Status cards will be created dynamically -->
+        </div>
+    </div>
+
+    <div class="disabled-overlay" id="overlay">WebSocket disconnected. Please reconnect.</div>
+</div>
+
+<script>
+    const statusTypes = ["cal_status", "orientation_captured", "device_alive"];
+    const statusMap = {};
+
+    let stompClient = null;
+
+    function getItem(key) {
+        return localStorage.getItem(key);
+    }
+
+    function clearLocalStorage() {
+        localStorage.removeItem("token");
+        localStorage.removeItem("username");
+    }
+
+    function createStatusCard(type) {
+        const card = document.createElement("div");
+        card.id = `status-${type}`;
+        card.className = "status-card";
+        card.innerHTML = `<strong>${type}</strong><div>Status: unknown</div>`;
+        return card;
+    }
+
+    function updateCard(type, status) {
+        const card = document.getElementById(`status-${type}`);
+        if (!card) return;
+        card.className = "status-card";
+        if (status === true) {
+            card.classList.add("status-true");
+        } else if (status === false) {
+            card.classList.add("status-false");
+        }
+        card.innerHTML = `<strong>${type}</strong><div>Status: ${status}</div>`;
+    }
+
+    function connectWS() {
+        const socket = new SockJS("http://localhost:8080/ws");
+        stompClient = Stomp.over(socket);
+        stompClient.connect({ Authorization: `Bearer ${getItem("token")}` }, (frame) => {
+            $("#connect").text("Connected").attr("disabled", true);
+            $("#connection-status").text("");
+            $("#overlay").hide();
+
+            stompClient.subscribe("/user/topic", (msg) => {
+                const data = JSON.parse(msg.body);
+                console.log("WebSocket msg", data);
+                statusMap[data.type] = data.status;
+                updateCard(data.type, data.status);
+            });
+
+        }, () => {
+            $("#connection-status").text("Connection lost");
+            $("#connect").text("Reconnect").attr("disabled", false);
+            $("#overlay").show();
+        });
+    }
+
+    $("#login-form").submit((e) => {
+        e.preventDefault();
+        fetch("http://localhost:8080/api/auth/signin", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                username: $("#login-username").val(),
+                password: $("#password").val(),
+            }),
+        })
+            .then((resp) => resp.json())
+            .then((data) => {
+                localStorage.setItem("token", data.jwtToken);
+                localStorage.setItem("username", data.username);
+                $("#greeting").text(`Hello ${data.username}`);
+                $("#login-div").hide();
+                $("#control-panel").removeClass("d-none");
+                $("#connect").text("Connect").attr("disabled", false);
+                statusTypes.forEach(type => {
+                    document.getElementById("status-cards").appendChild(createStatusCard(type));
+                });
+            })
+            .catch(() => alert("Login failed"));
+    });
+
+    $("#connect").click(() => connectWS());
+
+    $("#logout").click(() => {
+        clearLocalStorage();
+        location.reload();
+    });
+
+    $(".command-btn").click(function () {
+        const command = $(this).data("command");
+        fetch("http://localhost:8080/api/commands", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${getItem("token")}`,
+            },
+            body: JSON.stringify({ command }),
+        })
+            .then(res => res.json())
+            .then(data => console.log(data.message))
+            .catch(err => console.log("Command failed"));
+    });
+
+    // Auto-load session if already logged in
+    const token = getItem("token");
+    const username = getItem("username");
+    if (token && username) {
+        $("#greeting").text(`Hello ${username}`);
+        $("#login-div").hide();
+        $("#control-panel").removeClass("d-none");
+        statusTypes.forEach(type => {
+            document.getElementById("status-cards").appendChild(createStatusCard(type));
+        });
+    }
+</script>
+</body>
+</html>

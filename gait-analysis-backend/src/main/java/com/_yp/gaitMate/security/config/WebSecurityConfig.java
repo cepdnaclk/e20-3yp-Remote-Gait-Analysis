@@ -86,6 +86,7 @@ public class WebSecurityConfig {
                         (requests) -> requests
                                 .requestMatchers("/api/auth/user").authenticated()
                                 .requestMatchers("/api/auth/**").permitAll()
+                                .requestMatchers("/ws/**").permitAll()
 
                                 .requestMatchers("/h2-console/**").permitAll()
 
@@ -138,7 +139,8 @@ public class WebSecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
 
-        configuration.setAllowedOrigins(List.of("http://localhost:5173")); // ✅ update to actual frontend origin
+//        configuration.setAllowedOrigins(List.of("http://localhost:5173", "http://127.0.0.1:5500", "http://localhost:63342")); // ✅ update to actual frontend origin
+        configuration.addAllowedOriginPattern("*"); // ✅ allow all origins (not just specific ones)  // TODO; set this correctly
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS")); // ✅ add OPTIONS
         configuration.setAllowedHeaders(List.of("*")); // ✅ allow content-type and any custom headers
         configuration.setAllowCredentials(true); // ✅ needed if using Authorization headers or cookies

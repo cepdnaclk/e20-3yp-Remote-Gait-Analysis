@@ -22,7 +22,8 @@ public class MqttSubscriptionRegistrar {
 
     private final MqttClientProvider mqttClientProvider;
     private final CalibrationStatusListener calibrationStatusListener;
-
+    private final OrientationStatusListener orientationStatusListener;
+    private final AliveSignalListener aliveSignalListener;
     /**
      * Called automatically after Spring context is initialized.
      * Subscribes the application to all required MQTT topics.
@@ -34,7 +35,11 @@ public class MqttSubscriptionRegistrar {
 
             // Subscribe to calibration status topic
             client.subscribe(calibrationStatusListener, true);
+            client.subscribe(orientationStatusListener, true);
+            client.subscribe(aliveSignalListener, true);
             log.info("✅ Subscribed to topic: {}", calibrationStatusListener.getTopic());
+            log.info("✅ Subscribed to topic: {}", orientationStatusListener.getTopic());
+            log.info("✅ Subscribed to topic: {}", aliveSignalListener.getTopic());
 
         } catch (AWSIotException e) {
             log.error("❌ Failed to subscribe to MQTT topics: {}", e.getMessage(), e);
