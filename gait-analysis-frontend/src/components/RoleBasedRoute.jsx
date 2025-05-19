@@ -11,9 +11,15 @@ function parseJwt(token) {
 export default function RoleBasedRoute({ allowedRoles, children }) {
   const token = localStorage.getItem("token");
   const user = parseJwt(token);
-  // ✅ Log the decoded JWT and roles
+
   console.log("🔍 Decoded JWT:", user);
-  const roles = Array.isArray(user?.roles) ? user.roles : [user?.roles];
+
+  // Extract role strings from authorities if roles are objects
+  const roles = Array.isArray(user?.roles)
+    ? user.roles.map(r => typeof r === "string" ? r : r.authority)
+    : [user?.roles];
+  // ✅ Log the decoded JWT and roles
+  
   console.log("✅ Extracted roles:", roles);
 
 

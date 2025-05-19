@@ -9,12 +9,17 @@ export default function RootDashboard() {
   useEffect(() => {
     const fetchClinics = async () => {
       try {
-        const response = await axios.get("/api/root/clinics", {
+        const response = await axios.get("http://localhost:8080/api/clinics", {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
         });
-        setClinics(response.data);
+
+        console.log("📦 API Response:", response.data);
+
+        // Have to fix depending on actual structure
+        const data = response.data;
+        setClinics(Array.isArray(data) ? data : data.clinics); // ✅ handles both cases
       } catch (error) {
         console.error("Failed to fetch clinics:", error);
         alert("Could not load clinics.");

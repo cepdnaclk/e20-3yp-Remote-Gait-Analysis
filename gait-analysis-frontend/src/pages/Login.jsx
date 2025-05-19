@@ -73,7 +73,7 @@ const onSubmit = async (data) => {
   
     // Redirect based on role
     if (roles.includes("ROLE_ADMIN")) navigate("/root/dashboard");
-    else if (roles.includes("ROLE_CLINIC_ADMIN")) navigate("/clinic/dashboard");
+    else if (roles.includes("ROLE_CLINIC")) navigate("/clinic/dashboard");
     else if (roles.includes("ROLE_DOCTOR")) navigate("/doctor/dashboard");
     else if (roles.includes("ROLE_PATIENT")) navigate("/patient/dashboard");
     else alert("Unknown role, access denied");
