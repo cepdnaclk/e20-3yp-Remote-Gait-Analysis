@@ -1,4 +1,5 @@
 package com._yp.gaitMate.controller;
+import com._yp.gaitMate.dto.doctor.DoctorInfoResponse;
 
 import com._yp.gaitMate.dto.clinic.ClinicInfoResponse;
 import com._yp.gaitMate.dto.clinic.CreateClinicRequest;
@@ -264,6 +265,14 @@ public class ClinicController {
         List<ClinicInfoResponse> clinics = clinicService.getAllClinics();
         return ResponseEntity.ok(clinics);
     }
+
+    @GetMapping("/clinics/me/doctors")
+    @PreAuthorize("hasRole('CLINIC')")
+    public ResponseEntity<List<DoctorInfoResponse>> getMyDoctors() {
+        List<DoctorInfoResponse> doctors = clinicService.getDoctorsOfLoggedInClinic();
+        return ResponseEntity.ok(doctors);
+    }
+
 
 
     // TODO: update, delete
