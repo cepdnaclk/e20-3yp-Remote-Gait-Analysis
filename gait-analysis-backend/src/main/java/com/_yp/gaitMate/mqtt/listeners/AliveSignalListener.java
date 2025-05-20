@@ -32,6 +32,12 @@ import org.springframework.stereotype.Component;
  *   <li>Notify the frontend user via WebSocket with the alive status</li>
  * </ul>
  */
+
+//{
+//    "type": "device_alive",
+//    "device_id": 34,
+//    "status": true
+//}
 @Component
 @Slf4j
 public class AliveSignalListener extends AbstractTopicListener {
@@ -40,7 +46,7 @@ public class AliveSignalListener extends AbstractTopicListener {
     private final NotificationService notificationService;
 
     public AliveSignalListener(SensorKitService sensorKitService, NotificationService notificationService) {
-        super("device/+/status/device_alive", AWSIotQos.QOS1);
+        super("device/+/status/alive", AWSIotQos.QOS1);
         this.sensorKitService = sensorKitService;
         this.notificationService = notificationService;
     }

@@ -44,6 +44,18 @@ public class AuthUtil {
         return userDetails.getId();
     }
 
+    public String loggedInUsername(){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+//        User user = userRepository.findByUsername(authentication.getName())
+//                .orElseThrow(()-> new UsernameNotFoundException("User not Found"));
+
+//        return user.getUserId();
+
+        UserDetailsImpl userDetails = (UserDetailsImpl) (authentication.getPrincipal());
+        return userDetails.getUsername();
+    }
+
     public User loggedInUser(){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
