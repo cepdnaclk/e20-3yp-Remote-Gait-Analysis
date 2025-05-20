@@ -1,5 +1,4 @@
 package com._yp.gaitMate.controller;
-
 import com._yp.gaitMate.dto.doctor.CreateDoctorRequest;
 import com._yp.gaitMate.dto.doctor.DoctorInfoResponse;
 import com._yp.gaitMate.service.doctorService.DoctorService;
@@ -17,11 +16,25 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import com._yp.gaitMate.model.Doctor;
+import com._yp.gaitMate.model.Patient;
+import com._yp.gaitMate.repository.PatientRepository;
+import com._yp.gaitMate.mapper.PatientMapper;
+import com._yp.gaitMate.dto.patient.PatientInfoResponse;
+import com._yp.gaitMate.security.utils.AuthUtil;
+import com._yp.gaitMate.dto.patient.PatientInfoResponse;
+import org.springframework.web.bind.annotation.GetMapping;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("api/")
 @RequiredArgsConstructor
 public class DoctorController {
+
+    private final AuthUtil authUtil;
+    private final PatientRepository patientRepository;
+    private final PatientMapper patientMapper;
     private final DoctorService doctorService;
 
     @PostMapping("/doctors")
@@ -99,4 +112,17 @@ public class DoctorController {
         DoctorInfoResponse response = doctorService.createDoctor(request);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
+
+    @GetMapping("/doctors/me/patients")
+    @PreAuthorize("hasRole('DOCTOR')")
+    public ResponseEntity<List<PatientInfoResponse>> getMyPatients() {
+        Doctor doctor = authUtil.loggedInDoctor();
+        List<Patient> patients = patientRepository.findByDoctor(doctor);
+        List<PatientInfoResponse> response = patients.stream()
+                .map(patientMapper::toPatientInfoResponse)
+                .toList();
+        return ResponseEntity.ok(response);
+    }
+
+
 }
