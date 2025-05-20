@@ -8,6 +8,9 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import com._yp.gaitMate.model.Patient;
+import com._yp.gaitMate.dto.patient.PatientInfoResponse;
+
 
 @Service
 public class Mapper {
@@ -41,4 +44,15 @@ public class Mapper {
 
         return userInfoResponse;
     }
+
+    public PatientInfoResponse toPatientInfoResponse(Patient patient) {
+        return PatientInfoResponse.builder()
+                .id(patient.getId())
+                .name(patient.getName())
+                .email(patient.getEmail())
+                .phoneNumber(patient.getPhoneNumber())
+                .createdAt(patient.getCreatedAt().toString())
+                .build();
+    }
+
 }

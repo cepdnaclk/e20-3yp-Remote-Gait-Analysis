@@ -16,6 +16,9 @@ import Unauthorized from "./pages/Unauthorized";
 import PatientDashboard from "./pages/patient/PatientDashboard";
 import TestResult from "./pages/patient/TestResult";
 import Feedback from "./pages/patient/Feedback";
+import ClinicDashboard from "./pages/clinic/ClinicDashboard";
+import AddDoctor from "./pages/clinic/AddDoctor";
+
 
 // Create a Query Client instance for managing API data fetching, caching, and state updates
 const queryClient = new QueryClient();
@@ -46,14 +49,32 @@ export default function App() {
           {/* Patient Profile Page Route */}
           <Route path="/patients/:id" element={<PatientProfile />} />
           {/* Real-time Dashboard Page Route */}
-          <Route path="/patients/:id/realtime" element={<RealTimeDashboard />} />
+          <Route path="/patients/:id/realtime" element={
+            <RealTimeDashboard allowedRoles = {["ROLE_DOCTOR"]}>
+            </RealTimeDashboard>} />
 
           {/* Root (Superadmin) Pages */}
           <Route path="/root/dashboard" element={
-            <RoleBasedRoute allowedRoles={["ROLE_ROOT"]}>
+            <RoleBasedRoute allowedRoles={["ROLE_ADMIN"]}>
             <RootDashboard />
             </RoleBasedRoute>
           } />
+
+          {/* Clinic Admin Pages */}
+          <Route path="/clinic/dashboard" element={
+            <RoleBasedRoute allowedRoles={["ROLE_CLINIC"]}>
+            <ClinicDashboard />
+            </RoleBasedRoute>
+          } />
+
+          {/* Add Doctor Page Route */}
+          <Route path="/clinic/add-doctor" element={
+            <RoleBasedRoute allowedRoles={["ROLE_CLINIC"]}>
+            <AddDoctor />
+            </RoleBasedRoute>
+          } />
+
+          {/* Add Patient Page Route */}
 
           {/* Patient Dashboard Page Route */}
           <Route path="/patient/dashboard" element={
@@ -78,7 +99,7 @@ export default function App() {
 
           {/* Clinic Admin Pages */}
           <Route path="/root/add-clinic" element={
-            <RoleBasedRoute allowedRoles={["ROLE_ROOT"]}>
+            <RoleBasedRoute allowedRoles={["ROLE_ADMIN"]}>
             <AddClinicAdmin />
             </RoleBasedRoute>
           } />

@@ -1,6 +1,8 @@
 import { Box, Typography, Paper, Grid, Button } from "@mui/material";
 import { useParams } from "react-router-dom"; // ✅ To get the patient ID
-import { usePatients } from "../api/patients";
+import { useEffect, useState } from "react";
+import axios from "axios";
+
 
 // import HeatmapComponent from "../components/HeatmapComponent";
 import InsoleHeatmap from "../components/heatmap/InsoleHeatmap.jsx";
@@ -13,21 +15,47 @@ import HeatmapWebSock3Force from "../components/heatmap/HeatmapWebSock3Force.jsx
 import RealTimeGraph from "../components/RealTimeGraph";
 import YawRealTimeGraph from "../components/YawRealTimeGraph";
 import Scene from "../components/Scene";
-import { useState } from "react";
+
 import HeatmapWebSock3ForceOptimized from "../components/heatmap/HeatmapWebSock3ForceOptimized.jsx";
 
 export default function RealTimeDashboard() {
   const { id } = useParams(); // ✅ Get the patient ID from the URL
-  const { data: patients, isLoading, error } = usePatients();
+  
+  const [patient, setPatient] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchPatient = async () => {
+      try {
+        const res = await axios.get(`/api/patients/${id}`, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        });
+        setPatient(res.data);
+        console.log("Patient Data:", res.data);
+      } catch (err) {
+        console.error("Failed to load patient", err);
+        setError(err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchPatient();
+  }, [id]);
+
   const [activeGraph, setActiveGraph] = useState("angles");
 
   if (isLoading) return <Typography>Loading Patient Data...</Typography>;
   if (error)
     return <Typography color="error">Error loading patient data</Typography>;
 
-  const patient = patients.find((p) => p.id === Number(id));
+  // const patient = patients.find((p) => p.id === Number(id));
   if (!patient) return <Typography color="error">Patient not found</Typography>;
 
+  console.log("Patient Data:", patient);
   return (
     <Box sx={{ padding: 3, height: "100vh" }}>
       <Typography variant="h4">Real-time Dashboard - {patient.name}</Typography>

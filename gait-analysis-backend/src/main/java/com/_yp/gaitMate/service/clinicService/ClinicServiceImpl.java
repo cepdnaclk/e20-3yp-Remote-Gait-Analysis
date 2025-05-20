@@ -1,4 +1,8 @@
 package com._yp.gaitMate.service.clinicService;
+import com._yp.gaitMate.dto.doctor.DoctorInfoResponse; // ✅ import DTO
+import com._yp.gaitMate.mapper.DoctorMapper;       // ✅ import mapper
+import com._yp.gaitMate.model.Doctor;
+import com._yp.gaitMate.repository.DoctorRepository; // ✅ import repo
 
 import com._yp.gaitMate.dto.clinic.ClinicInfoResponse;
 import com._yp.gaitMate.dto.clinic.CreateClinicRequest;
@@ -33,6 +37,10 @@ public class ClinicServiceImpl implements ClinicService {
     private final AuthenticationService authService;
     private final ClinicMapper clinicMapper;
     private final AuthUtil authUtil;
+
+    // ✅ Inject missing beans
+    private final DoctorRepository doctorRepository;
+    private final DoctorMapper doctorMapper;
 
     @Override
     @Transactional
@@ -91,6 +99,16 @@ public class ClinicServiceImpl implements ClinicService {
                 .map(clinicMapper::toClinicInfoResponse)
                 .toList();
     }
+
+    @Override
+    public List<DoctorInfoResponse> getDoctorsOfLoggedInClinic() {
+        Clinic clinic = authUtil.loggedInClinic(); // or however you fetch current clinic
+        List<Doctor> doctors = doctorRepository.findByClinic(clinic);
+        return doctors.stream()
+                .map(doctorMapper::toDoctorInfoResponse)
+                .toList();
+    }
+
 
 }
 

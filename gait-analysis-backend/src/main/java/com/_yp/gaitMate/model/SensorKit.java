@@ -26,16 +26,19 @@ public class SensorKit {
 
      /**
       * Current status of the sensor kit.
-      * Indicates whether the kit is in use, available, or faulty.
+      * Indicates whether the kit is in use, available, faulty or in-stock.
       */
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Status status;
 
+    @Column(nullable = false)
+    private Boolean isCalibrated;
+
     /**
      * Serial number of the physical kit device.
      */
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private Long serialNo;
 
     /**

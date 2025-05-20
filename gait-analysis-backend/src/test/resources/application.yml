@@ -26,3 +26,18 @@ jwt:
   secret: d9692a94f0a03f80a196ed630d430a894cf2d0514bd16861cdc7bf60023c6878418ab0b0d210226b4d9c15ed30f73457e89661c6224c3790a9d567e98cd688c8a5377795514bd256dc6f846d16e1c4fac39517367f8a0bcb1b0bf4343a25774d5de6cad159e3fb33f97a56ee964f8ce10b83a11906917c5f83a05e322ac2ef40860cfd2cc6a9533525aca626f9a3227300711944ea6b2b3042306ea537cb8d428131b1f8c7b55f0c4e7113ec8e08055dc8c4fe886dc91bf4f329e4b22fbe951e05d9a54bd21115a72d697f1827e8106234897123377671e62f947b39865efc46345e8d062a51dd4e3745cc05288aa5cc1c6e4cd6b42893be309f94b141bbec87
   expiration:
     ms: 432000000
+
+
+mqtt:
+  client:
+    endpoint: {MQTT_CLIENT_ENDPOINT}
+    id: {MQTT_CLIENT_ID}
+  aws:
+    accessKey: {MQTT_AWS_ACCESS_KEY}
+    accessId: {MQTT_AWS_ACCESS_ID}
+
+
+microservices:
+  data:
+    processing:
+      url: http://localhost:8000/process-session

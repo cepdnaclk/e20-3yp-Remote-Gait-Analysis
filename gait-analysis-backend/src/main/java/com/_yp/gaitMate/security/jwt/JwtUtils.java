@@ -1,5 +1,5 @@
 package com._yp.gaitMate.security.jwt;
-
+import org.springframework.security.core.GrantedAuthority;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.MalformedJwtException;
@@ -50,8 +50,15 @@ public class JwtUtils {
         Date now = Date.from(Instant.now());
         Date expiryDate = Date.from(Instant.now().plusMillis(jwtExpirationMs));
 
+        // ✅ Extract role names
+        var roles = userDetails.getAuthorities()
+                .stream()
+                .map(GrantedAuthority::getAuthority)
+                .toList();
+
         return Jwts.builder()
                 .subject(username)
+                .claim("roles", roles)  // ✅ Include roles in JWT
                 .issuedAt(now)
                 .expiration(expiryDate)
                 .signWith(key())
