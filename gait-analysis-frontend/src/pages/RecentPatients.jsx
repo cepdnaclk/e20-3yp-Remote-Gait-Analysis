@@ -22,6 +22,7 @@ import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { useNavigate } from "react-router-dom"; // ✅ Import useNavigate
 
+
 export default function RecentPatients({ patients, isLoading, error }) {
   const navigate = useNavigate(); // ✅ Initialize navigate hook
 
@@ -166,7 +167,8 @@ export default function RecentPatients({ patients, isLoading, error }) {
                       color="primary"
                       onClick={(e) => {
                         e.stopPropagation(); // ✅ Prevent row click navigation
-                        navigate(`/patients/${patient.id}`); // ✅ Navigate to real-time dashboard
+                        console.log("View Details clicked for patient ID:", patient.id);
+                        navigate(`/patients/${patient.id}/realtime`); // ✅ Navigate to real-time dashboard
                       }}
                     >
                       View Details

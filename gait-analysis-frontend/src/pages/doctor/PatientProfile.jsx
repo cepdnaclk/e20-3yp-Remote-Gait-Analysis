@@ -1,6 +1,5 @@
 import { useParams } from "react-router-dom";
 import { Typography, Box, Paper, Button, Grid, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from "@mui/material";
-import { usePatients } from "../../api/patients";
 import PatientSidebar from "../../components/PatientSidebar";
 import { useNavigate } from "react-router-dom";
 

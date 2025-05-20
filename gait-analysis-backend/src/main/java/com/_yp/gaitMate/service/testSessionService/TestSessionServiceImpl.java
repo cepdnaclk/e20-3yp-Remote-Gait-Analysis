@@ -161,7 +161,7 @@ public class TestSessionServiceImpl implements TestSessionService {
     private Patient getLoggedInPatient() {
         Long userId = authUtil.loggedInUserId();
 
-        return patientRepository.findByUser_UserId(userId)
+        return patientRepository.findById(userId)
                 .orElseThrow(() -> new ApiException("Patient not found for user ID: " + userId));
     }
 

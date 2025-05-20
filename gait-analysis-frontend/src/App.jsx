@@ -49,7 +49,9 @@ export default function App() {
           {/* Patient Profile Page Route */}
           <Route path="/patients/:id" element={<PatientProfile />} />
           {/* Real-time Dashboard Page Route */}
-          <Route path="/patients/:id/realtime" element={<RealTimeDashboard />} />
+          <Route path="/patients/:id/realtime" element={
+            <RealTimeDashboard allowedRoles = {["ROLE_DOCTOR"]}>
+            </RealTimeDashboard>} />
 
           {/* Root (Superadmin) Pages */}
           <Route path="/root/dashboard" element={

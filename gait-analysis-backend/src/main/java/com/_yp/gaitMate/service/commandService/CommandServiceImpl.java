@@ -32,7 +32,7 @@ public class CommandServiceImpl implements CommandService{
     public ApiResponse sendCommandToSensor(CommandRequestDto request) {
         // 1. Get the logged-in patient's sensor kit
         Long userId = authUtil.loggedInUserId();
-        Patient patient = patientRepository.findByUser_UserId(userId)
+        Patient patient = patientRepository.findById(userId)
                 .orElseThrow(() -> new ApiException("Patient not found for user ID: " + userId));
 
         SensorKit sensorKit = patient.getSensorKit();
