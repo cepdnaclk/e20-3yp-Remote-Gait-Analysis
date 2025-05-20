@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8" />
+    <title>Status Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.6.1/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <style>
+        body {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .status-card {
+            border-left: 6px solid gray;
+            padding: 1rem;
+            border-radius: 8px;
+            background-color: #2c2c2c;
+            margin-bottom: 1rem;
+            color: white;
+        }
+
+        .status-true {
+            border-left-color: #28a745;
+            background-color: #1f3d26;
+        }
+
+        .status-false {
+            border-left-color: #dc3545;
+            background-color: #3d1f1f;
+        }
+
+        .disabled-overlay {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 100;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 1.2rem;
+        }
+
+        .login-container {
+            width: 100%;
+            max-width: 400px;
+            margin: auto;
+            padding: 2rem;
+            border-radius: 10px;
+            background-color: #2c2c2c;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .login-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .processing-spinner {
+            display: inline-block;
+            width: 1rem;
+            height: 1rem;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 0.5rem;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .results-table {
+            background-color: #2c2c2c;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .completed-badge {
+            background-color: #28a745;
+            color: white;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .results-container {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            border-radius: 8px;
+            background-color: #2c2c2c;
+        }
+    </style>
+</head>
+
+<body>
+<div class="container my-4">
+    <h2 class="text-center mb-4">Status Dashboard</h2>
+    <div id="greeting" class="my-2 text-center"></div>
+
+    <div id="login-div" class="d-flex justify-content-center align-items-center">
+        <div class="login-container">
+            <h3 class="mb-4 text-center">Login</h3>
+            <form id="login-form" class="login-form">
+                <input type="text" class="form-control" placeholder="Username" id="login-username" required />
+                <input type="password" class="form-control" placeholder="Password" id="password" required />
+                <button class="btn btn-primary">Login</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="control-panel" class="d-none">
+        <div class="d-flex justify-content-between my-3">
+            <div>
+                <button id="connect" class="btn btn-success">Connect</button>
+                <button id="logout" class="btn btn-outline-light ms-2">Logout</button>
+            </div>
+            <span id="connection-status" class="text-danger"></span>
+        </div>
+
+        <div id="actions-container" class="d-none">
+            <div class="d-flex flex-wrap gap-2 mb-3">
+                <button class="btn btn-warning command-btn" data-command="CHECK_CALIBRATION">Check Calibration</button>
+                <button class="btn btn-warning command-btn" data-command="START_CALIBRATION">Start Calibration</button>
+                <button class="btn btn-warning command-btn" data-command="CAPTURE_ORIENTATION">Capture Orientation</button>
+                <button id="test-btn" class="btn btn-primary">Start Test</button>
+            </div>
+
+            <div id="status-cards">
+                <!-- Status cards will be created dynamically -->
+            </div>
+        </div>
+
+        <div id="processing-indicator" class="mt-3 d-none">
+            <div class="alert alert-info">
+                <div class="d-flex align-items-center">
+                    <div class="processing-spinner"></div>
+                    <span>Processing data...</span>
+                </div>
+            </div>
+        </div>
+
+        <div id="results-ready" class="mt-3 d-none">
+            <div class="alert alert-success">
+                <div class="d-flex justify-content-between align-items-center">
+                    <span>Results ready!</span>
+                    <button id="view-results-btn" class="btn btn-sm btn-outline-success">Click here to view results</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="results-container" class="results-container d-none">
+            <h4 class="mb-3">Test Results</h4>
+            <div class="table-responsive">
+                <table class="table table-dark table-bordered results-table">
+                    <tbody id="results-data">
+                    <!-- Results will be populated here -->
+                    </tbody>
+                </table>
+            </div>
+            <div id="pressure-image" class="mt-4 text-center d-none">
+                <h5>Pressure Results</h5>
+                <img id="pressure-img" src="" alt="Pressure Results" class="img-fluid mt-2 rounded" style="max-height: 400px;">
+            </div>
+        </div>
+    </div>
+
+    <div class="disabled-overlay" id="overlay">WebSocket disconnected. Please reconnect.</div>
+</div>
+
+<script>
+    const statusTypes = ["cal_status", "orientation_captured", "device_alive"];
+    const statusMap = {};
+    const baseUrl = "http://localhost:8080";
+
+    let stompClient = null;
+    let currentSessionId = null;
+    let isTestRunning = false;
+
+    function getItem(key) {
+        return localStorage.getItem(key);
+    }
+
+    function setItem(key, value) {
+        localStorage.setItem(key, value);
+    }
+
+    function clearLocalStorage() {
+        localStorage.removeItem("token");
+        localStorage.removeItem("username");
+        localStorage.removeItem("sessionId");
+    }
+
+    function createStatusCard(type) {
+        const card = document.createElement("div");
+        card.id = `status-${type}`;
+        card.className = "status-card";
+        card.innerHTML = `<strong>${type}</strong><div>Status: unknown</div>`;
+        return card;
+    }
+
+    function updateCard(type, status) {
+        const card = document.getElementById(`status-${type}`);
+        if (!card) return;
+        card.className = "status-card";
+        if (status === true) {
+            card.classList.add("status-true");
+        } else if (status === false) {
+            card.classList.add("status-false");
+        }
+        card.innerHTML = `<strong>${type}</strong><div>Status: ${status}</div>`;
+    }
+
+    function getCurrentTimestamp() {
+        const now = new Date();
+        return now.getFullYear() + '-' +
+            String(now.getMonth() + 1).padStart(2, '0') + '-' +
+            String(now.getDate()).padStart(2, '0') + 'T' +
+            String(now.getHours()).padStart(2, '0') + ':' +
+            String(now.getMinutes()).padStart(2, '0') + ':' +
+            String(now.getSeconds()).padStart(2, '0') + '.' +
+            String(now.getMilliseconds()).padStart(3, '0');
+    }
+
+    function startTest() {
+        fetch(`${baseUrl}/api/test-sessions`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${getItem("token")}`,
+            },
+            body: JSON.stringify({
+                action: "START",
+                timestamp: getCurrentTimestamp()
+            }),
+        })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(data => {
+                        throw new Error(data.message || "Failed to start test");
+                    });
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log("Test started:", data);
+                currentSessionId = data.sessionId;
+                setItem("sessionId", currentSessionId);
+                isTestRunning = true;
+                $("#test-btn").text("Stop Test").removeClass("btn-primary").addClass("btn-danger");
+
+                // Hide previous results if they exist
+                $("#results-ready").addClass("d-none");
+                $("#results-container").addClass("d-none");
+            })
+            .catch(error => {
+                console.error("Start test error:", error);
+                showNotification(error.message, "danger");
+            });
+    }
+
+    function stopTest() {
+        const sessionId = currentSessionId || getItem("sessionId");
+        if (!sessionId) {
+            console.error("No session ID found");
+            return;
+        }
+
+        fetch(`${baseUrl}/api/test-sessions/${sessionId}`, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${getItem("token")}`,
+            },
+            body: JSON.stringify({
+                action: "STOP",
+                timestamp: getCurrentTimestamp()
+            }),
+        })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(data => {
+                        throw new Error(data.message || "Failed to stop test");
+                    });
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log("Test stopped:", data);
+                isTestRunning = false;
+                $("#test-btn").text("Start Test").removeClass("btn-danger").addClass("btn-primary");
+
+                // Show processing indicator
+                $("#processing-indicator").removeClass("d-none");
+
+                if (data.message) {
+                    showNotification(data.message, data.status ? "success" : "danger");
+                }
+            })
+            .catch(error => {
+                console.error("Stop test error:", error);
+                showNotification(error.message, "danger");
+
+                // Reset test button state in case of error
+                isTestRunning = false;
+                $("#test-btn").text("Start Test").removeClass("btn-danger").addClass("btn-primary");
+            });
+    }
+
+    function fetchTestResults(sessionId) {
+        fetch(`${baseUrl}/api/test-sessions/${sessionId}`, {
+            method: "GET",
+            headers: {
+                Authorization: `Bearer ${getItem("token")}`,
+            },
+        })
+            .then(response => response.json())
+            .then(data => {
+                console.log("Test results:", data);
+                displayResults(data);
+            })
+            .catch(error => {
+                console.error("Fetch results error:", error);
+                showNotification("Failed to fetch test results", "danger");
+            });
+    }
+
+    function displayResults(data) {
+        // Clear previous results
+        $("#results-data").empty();
+
+        // Hide processing indicator
+        $("#processing-indicator").addClass("d-none");
+
+        // Session info
+        let html = `
+            <tr>
+                <th>Session ID</th>
+                <td>${data.sessionId}</td>
+            </tr>
+            <tr>
+                <th>Patient ID</th>
+                <td>${data.patientId}</td>
+            </tr>
+            <tr>
+                <th>Start Time</th>
+                <td>${new Date(data.startTime).toLocaleString()}</td>
+            </tr>
+            <tr>
+                <th>End Time</th>
+                <td>${new Date(data.endTime).toLocaleString()}</td>
+            </tr>
+            <tr>
+                <th>Status</th>
+                <td>${data.status === "COMPLETED" ?
+            '<span class="completed-badge">COMPLETED</span>' :
+            data.status}</td>
+            </tr>
+        `;
+
+        // Results data
+        if (data.results) {
+            const results = data.results;
+            html += `
+                <tr>
+                    <th>Cadence</th>
+                    <td>${results.cadence} steps/min</td>
+                </tr>
+                <tr>
+                    <th>Step Length</th>
+                    <td>${results.stepLength} cm</td>
+                </tr>
+                <tr>
+                    <th>Stride Length</th>
+                    <td>${results.strideLength} cm</td>
+                </tr>
+                <tr>
+                    <th>Step Time</th>
+                    <td>${results.stepTime} s</td>
+                </tr>
+                <tr>
+                    <th>Stride Time</th>
+                    <td>${results.strideTime} s</td>
+                </tr>
+                <tr>
+                    <th>Speed</th>
+                    <td>${results.speed} m/s</td>
+                </tr>
+                <tr>
+                    <th>Symmetry Index</th>
+                    <td>${results.symmetryIndex}%</td>
+                </tr>
+            `;
+
+            // Show pressure image if available
+            if (results.pressureResultsPath) {
+                $("#pressure-img").attr("src", results.pressureResultsPath);
+                $("#pressure-image").removeClass("d-none");
+            } else {
+                $("#pressure-image").addClass("d-none");
+            }
+        }
+
+        $("#results-data").html(html);
+        $("#results-container").removeClass("d-none");
+    }
+
+    function showNotification(message, type = "info") {
+        const notificationId = "notification-" + new Date().getTime();
+        const html = `
+            <div id="${notificationId}" class="alert alert-${type} alert-dismissible fade show" role="alert">
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        `;
+
+        $(html).insertAfter("#greeting");
+
+        // Auto dismiss after 5 seconds
+        setTimeout(() => {
+            $(`#${notificationId}`).remove();
+        }, 5000);
+    }
+
+    function connectWS() {
+        const socket = new SockJS(`${baseUrl}/ws`);
+        stompClient = Stomp.over(socket);
+        stompClient.connect({ Authorization: `Bearer ${getItem("token")}` }, (frame) => {
+            $("#connect").text("Connected").attr("disabled", true);
+            $("#connection-status").text("");
+            $("#overlay").hide();
+
+            // Show action buttons and status cards only after connection is established
+            $("#actions-container").removeClass("d-none");
+
+            stompClient.subscribe("/user/topic", (msg) => {
+                const data = JSON.parse(msg.body);
+                console.log("WebSocket msg", data);
+
+                // Handle regular status updates
+                if (data.type && typeof data.status !== 'undefined') {
+                    // Handle normal status updates
+                    if (data.type !== "results_ready") {
+                        statusMap[data.type] = data.status;
+                        updateCard(data.type, data.status);
+                    }
+                    // Handle results_ready message
+                    else if (data.type === "results_ready") {
+                        // Hide processing indicator
+                        $("#processing-indicator").addClass("d-none");
+
+                        if (data.status === true) {
+                            // Show results ready message
+                            $("#results-ready").removeClass("d-none");
+                        } else {
+                            // Show error message if processing failed
+                            const errorMessage = data.message || "Processing failed";
+                            showNotification(errorMessage, "danger");
+                        }
+                    }
+                }
+            });
+
+        }, () => {
+            $("#connection-status").text("Connection lost");
+            $("#connect").text("Reconnect").attr("disabled", false);
+            $("#overlay").show();
+            $("#actions-container").addClass("d-none");
+        });
+    }
+
+    $("#login-form").submit((e) => {
+        e.preventDefault();
+        fetch(`${baseUrl}/api/auth/signin`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                username: $("#login-username").val(),
+                password: $("#password").val(),
+            }),
+        })
+            .then((resp) => resp.json())
+            .then((data) => {
+                setItem("token", data.jwtToken);
+                setItem("username", data.username);
+                $("#greeting").text(`Hello ${data.username}`);
+                $("#login-div").addClass("d-none");
+                $("#control-panel").removeClass("d-none");
+                $("#connect").text("Connect").attr("disabled", false);
+            })
+            .catch((error) => {
+                console.error("Login error:", error);
+                showNotification("Login failed. Please check your credentials.", "danger");
+            });
+    });
+
+    $("#connect").click(() => {
+        // Clear any existing status cards first
+        $("#status-cards").empty();
+
+        // Create status cards
+        statusTypes.forEach(type => {
+            document.getElementById("status-cards").appendChild(createStatusCard(type));
+        });
+
+        // Connect WebSocket
+        connectWS();
+    });
+
+    $("#logout").click(() => {
+        clearLocalStorage();
+        location.reload();
+    });
+
+    $(".command-btn").click(function () {
+        const command = $(this).data("command");
+        fetch(`${baseUrl}/api/commands`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${getItem("token")}`,
+            },
+            body: JSON.stringify({ command }),
+        })
+            .then(res => res.json())
+            .then(data => {
+                console.log(data.message);
+                if (data.message) {
+                    showNotification(data.message, data.status ? "success" : "warning");
+                }
+            })
+            .catch(err => {
+                console.log("Command failed", err);
+                showNotification("Command failed", "danger");
+            });
+    });
+
+    $("#test-btn").click(function() {
+        if (isTestRunning) {
+            stopTest();
+        } else {
+            startTest();
+        }
+    });
+
+    $("#view-results-btn").click(function() {
+        const sessionId = getItem("sessionId");
+        if (sessionId) {
+            fetchTestResults(sessionId);
+        } else {
+            showNotification("No session ID found", "danger");
+        }
+    });
+
+    // Auto-load session if already logged in
+    const token = getItem("token");
+    const username = getItem("username");
+    if (token && username) {
+        $("#greeting").text(`Hello ${username}`);
+        $("#login-div").addClass("d-none");
+        $("#control-panel").removeClass("d-none");
+    }
+</script>
+
+</body>
+</html>

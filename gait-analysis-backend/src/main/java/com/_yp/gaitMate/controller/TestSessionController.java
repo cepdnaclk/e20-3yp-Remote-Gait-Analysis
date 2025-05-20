@@ -3,6 +3,7 @@ package com._yp.gaitMate.controller;
 import com._yp.gaitMate.dto.ApiResponse;
 import com._yp.gaitMate.dto.testSession.TestSessionActionDto;
 import com._yp.gaitMate.dto.testSession.StartTestSessionResponse;
+import com._yp.gaitMate.dto.testSession.TestSessionDetailsResponse;
 import com._yp.gaitMate.service.testSessionService.TestSessionService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -41,6 +42,21 @@ public class TestSessionController {
 
         ApiResponse response = testSessionService.stopSession(sessionId, request);
         return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+
+    /**
+     * Retrieves full session details, including results, feedback, and raw data path.
+     * Only accessible by the patient who owns the session.
+     *
+     * @param sessionId ID of the test session
+     * @return Full session DTO
+     */
+    @PreAuthorize("hasRole('PATIENT')")
+    @GetMapping("/{id}")
+    public ResponseEntity<TestSessionDetailsResponse> getSession(@PathVariable("id") Long sessionId) {
+        TestSessionDetailsResponse response = testSessionService.getTestSessionById(sessionId);
+        return ResponseEntity.ok(response);
     }
 
 

@@ -32,6 +32,11 @@ import org.springframework.stereotype.Component;
  *   <li>Send WebSocket message to the linked frontend user</li>
  * </ul>
  */
+//{
+//        "type": "orientation_captured",
+//        "device_id": 34,
+//        "status": true
+//        }
 @Component
 @Slf4j
 public class OrientationStatusListener extends AbstractTopicListener {
