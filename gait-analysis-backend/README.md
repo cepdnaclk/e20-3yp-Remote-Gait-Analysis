@@ -1,4 +1,4 @@
-Absolutely. I’ll now generate a comprehensive, full-length README.md-style backend documentation — covering every relevant component you’ve implemented, including:
+a comprehensive, full-length README.md-style backend documentation — covering every relevant component implemented, including:
 
 * Roles, entities, services
 * Test session lifecycle
@@ -9,16 +9,6 @@ Absolutely. I’ll now generate a comprehensive, full-length README.md-style bac
 
 This document will follow a **narrative style** and be detailed enough for new developers or reviewers to understand the complete system end-to-end.
 
----
-
-### ✅ Starting…
-
-This may take a few minutes to compile completely — I’ll respond again shortly with the full document.
-
-
-Here is your comprehensive backend documentation in README format, covering the full system with a narrative flow:
-
----
 
 # 🧠 GaitMate Backend (Spring Boot) — Comprehensive System Overview
 
@@ -283,6 +273,3 @@ The GaitMate backend is a highly modular, event-driven, real-time system built w
 
 > This README is intended to serve as the canonical technical reference for developers, testers, integrators, and new team members onboarding into the backend system.
 
----
-
-Let me know if you'd like this exported to a `.md` file or integrated into Swagger/OpenAPI or internal Confluence docs.
