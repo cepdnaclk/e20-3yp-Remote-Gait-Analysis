@@ -42,6 +42,7 @@ public class DataProcessingService {
     public void sendProcessingRequest(ProcessingRequestDto request, String username) {
         try {
             log.info("📤 Sending async processing request for session {}", request.getSessionId());
+            // POST request to the microservice
             restTemplate.postForEntity(PROCESSING_URL, request, Void.class);
             log.info("✅ Processing request sent successfully");
         } catch (Exception e) {

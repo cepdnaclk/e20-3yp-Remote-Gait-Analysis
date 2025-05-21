@@ -111,7 +111,7 @@ public class TestSessionServiceImpl implements TestSessionService {
         SensorKit sensorKit = patient.getSensorKit();
         sendStopCommandToSensor(sensorKit);
 
-        // 9. Trigger asynchronous processing
+        // 9. Trigger asynchronous processing request
         ProcessingRequestDto processingRequest = ProcessingRequestDto.builder()
                 .sensorId(sensorKit.getId())
                 .startTime(session.getStartTime().toString())
