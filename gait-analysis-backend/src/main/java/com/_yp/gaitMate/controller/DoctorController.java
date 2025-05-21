@@ -30,7 +30,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("api/")
-//@RequiredArgsConstructor
+@RequiredArgsConstructor
 public class DoctorController {
 
     private final AuthUtil authUtil;
@@ -38,9 +38,9 @@ public class DoctorController {
     private final PatientMapper patientMapper;
     private final DoctorService doctorService;
 
-    public DoctorController(DoctorService doctorService) {
-        this.doctorService = doctorService;
-    }
+//    public DoctorController(DoctorService doctorService) {
+//        this.doctorService = doctorService;
+//    }
 
     @PostMapping("/doctors")
     @PreAuthorize("hasRole('CLINIC')")

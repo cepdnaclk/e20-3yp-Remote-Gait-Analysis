@@ -17,4 +17,5 @@ public class ClinicInfoResponse {
     private String email;
     private String phoneNumber;
     private String createdAt;
+
 }
