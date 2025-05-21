@@ -10,10 +10,15 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.NotImplementedException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import com._yp.gaitMate.model.Patient;
+import com._yp.gaitMate.repository.PatientRepository;
+import com._yp.gaitMate.mapper.PatientMapper;
+import com._yp.gaitMate.exception.ResourceNotFoundException;
 
 @RestController
 @RequestMapping("/api")
@@ -21,6 +26,8 @@ import org.springframework.web.bind.annotation.*;
 public class PatientController {
 
     private final PatientService patientService;
+    private final PatientRepository patientRepository; // ✅ Add this
+    private final PatientMapper patientMapper;
 
     @PostMapping("/patients")
     @PreAuthorize("hasRole('CLINIC')")
@@ -113,4 +120,39 @@ public class PatientController {
         PatientInfoResponse response = patientService.createPatient(request);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
+
+    @GetMapping("patients/{id}")
+    @PreAuthorize("hasAnyRole('DOCTOR', 'CLINIC', 'ADMIN')")
+    public ResponseEntity<PatientInfoResponse> getPatientById(@PathVariable Long id) {
+        Patient patient = patientRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Patient", "id", id));
+
+        return ResponseEntity.ok(patientMapper.toPatientInfoResponse(patient));
+    }
+
+
+    // TODO:
+    @GetMapping("patients/me")
+    @PreAuthorize("hasRole('PATIENT')")
+    @Operation(summary = "Get the logged in patient's patient profile [TODO]")
+    public ResponseEntity<PatientInfoResponse> getMyPatientProfile(){
+        throw new NotImplementedException();
+    }
+
+    // TODO:
+    @DeleteMapping("patients/{id}")
+    @PreAuthorize("hasRole('CLINIC')")
+    @Operation(summary = "Delete patient from the clinic [TODO]")
+    public ResponseEntity<?> deletePatient(@PathVariable Long id){
+        throw new NotImplementedException();
+    }
+
+    // TODO:
+    @PutMapping("patients/{id}")
+    @PreAuthorize("hasRole('CLINIC')")
+    @Operation(summary = "Update patient details [TODO]")
+    public ResponseEntity<PatientInfoResponse> updatePatient(@PathVariable Long id, @RequestBody @Valid CreatePatientRequest request) {
+        throw new NotImplementedException();
+    }
+
 }

@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { useNavigate } from "react-router-dom";
-import { Box, Button, TextField, Typography, Stack, CssBaseline, Divider, FormLabel, FormControl, Link } from "@mui/material";
+import { Box, Button, TextField, Typography, Stack, CssBaseline, Divider, FormLabel, FormControl, Link, Snackbar, Alert } from "@mui/material";
 import MuiCard from '@mui/material/Card';
 import { styled } from '@mui/material/styles';
 import { useForm } from "react-hook-form";
@@ -57,6 +57,11 @@ export default function Login() {
     resolver: zodResolver(schema),
   });
 
+  // Display Message errors
+  const [snackbarOpen, setSnackbarOpen] = React.useState(false);
+  const [snackbarMessage, setSnackbarMessage] = React.useState('');
+  const [snackbarSeverity, setSnackbarSeverity] = React.useState('error');
+
 const onSubmit = async (data) => {
   try {
     const response = await axios.post(`${BASE_URL}/api/auth/signin`, {
@@ -72,15 +77,24 @@ const onSubmit = async (data) => {
     localStorage.setItem("roles", JSON.stringify(roles));
   
     // Redirect based on role
-    if (roles.includes("ROLE_ROOT")) navigate("/root/dashboard");
-    else if (roles.includes("ROLE_CLINIC_ADMIN")) navigate("/clinic/dashboard");
+    if (roles.includes("ROLE_ADMIN")) navigate("/root/dashboard");
+    else if (roles.includes("ROLE_CLINIC")) navigate("/clinic/dashboard");
     else if (roles.includes("ROLE_DOCTOR")) navigate("/doctor/dashboard");
     else if (roles.includes("ROLE_PATIENT")) navigate("/patient/dashboard");
-    else alert("Unknown role, access denied");
+    else {
+      // Show error message for unknown role
+      setSnackbarMessage("Unknown role, access denied");
+      setSnackbarSeverity("error");
+      setSnackbarOpen(true);
+    }
   
   } catch (err) {
-    console.error(err);
-    alert("Invalid login. Check username and password.");
+    const message =
+      err.response?.data?.message ||
+      "Login failed. Please check your network or try again.";
+    setSnackbarMessage(message);
+    setSnackbarSeverity("error");
+    setSnackbarOpen(true);
   }
 };
   
@@ -100,7 +114,7 @@ const onSubmit = async (data) => {
                 required
                 fullWidth
                 id="username"
-                placeholder="your username"
+                placeholder="Your username"
                 name="username"
                 autoComplete="username"
                 variant="outlined"
@@ -137,6 +151,22 @@ const onSubmit = async (data) => {
             <Link href="/Signup" variant="body2" sx={{ alignSelf: 'center' }}>Sign up</Link>
           </Typography>
         </Card>
+
+        {/* Snackbar for feedback */}
+        <Snackbar
+          open={snackbarOpen}
+          autoHideDuration={6000}
+          onClose={() => setSnackbarOpen(false)}
+        >
+          <Alert
+            onClose={() => setSnackbarOpen(false)}
+            severity={snackbarSeverity}
+            sx={{ width: '100%' }}
+          >
+            {snackbarMessage}
+          </Alert>
+        </Snackbar>
+        
       </LoginContainer>
     </React.Fragment>
   );

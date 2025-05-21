@@ -1,4 +1,7 @@
-import { usePatients } from "../../api/patients";
+import axios from "axios";
+import { useEffect, useState } from "react";
+
+import { useQuery } from "@tanstack/react-query";
 import { 
   CircularProgress, 
   Typography, 
@@ -31,7 +34,6 @@ import DashboardIcon from "@mui/icons-material/Dashboard";
 import MenuIcon from "@mui/icons-material/Menu";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 
-import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import RecentPatients from "../RecentPatients";
 import Appointments from "../Appointments";
@@ -42,9 +44,44 @@ import NavbarAuth from "../../components/NavbarAuth";
 
 export default function DoctorDashboard() {
   const navigate = useNavigate();
-  const { data: patients, isLoading, error } = usePatients();
+  const [patients, setPatients] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+
   const [selectedSection, setSelectedSection] = useState("Dashboard");
   const [sidebarOpen, setSidebarOpen] = useState(true);
+
+  const token = localStorage.getItem("token");
+  let doctorName = "";
+  
+  if (token) {
+    const decoded = JSON.parse(atob(token.split('.')[1]));
+    doctorName = decoded.sub; // or use `decoded.name` if available
+  }
+
+  
+
+  useEffect(() => {
+    const fetchPatients = async () => {
+      try {
+      const res = await axios.get("http://localhost:8080/api/doctors/me/patients", {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
+      setPatients(res.data);
+    } catch (err) {
+      console.error("Failed to load patients", err);
+      setError(err);
+    } finally {
+      setIsLoading(false);
+    }
+  };  
+
+    fetchPatients();
+  }, []);
+
+  
 
   const menuItems = [
     { text: "Dashboard", icon: <DashboardIcon /> },
@@ -116,8 +153,13 @@ export default function DoctorDashboard() {
 
         <Collapse in={sidebarOpen}>
           <Box sx={{ textAlign: "center", p: 2 }}>
-            <Avatar sx={{ width: 75, height: 75, margin: "auto" }}>K</Avatar>
-            <Typography variant="body1" mt={1}>Dr. Keerthi Illukkumbura</Typography>
+          <Avatar sx={{ width: 75, height: 75, margin: "auto" }}>
+            {doctorName.charAt(0).toUpperCase()}
+          </Avatar>
+          <Typography variant="body1" mt={1}>
+            Dr. {doctorName}
+          </Typography>
+
           </Box>
         </Collapse>
 
@@ -142,9 +184,8 @@ export default function DoctorDashboard() {
 
       {/* Main Content */}
       <Box sx={{ flexGrow: 1, padding: 3 }}>
-        <Typography variant="h4" gutterBottom fontWeight="bold" textshadow="2px 2px 5px rgba(0,0,0,0.2)">
-          Welcome Back, Dr. Keerthi Ilukkumbura
-        </Typography>
+        <Typography variant="h4">Welcome Back, Dr. {doctorName}</Typography>
+
         <Typography variant="h6" color="text.secondary">
           Here's what's happening with your patients today!
         </Typography>
