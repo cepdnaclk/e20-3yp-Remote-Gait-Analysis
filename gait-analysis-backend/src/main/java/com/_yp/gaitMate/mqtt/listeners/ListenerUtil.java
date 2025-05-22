@@ -4,6 +4,8 @@ import com._yp.gaitMate.websocket.NotificationMessage;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import java.time.LocalDateTime;
+
 public class ListenerUtil {
 
     /**
@@ -54,6 +56,7 @@ public class ListenerUtil {
                 .type(type)
                 .deviceId(deviceId)
                 .status(status)
+                .timestamp(LocalDateTime.now().toString())
                 .build();
     }
 }

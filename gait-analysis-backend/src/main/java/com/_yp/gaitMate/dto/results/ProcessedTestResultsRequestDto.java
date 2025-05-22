@@ -11,31 +11,31 @@ import lombok.Setter;
 @Getter
 @Setter
 public class ProcessedTestResultsRequestDto {
+    @NotNull
+    private Boolean status;
 
     @NotNull
     private Long sessionId;
 
-    @NotNull @Min(0)
+    
     private Integer cadence;
 
-    @NotNull @Min(0)
+    
     private Integer stepLength;
 
-    @NotNull @Min(0)
+    
     private Integer strideLength;
 
-    @NotNull @Min(0)
+    
     private Double stepTime;
 
-    @NotNull @Min(0)
+    
     private Double strideTime;
 
-    @NotNull @Min(0)
+  
     private Double speed;
 
-    @NotNull @Min(0)
     private Double symmetryIndex;
 
-    @NotNull
     private String pressureResultsPath;
 }

@@ -4,16 +4,17 @@ import com._yp.gaitMate.dto.ApiResponse;
 import com._yp.gaitMate.dto.testSession.ProcessingRequestDto;
 import com._yp.gaitMate.dto.testSession.StartTestSessionResponse;
 import com._yp.gaitMate.dto.testSession.TestSessionActionDto;
+import com._yp.gaitMate.dto.testSession.TestSessionDetailsResponse;
 import com._yp.gaitMate.exception.ApiException;
-import com._yp.gaitMate.model.Patient;
-import com._yp.gaitMate.model.SensorKit;
-import com._yp.gaitMate.model.TestSession;
+import com._yp.gaitMate.mapper.TestSessionMapper;
+import com._yp.gaitMate.model.*;
 import com._yp.gaitMate.mqtt.core.MqttPublisher;
 import com._yp.gaitMate.repository.PatientRepository;
 import com._yp.gaitMate.repository.TestSessionRepository;
 import com._yp.gaitMate.security.utils.AuthUtil;
 import com.amazonaws.services.iot.client.AWSIotQos;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -22,6 +23,7 @@ import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class TestSessionServiceImpl implements TestSessionService {
 
     private static final Logger log = LoggerFactory.getLogger(TestSessionServiceImpl.class);
@@ -30,6 +32,8 @@ public class TestSessionServiceImpl implements TestSessionService {
     private final AuthUtil authUtil;
     private final MqttPublisher mqttPublisher;
     private final DataProcessingService dataProcessingService;
+    private final TestSessionMapper testSessionMapper;
+
 
 
     @Override
@@ -60,6 +64,7 @@ public class TestSessionServiceImpl implements TestSessionService {
 
         session = testSessionRepository.save(session);
 
+        log.info("✅ New test session {} started", session.getId());
         // 7. Return response
         return StartTestSessionResponse.builder()
                 .sessionId(session.getId())
@@ -106,7 +111,7 @@ public class TestSessionServiceImpl implements TestSessionService {
         SensorKit sensorKit = patient.getSensorKit();
         sendStopCommandToSensor(sensorKit);
 
-        // 9. Trigger asynchronous processing
+        // 9. Trigger asynchronous processing request
         ProcessingRequestDto processingRequest = ProcessingRequestDto.builder()
                 .sensorId(sensorKit.getId())
                 .startTime(session.getStartTime().toString())
@@ -114,10 +119,28 @@ public class TestSessionServiceImpl implements TestSessionService {
                 .sessionId(session.getId())
                 .build();
 
-        dataProcessingService.sendProcessingRequest(processingRequest);
+
+        String username = patient.getUser().getUsername();
+        dataProcessingService.sendProcessingRequest(processingRequest, username);
         log.info("🚀 Processing request dispatched asynchronously for session {}", session.getId());
 
         return new ApiResponse("Processing started", true);
+    }
+
+    @Override
+    public TestSessionDetailsResponse getTestSessionById(Long sessionId) {
+        // TODO: implement access to the doctor of the patient as well
+        Long userId = authUtil.loggedInUserId();
+
+        TestSession session = testSessionRepository.findById(sessionId)
+                .orElseThrow(() -> new ApiException("Test session not found for ID: " + sessionId));
+
+        // Verify the user owns this session
+        if (!session.getPatient().getUser().getUserId().equals(userId)) {
+            throw new ApiException("Unauthorized access to this test session");
+        }
+
+        return testSessionMapper.toDetailsResponse(session);
     }
 
     // =====================================
@@ -135,8 +158,8 @@ public class TestSessionServiceImpl implements TestSessionService {
     private void sendStopCommandToSensor(SensorKit sensorKit) {
         try {
             Long sensorId = sensorKit.getId();
-            String topic = "sensors/" + sensorId + "/command";
-            String payload = "{ \"action\": \"STOP\" }";
+            String topic = "device/" + sensorId + "/command";
+            String payload = "{ \"command\": \"stop_streaming\" }";
 
             mqttPublisher.publishBlocking(topic, payload, AWSIotQos.QOS1);
 

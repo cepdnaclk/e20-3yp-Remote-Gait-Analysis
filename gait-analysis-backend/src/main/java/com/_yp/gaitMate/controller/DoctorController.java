@@ -9,13 +9,11 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.NotImplementedException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import com._yp.gaitMate.model.Doctor;
 import com._yp.gaitMate.model.Patient;
 import com._yp.gaitMate.repository.PatientRepository;
@@ -23,7 +21,6 @@ import com._yp.gaitMate.mapper.PatientMapper;
 import com._yp.gaitMate.dto.patient.PatientInfoResponse;
 import com._yp.gaitMate.security.utils.AuthUtil;
 import com._yp.gaitMate.dto.patient.PatientInfoResponse;
-import org.springframework.web.bind.annotation.GetMapping;
 
 import java.util.List;
 
@@ -117,5 +114,43 @@ public class DoctorController {
 
 
 
+
+    @GetMapping("/doctors/me")
+    @PreAuthorize("hasRole('DOCTOR')")
+    @Operation(summary = "Get logged-in doctor's profile [TODO]")
+    public ResponseEntity<DoctorInfoResponse> getMyProfile() {
+        throw new NotImplementedException();
+    }
+
+
+    @PutMapping("/doctors/{id}")
+    @PreAuthorize("hasRole('DOCTOR')")
+    @Operation(summary = "Update logged-in doctor's profile [TODO]")
+    public ResponseEntity<DoctorInfoResponse> updateDoctor(@RequestBody @Valid CreateDoctorRequest request) {
+        throw new NotImplementedException();
+    }
+
+    @GetMapping("/doctors")
+    @PreAuthorize("hasRole('CLINIC')")
+    @Operation(summary = "List all doctors for the clinic [TODO]")
+    public ResponseEntity<?> getAllDoctorsForClinic() {
+        throw new NotImplementedException();
+    }
+
+
+    @GetMapping("/doctors/{id}")
+    @PreAuthorize("hasAnyRole('CLINIC', 'ADMIN')")
+    @Operation(summary = "Get doctor by ID [TODO]")
+    public ResponseEntity<DoctorInfoResponse> getDoctorById(@PathVariable Long id) {
+        throw new NotImplementedException();
+    }
+
+
+    @DeleteMapping("/doctors/{id}")
+    @PreAuthorize("hasRole('CLINIC')")
+    @Operation(summary = "Delete doctor [TODO]")
+    public ResponseEntity<?> deleteDoctor(@PathVariable Long id) {
+        throw new NotImplementedException();
+    }
 
 }
