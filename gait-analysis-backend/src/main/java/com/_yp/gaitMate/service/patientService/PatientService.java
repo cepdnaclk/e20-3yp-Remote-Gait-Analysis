@@ -9,5 +9,7 @@ import java.util.List;
 public interface PatientService {
     PatientInfoResponse createPatient(@Valid CreatePatientRequest request);
 
-    List<PatientInfoResponse> getMyPatients();
+    List<PatientInfoResponse> getPatientsOfLoggedInDoctor();
+
+    List<PatientInfoResponse> getPatientsOfLoggedInClinic();
 }

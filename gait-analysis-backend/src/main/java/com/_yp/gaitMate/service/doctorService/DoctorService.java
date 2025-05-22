@@ -9,4 +9,5 @@ import java.util.List;
 public interface DoctorService {
     DoctorInfoResponse createDoctor(CreateDoctorRequest request);
 
+    List<DoctorInfoResponse> getDoctorsOfLoggedInClinic();
 }

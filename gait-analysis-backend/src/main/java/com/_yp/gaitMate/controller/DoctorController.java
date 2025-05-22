@@ -153,4 +153,12 @@ public class DoctorController {
         throw new NotImplementedException();
     }
 
+    @GetMapping("/clinics/me/doctors")
+    @PreAuthorize("hasRole('CLINIC')")
+    @Operation(summary = "Get doctors of the logged-in clinic")
+    public ResponseEntity<List<DoctorInfoResponse>> getDoctorsOfLoggedInClinic() {
+        List<DoctorInfoResponse> doctors = doctorService.getDoctorsOfLoggedInClinic();
+        return new ResponseEntity<>(doctors, HttpStatus.OK);
+    }
+
 }

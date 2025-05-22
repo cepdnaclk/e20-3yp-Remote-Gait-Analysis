@@ -99,16 +99,5 @@ public class ClinicServiceImpl implements ClinicService {
                 .map(clinicMapper::toClinicInfoResponse)
                 .toList();
     }
-
-    @Override
-    public List<DoctorInfoResponse> getDoctorsOfLoggedInClinic() {
-        Clinic clinic = authUtil.loggedInClinic(); // or however you fetch current clinic
-        List<Doctor> doctors = doctorRepository.findByClinic(clinic);
-        return doctors.stream()
-                .map(doctorMapper::toDoctorInfoResponse)
-                .toList();
-    }
-
-
 }
 

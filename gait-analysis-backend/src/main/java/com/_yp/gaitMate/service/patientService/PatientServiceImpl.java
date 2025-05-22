@@ -116,12 +116,33 @@ public class PatientServiceImpl implements PatientService{
     }
 
     @Override
-    public List<PatientInfoResponse> getMyPatients() {
-        Doctor doctor = authUtil.loggedInDoctor();
+    public List<PatientInfoResponse> getPatientsOfLoggedInDoctor() {
+        Doctor doctor = authUtil.getLoggedInDoctor();
         List<Patient> patients = patientRepository.findByDoctor(doctor);
+
         List<PatientInfoResponse> response = patients.stream()
                 .map(patientMapper::toPatientInfoResponse)
                 .toList();
-        return List.of();
+
+        return response;
     }
+
+
+    @Override
+    public List<PatientInfoResponse> getPatientsOfLoggedInClinic() {
+        Clinic clinic = authUtil.getLoggedInClinic();
+        List<Patient> patients = patientRepository.findByClinic(clinic);
+
+        List<PatientInfoResponse> response = patients.stream()
+                .map(patientMapper::toPatientInfoResponse)
+                .toList();
+
+        return response;
+    }
+
+
+
+    //*********************** P R I V A T E  M E T H O D S ************************************
+
+
 }

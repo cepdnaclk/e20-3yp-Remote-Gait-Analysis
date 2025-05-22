@@ -1,5 +1,6 @@
 package com._yp.gaitMate.repository;
 
+import com._yp.gaitMate.model.Clinic;
 import com._yp.gaitMate.model.Patient;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -17,4 +18,6 @@ public interface PatientRepository extends JpaRepository<Patient, Long> {
     List<Patient> findByDoctor(Doctor doctor);
 
     Optional<Patient> findByUser_UserId(Long userUserId);
+
+    List<Patient> findByClinic(Clinic clinic);
 }
