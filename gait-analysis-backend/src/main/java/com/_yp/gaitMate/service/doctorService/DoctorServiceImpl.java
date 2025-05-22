@@ -41,12 +41,7 @@ public class DoctorServiceImpl implements DoctorService{
             throw new ApiException("Doctor name already exists");
         }
 
-        // Get currently logged-in clinic's user ID
-        Long clinicUserId = authUtil.loggedInUserId();
-
-        // find the clinic of the logged in user
-        Clinic clinic = clinicRepository.findByUser_UserId(clinicUserId)
-                .orElseThrow(() -> new ResourceNotFoundException("Clinic", "userId", clinicUserId));
+        Clinic clinic = authUtil.getLoggedInClinic();
 
         // register a user with ROLE_DOCTOR
         SignupRequest signup = SignupRequest.builder()
@@ -75,6 +70,23 @@ public class DoctorServiceImpl implements DoctorService{
         doctor = doctorRepository.save(doctor);
         return doctorMapper.toDoctorInfoResponse(doctor);
     }
+
+
+
+    @Override
+    public List<DoctorInfoResponse> getDoctorsOfLoggedInClinic() {
+        Clinic clinic = authUtil.getLoggedInClinic();
+
+        List<Doctor> doctors = doctorRepository.findByClinic(clinic);
+
+        return doctors.stream()
+                .map(doctorMapper::toDoctorInfoResponse)
+                .toList();
+    }
+
+    //*********************** P R I V A T E  M E T H O D S ************************************
+
+
 
 
 }

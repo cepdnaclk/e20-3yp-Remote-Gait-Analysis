@@ -1,5 +1,6 @@
 package com._yp.gaitMate.security.utils;
 
+import com._yp.gaitMate.exception.ResourceNotFoundException;
 import com._yp.gaitMate.security.dto.UserInfoResponse;
 import com._yp.gaitMate.security.mapper.Mapper;
 import com._yp.gaitMate.security.model.User;
@@ -25,18 +26,6 @@ public class AuthUtil {
 
     private final ClinicRepository clinicRepository;
     private final DoctorRepository doctorRepository;
-
-    public Clinic loggedInClinic() {
-        Long userId = loggedInUserId();
-        return clinicRepository.findByUser_UserId(userId)
-                .orElseThrow(() -> new UsernameNotFoundException("Clinic not found for user ID: " + userId));
-    }
-
-    public Doctor loggedInDoctor() {
-        Long userId = loggedInUserId();
-        return doctorRepository.findByUser_UserId(userId)
-                .orElseThrow(() -> new UsernameNotFoundException("Doctor not found for user ID: " + userId));
-    }
 
 
     public String loggedInEmail(){
@@ -93,5 +82,30 @@ public class AuthUtil {
 //                .orElseThrow(()-> new UsernameNotFoundException("User not Found"));
 
         return mapper.toUserInfoResponse((UserDetailsImpl) authentication.getPrincipal());
+    }
+
+
+
+    public Clinic getLoggedInClinic() {
+        // Get currently logged-in clinic's user ID
+        Long clinicUserId = loggedInUserId();
+
+        // find the clinic of the logged-in user
+        Clinic clinic = clinicRepository.findByUser_UserId(clinicUserId)
+                .orElseThrow(() -> new ResourceNotFoundException("Clinic", "userId", clinicUserId));
+
+        return clinic;
+    }
+
+
+    public Doctor getLoggedInDoctor() {
+        // Get currently logged-in doctor's user ID
+        Long doctorUserId = loggedInUserId();
+
+        // find the doctor attached to the logged-in user
+        Doctor doctor = doctorRepository.findByUser_UserId(doctorUserId)
+                .orElseThrow(() -> new ResourceNotFoundException("Doctor", "userId", doctorUserId));
+
+        return doctor;
     }
 }

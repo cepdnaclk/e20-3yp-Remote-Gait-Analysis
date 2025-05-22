@@ -135,11 +135,23 @@ public class PatientController {
 
     @GetMapping("/doctors/me/patients")
     @PreAuthorize("hasRole('DOCTOR')")
-    public ResponseEntity<List<PatientInfoResponse>> getMyPatients() {
+    @Operation(summary = "Get the logged in doctor's patients")
+    public ResponseEntity<List<PatientInfoResponse>> getPatientsOfLoggedInDoctor() {
 
-        List<PatientInfoResponse> patients = patientService.getMyPatients();
+        List<PatientInfoResponse> patients = patientService.getPatientsOfLoggedInDoctor();
 
         return ResponseEntity.ok(patients);
+    }
+
+    @GetMapping("/clinics/me/patients")
+    @PreAuthorize("hasRole('CLINIC')")
+    @Operation(summary = "Get the logged in clinic's patients")
+    public ResponseEntity<List<PatientInfoResponse>> getPatientsOfLoggedInClinic() {
+
+        List<PatientInfoResponse> patients = patientService.getPatientsOfLoggedInClinic();
+
+        return ResponseEntity.ok(patients);
+    }
 
 
     // TODO:
