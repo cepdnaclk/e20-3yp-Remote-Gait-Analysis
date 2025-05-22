@@ -110,16 +110,9 @@ public class DoctorController {
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
-    @GetMapping("/doctors/me/patients")
-    @PreAuthorize("hasRole('DOCTOR')")
-    public ResponseEntity<List<PatientInfoResponse>> getMyPatients() {
-        Doctor doctor = authUtil.loggedInDoctor();
-        List<Patient> patients = patientRepository.findByDoctor(doctor);
-        List<PatientInfoResponse> response = patients.stream()
-                .map(patientMapper::toPatientInfoResponse)
-                .toList();
-        return ResponseEntity.ok(response);
-    }
+
+
+
 
 
     @GetMapping("/doctors/me")

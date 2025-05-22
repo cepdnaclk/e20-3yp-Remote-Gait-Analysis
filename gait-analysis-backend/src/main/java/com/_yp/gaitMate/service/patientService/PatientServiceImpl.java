@@ -23,6 +23,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Set;
 
 @Service
@@ -112,5 +113,15 @@ public class PatientServiceImpl implements PatientService{
         // sensorKit.setPatient(patient);
 
         return patientMapper.toPatientInfoResponse(patient);
+    }
+
+    @Override
+    public List<PatientInfoResponse> getMyPatients() {
+        Doctor doctor = authUtil.loggedInDoctor();
+        List<Patient> patients = patientRepository.findByDoctor(doctor);
+        List<PatientInfoResponse> response = patients.stream()
+                .map(patientMapper::toPatientInfoResponse)
+                .toList();
+        return List.of();
     }
 }
