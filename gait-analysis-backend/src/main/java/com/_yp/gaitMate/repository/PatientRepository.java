@@ -14,7 +14,7 @@ public interface PatientRepository extends JpaRepository<Patient, Long> {
     boolean existsByName(String name);
     boolean existsByNic(String nic);
 
-    Optional<Patient> findById(Long userUserId);
     List<Patient> findByDoctor(Doctor doctor);
 
+    Optional<Patient> findByUser_UserId(Long userUserId);
 }
