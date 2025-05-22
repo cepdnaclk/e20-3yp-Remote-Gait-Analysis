@@ -19,6 +19,8 @@ import com._yp.gaitMate.repository.PatientRepository;
 import com._yp.gaitMate.mapper.PatientMapper;
 import com._yp.gaitMate.exception.ResourceNotFoundException;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api")
 @RequiredArgsConstructor
@@ -127,6 +129,15 @@ public class PatientController {
                 .orElseThrow(() -> new ResourceNotFoundException("Patient", "id", id));
 
         return ResponseEntity.ok(patientMapper.toPatientInfoResponse(patient));
+    }
+
+    @GetMapping("/doctors/me/patients")
+    @PreAuthorize("hasRole('DOCTOR')")
+    public ResponseEntity<List<PatientInfoResponse>> getMyPatients() {
+
+        List<PatientInfoResponse> patients = patientService.getMyPatients();
+
+        return ResponseEntity.ok(patients);
     }
 
 }
