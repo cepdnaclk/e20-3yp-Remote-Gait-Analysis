@@ -21,6 +21,7 @@ public class CommandController {
     @PreAuthorize("hasRole('PATIENT')")
     @Operation(summary = "Send commands to sensor device")
     public ResponseEntity<ApiResponse> handleCommand(@RequestBody @Valid CommandRequestDto request) {
+        // call the commandService to publish the command to IoT core
         ApiResponse response = commandService.sendCommandToSensor(request);
         return ResponseEntity.ok(response);
     }

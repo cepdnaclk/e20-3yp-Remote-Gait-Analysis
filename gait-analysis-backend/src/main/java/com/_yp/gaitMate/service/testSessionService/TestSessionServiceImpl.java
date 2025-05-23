@@ -23,7 +23,6 @@ import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
-@Slf4j
 public class TestSessionServiceImpl implements TestSessionService {
 
     private static final Logger log = LoggerFactory.getLogger(TestSessionServiceImpl.class);

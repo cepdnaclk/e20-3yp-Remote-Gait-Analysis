@@ -270,12 +270,7 @@ public class ClinicController {
         return ResponseEntity.ok(clinics);
     }
 
-    @GetMapping("/clinics/me/doctors")
-    @PreAuthorize("hasRole('CLINIC')")
-    public ResponseEntity<List<DoctorInfoResponse>> getMyDoctors() {
-        List<DoctorInfoResponse> doctors = clinicService.getDoctorsOfLoggedInClinic();
-        return ResponseEntity.ok(doctors);
-    }
+
 
 
 

@@ -20,6 +20,8 @@ import com._yp.gaitMate.repository.PatientRepository;
 import com._yp.gaitMate.mapper.PatientMapper;
 import com._yp.gaitMate.exception.ResourceNotFoundException;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api")
 @RequiredArgsConstructor
@@ -131,6 +133,27 @@ public class PatientController {
     }
 
 
+    @GetMapping("/doctors/me/patients")
+    @PreAuthorize("hasRole('DOCTOR')")
+    @Operation(summary = "Get the logged in doctor's patients")
+    public ResponseEntity<List<PatientInfoResponse>> getPatientsOfLoggedInDoctor() {
+
+        List<PatientInfoResponse> patients = patientService.getPatientsOfLoggedInDoctor();
+
+        return ResponseEntity.ok(patients);
+    }
+
+    @GetMapping("/clinics/me/patients")
+    @PreAuthorize("hasRole('CLINIC')")
+    @Operation(summary = "Get the logged in clinic's patients")
+    public ResponseEntity<List<PatientInfoResponse>> getPatientsOfLoggedInClinic() {
+
+        List<PatientInfoResponse> patients = patientService.getPatientsOfLoggedInClinic();
+
+        return ResponseEntity.ok(patients);
+    }
+
+
     // TODO:
     @GetMapping("patients/me")
     @PreAuthorize("hasRole('PATIENT')")
@@ -153,6 +176,7 @@ public class PatientController {
     @Operation(summary = "Update patient details [TODO]")
     public ResponseEntity<PatientInfoResponse> updatePatient(@PathVariable Long id, @RequestBody @Valid CreatePatientRequest request) {
         throw new NotImplementedException();
+
     }
 
 }

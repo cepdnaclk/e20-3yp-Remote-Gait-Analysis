@@ -114,16 +114,9 @@ public class DoctorController {
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
-    @GetMapping("/doctors/me/patients")
-    @PreAuthorize("hasRole('DOCTOR')")
-    public ResponseEntity<List<PatientInfoResponse>> getMyPatients() {
-        Doctor doctor = authUtil.loggedInDoctor();
-        List<Patient> patients = patientRepository.findByDoctor(doctor);
-        List<PatientInfoResponse> response = patients.stream()
-                .map(patientMapper::toPatientInfoResponse)
-                .toList();
-        return ResponseEntity.ok(response);
-    }
+
+
+
 
 
     @GetMapping("/doctors/me")
@@ -162,6 +155,14 @@ public class DoctorController {
     @Operation(summary = "Delete doctor [TODO]")
     public ResponseEntity<?> deleteDoctor(@PathVariable Long id) {
         throw new NotImplementedException();
+    }
+
+    @GetMapping("/clinics/me/doctors")
+    @PreAuthorize("hasRole('CLINIC')")
+    @Operation(summary = "Get doctors of the logged-in clinic")
+    public ResponseEntity<List<DoctorInfoResponse>> getDoctorsOfLoggedInClinic() {
+        List<DoctorInfoResponse> doctors = doctorService.getDoctorsOfLoggedInClinic();
+        return new ResponseEntity<>(doctors, HttpStatus.OK);
     }
 
 }

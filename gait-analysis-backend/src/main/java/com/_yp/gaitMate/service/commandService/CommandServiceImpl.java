@@ -30,26 +30,30 @@ public class CommandServiceImpl implements CommandService{
 
     @Override
     public ApiResponse sendCommandToSensor(CommandRequestDto request) {
-        // 1. Get the logged-in patient's sensor kit
+        // Get the logged-in patient's sensor kit
         Long userId = authUtil.loggedInUserId();
+
         Patient patient = patientRepository.findByUser_UserId(userId)
                 .orElseThrow(() -> new ApiException("Patient not found for user ID: " + userId));
 
         SensorKit sensorKit = patient.getSensorKit();
+
+        // Validate the sensor-kit
         if (sensorKit == null) {
             throw new ApiException("Patient is not assigned a sensorKit");
         }
 
-//        Ensure no active session exists
+        // Ensure no active session exists (To start a test from a sensor-kit, there should not be any active sessions)
         if (testSessionRepository.existsByPatientAndStatus(patient, TestSession.Status.ACTIVE)) {
             throw new ApiException("There is already an active test session for this patient");
         }
 
+        // Build the publishing topic, including the sensorKit id in the middle
         Long sensorId = sensorKit.getId();
         String topic = "device/" + sensorId + "/command";
 
-        // 2. Determine action and publish
-        String commandStr = request.getCommand().toLowerCase();
+        // Determine action and publish
+        String commandStr = request.getCommand().toUpperCase();
 
         switch (commandStr) {
 
