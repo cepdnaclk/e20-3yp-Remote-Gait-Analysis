@@ -32,7 +32,7 @@ public class CommandServiceImpl implements CommandService{
     public ApiResponse sendCommandToSensor(CommandRequestDto request) {
         // 1. Get the logged-in patient's sensor kit
         Long userId = authUtil.loggedInUserId();
-        Patient patient = patientRepository.findById(userId)
+        Patient patient = patientRepository.findByUser_UserId(userId)
                 .orElseThrow(() -> new ApiException("Patient not found for user ID: " + userId));
 
         SensorKit sensorKit = patient.getSensorKit();
@@ -49,14 +49,15 @@ public class CommandServiceImpl implements CommandService{
         String topic = "device/" + sensorId + "/command";
 
         // 2. Determine action and publish
-        String commandStr = request.getCommand().toUpperCase();
+        String commandStr = request.getCommand().toLowerCase();
 
         switch (commandStr) {
 
-            case "CHECK_CALIBRATION":
-            case "START_CALIBRATION":
-            case "CAPTURE_ORIENTATION":
-            case "START_STREAMING": {
+            case "check_calibration":
+            case "start_calibration":
+            case "start_streaming":
+            case "capture_orientation":
+            case "stop_streaming": {
                 String payload = "{ \"command\": \"" + commandStr + "\" }";
                 try {
                     mqttPublisher.publishBlocking(topic, payload, AWSIotQos.QOS1);

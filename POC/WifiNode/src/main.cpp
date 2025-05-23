@@ -9,7 +9,7 @@
 const char* ssid = "Yohan's Galaxy A52";
 const char* password = "11111111";
 const char* mqtt_server = "a18e6b70jffugd-ats.iot.eu-north-1.amazonaws.com";
-const String DEVICE_ID = "esp-001";
+const String DEVICE_ID = "601";
 
 bool stopStreaming = true;
 bool calibrationComplete = false;

@@ -5,7 +5,7 @@
 #include <utility/imumaths.h>
 
 #define UART_BAUD_RATE 115200
-#define DEVICE_ID "esp-001"
+#define DEVICE_ID "601"
 
 Adafruit_BNO055 bno = Adafruit_BNO055();
 
@@ -64,7 +64,7 @@ void startCalibration() {
 
   while (true) {
     bno.getCalibration(&sysCal, &gyroCal, &accelCal, &magCal);
-    bool complete = (sysCal > 0 && gyroCal == 3 && accelCal > 0 && magCal == 3);
+    bool complete = (sysCal = 3 && gyroCal == 3 && accelCal > 0 && magCal == 3);
 
     unsigned long ts = syncedTime + (millis() - lastSyncTime) / 1000;
 

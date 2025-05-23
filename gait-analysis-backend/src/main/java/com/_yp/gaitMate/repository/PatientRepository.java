@@ -16,5 +16,7 @@ public interface PatientRepository extends JpaRepository<Patient, Long> {
 
     Optional<Patient> findById(Long userUserId);
     List<Patient> findByDoctor(Doctor doctor);
+    Optional<Patient> findByUser_UserId(Long userUserId);
+
 
 }
