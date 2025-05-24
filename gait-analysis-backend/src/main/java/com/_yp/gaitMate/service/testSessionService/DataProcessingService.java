@@ -50,16 +50,16 @@ public class DataProcessingService {
             markSessionAsFailed(request.getSessionId());
 
 
-            NotificationMessage message = NotificationMessage.builder()
-                    .type("results_ready")
-                    //.deviceId(deviceId)
-                    .status(false)
-                    .timestamp(LocalDateTime.now().toString())
-                    .message(e.getMessage())
-                    .build();
-
-            notificationService.sendToUser(username, message);
-//            log.info("✅ WebSocket notification [results_ready] sent to user [{}]", username);
+//            NotificationMessage message = NotificationMessage.builder()
+//                    .type("results_ready")
+//                    //.deviceId(deviceId)
+//                    .status(false)
+//                    .timestamp(LocalDateTime.now().toString())
+//                    .message(e.getMessage())
+//                    .build();
+//
+//            notificationService.sendToUser(username, message);
+////            log.info("✅ WebSocket notification [results_ready] sent to user [{}]", username);
 
         }
     }
