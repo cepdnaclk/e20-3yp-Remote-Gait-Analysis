@@ -12,7 +12,8 @@ const StepCalibration = ({
   isCalibrating,
   calibrationProgress,
   startCalibration,
-  setActiveStep
+  setActiveStep,
+  orientationCaptured
 }) => (
   <Card elevation={0} sx={{
     borderRadius: 4,
@@ -40,7 +41,7 @@ const StepCalibration = ({
       </Box>
 
       <Grid container spacing={4}>
-        <Grid item xs={12}>
+        <Grid item xs={12} sx={{ mb: 2 }}>
           <Typography variant="h5" fontWeight="600" sx={{ mb: 3 }}>
             Device Status
           </Typography>
@@ -52,7 +53,7 @@ const StepCalibration = ({
               <DeviceStatusCard status={deviceStatus.deviceCalibrated} label="Device Calibrated" icon={CheckCircle} />
             </Grid>
             <Grid item xs={12} sm={4}>
-              <DeviceStatusCard status={deviceStatus.atlas} label="Atlas Connection" icon={SignalCellularAlt} />
+              <DeviceStatusCard status={deviceStatus.orientationCaptured} label="Orientation Captured" icon={CheckCircle} />
             </Grid>
           </Grid>
         </Grid>
@@ -66,43 +67,36 @@ const StepCalibration = ({
             <Typography variant="h5" fontWeight="600" color="primary" sx={{ mb: 3 }}>
               Calibration Instructions
             </Typography>
-            {["Position your device firmly for few seconds", "Tilt your device 45° and keep hold for few seconds, repeat for 90°", "Follow the video instructions for proper calibration"].map((text, idx) => (
+            {["Position your device firmly for few seconds", "Tilt your device 45° and hold for a few seconds, repeat for 90°", "Follow the video instructions for proper calibration"].map((text, idx) => (
               <Typography key={idx} variant="body1" sx={{ mb: 2, display: 'flex', alignItems: 'center' }}>
                 <Box component="span" sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: 'primary.main', mr: 2 }} />
                 {text}
               </Typography>
             ))}
           </Paper>
-        </Grid>
 
-        <Grid item xs={12} lg={4}>
-          <VideoCard title="Calibration Tutorial" subtitle="Watch the step-by-step guide" aspectRatio="4/5" />
-        </Grid>
-
-        {isCalibrating && (
-          <Grid item xs={12}>
+        
+          <Box width="100%" mt={5}  /*linear progress bar*/ >
             <Paper elevation={0} sx={{
-              p: 3, borderRadius: 3,
+              p: 2.5, borderRadius: 3,
               background: 'linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%)',
               border: '1px solid #bbf7d0'
             }}>
-              <Box display="flex" justifyContent="space-between" mb={2}>
-                <Typography variant="h6" fontWeight="600">Calibration Progress</Typography>
-                <Typography variant="h6" fontWeight="600" color="success.main">{calibrationProgress}%</Typography>
+              <Box display="flex" justifyContent="space-between" mb={1.5}>
+                <Typography variant="body1" fontWeight="600">Calibration Progress</Typography>
+                <Typography variant="body1" fontWeight="600" color="success.main">{calibrationProgress}%</Typography>
               </Box>
               <LinearProgress variant="determinate" value={calibrationProgress} sx={{
-                height: 12, borderRadius: 6, bgcolor: 'rgba(34, 197, 94, 0.1)',
+                height: 8, borderRadius: 4, bgcolor: 'rgba(34, 197, 94, 0.1)',
                 '& .MuiLinearProgress-bar': {
                   background: 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)',
-                  borderRadius: 6
+                  borderRadius: 4
                 }
               }} />
             </Paper>
-          </Grid>
-        )}
+          </Box>
 
-        <Grid item xs={12}>
-          <Box display="flex" gap={3} flexWrap="wrap">
+          <Box display="flex" gap={3} flexWrap="wrap" mt={5} alignItems="flex-end">
             <Button
               variant="contained"
               size="large"
@@ -147,9 +141,14 @@ const StepCalibration = ({
             )}
           </Box>
         </Grid>
+
+        <Grid item xs={12} lg={4}>
+          <VideoCard title="Calibration Tutorial" subtitle="Watch the step-by-step guide" aspectRatio="4/5" />
+        </Grid>
       </Grid>
     </CardContent>
   </Card>
 );
 
 export default StepCalibration;
+

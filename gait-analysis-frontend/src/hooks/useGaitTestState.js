@@ -6,7 +6,6 @@ const useGaitTestState = () => {
   const [deviceStatus, setDeviceStatus] = useState({
     deviceAlive: true,
     deviceCalibrated: false,
-    atlas: true
   });
   const [orientationCaptured, setOrientationCaptured] = useState(false);
   const [isCalibrating, setIsCalibrating] = useState(false);

@@ -1,12 +1,13 @@
 /* File: components/StepWearDevice.jsx */
 import React from 'react';
 import {
-  Box, Card, CardContent, Typography, Grid, Alert, Button, CircularProgress
+  Box, Card, CardContent, Typography, Grid, Paper, Button, CircularProgress
 } from '@mui/material';
-import { ArrowBack, Videocam } from '@mui/icons-material';
+import { ArrowBack, Videocam, Wifi, CheckCircle } from '@mui/icons-material';
+import DeviceStatusCard from './DeviceStatusCard';
 import VideoCard from './VideoCard';
 
-const StepWearDevice = ({ orientationCaptured, setActiveStep, captureOrientation }) => (
+const StepWearDevice = ({ orientationCaptured, setActiveStep, captureOrientation, deviceStatus }) => (
   <Card elevation={0} sx={{
     borderRadius: 4,
     background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.9) 100%)',
@@ -16,8 +17,10 @@ const StepWearDevice = ({ orientationCaptured, setActiveStep, captureOrientation
     <CardContent sx={{ p: 4 }}>
       <Box display="flex" alignItems="center" gap={3} mb={4}>
         <Box sx={{
-          width: 64, height: 64, background: 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)',
-          borderRadius: 3, display: 'flex', alignItems: 'center', justifyContent: 'center',
+          width: 64, height: 64,
+          background: 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)',
+          borderRadius: 3,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
           boxShadow: '0 8px 30px rgba(34, 197, 94, 0.3)'
         }}>
           <Videocam sx={{ color: 'white', fontSize: 32 }} />
@@ -33,25 +36,41 @@ const StepWearDevice = ({ orientationCaptured, setActiveStep, captureOrientation
       </Box>
 
       <Grid container spacing={4}>
+        <Grid item xs={12} sx={{ mb: 2 }}>
+          <Typography variant="h5" fontWeight="600" sx={{ mb: 3 }}>
+            Device Status
+          </Typography>
+          <Grid container spacing={3}>
+            <Grid item xs={12} sm={4}>
+              <DeviceStatusCard status={deviceStatus.deviceAlive} label="Device Alive" icon={Wifi} />
+            </Grid>
+            <Grid item xs={12} sm={4}>
+              <DeviceStatusCard status={deviceStatus.deviceCalibrated} label="Device Calibrated" icon={CheckCircle} />
+            </Grid>
+            <Grid item xs={12} sm={4}>
+              <DeviceStatusCard status={orientationCaptured} label="Orientation Captured" icon={CheckCircle} />
+            </Grid>
+          </Grid>
+        </Grid>
+
         <Grid item xs={12} lg={8}>
-          <Alert severity="info" sx={{
-            mb: 4, borderRadius: 3,
-            border: '1px solid #bae6fd',
+          <Paper elevation={0} sx={{
+            p: 4, borderRadius: 4,
             background: 'linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%)',
-            '& .MuiAlert-icon': { fontSize: '2rem' }
+            border: '1px solid #bae6fd'
           }}>
-            <Typography variant="h6" fontWeight="600" sx={{ mb: 2 }}>
+            <Typography variant="h5" fontWeight="600" color="primary" sx={{ mb: 3 }}>
               Setup Instructions
             </Typography>
             {["Wear your device and get comfortable", "When you are relaxed and ready click \"I'm Ready\"", "We will prepare your session for the gait analysis"].map((text, idx) => (
-              <Typography key={idx} variant="body1" sx={{ mb: 1, display: 'flex', alignItems: 'center' }}>
+              <Typography key={idx} variant="body1" sx={{ mb: 2, display: 'flex', alignItems: 'center' }}>
                 <Box component="span" sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: 'info.main', mr: 2 }} />
                 {text}
               </Typography>
             ))}
-          </Alert>
+          </Paper>
 
-          <Box display="flex" gap={3} flexWrap="wrap">
+          <Box display="flex" gap={3} flexWrap="wrap" mt={5} alignItems="flex-end">
             <Button
               variant="outlined"
               size="large"
@@ -100,7 +119,7 @@ const StepWearDevice = ({ orientationCaptured, setActiveStep, captureOrientation
         </Grid>
 
         <Grid item xs={12} lg={4}>
-          <VideoCard title="Device Placement Guide" subtitle="Learn proper positioning" aspectRatio="9/16" />
+          <VideoCard title="Device Placement Guide" subtitle="Learn proper positioning" aspectRatio="4/5" />
         </Grid>
       </Grid>
     </CardContent>

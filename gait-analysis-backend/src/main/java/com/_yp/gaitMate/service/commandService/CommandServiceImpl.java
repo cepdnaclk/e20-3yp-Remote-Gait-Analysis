@@ -53,7 +53,7 @@ public class CommandServiceImpl implements CommandService{
         String topic = "device/" + sensorId + "/command";
 
         // Determine action and publish
-        String commandStr = request.getCommand().toUpperCase();
+        String commandStr = request.getCommand().toLowerCase();
 
         switch (commandStr) {
 
