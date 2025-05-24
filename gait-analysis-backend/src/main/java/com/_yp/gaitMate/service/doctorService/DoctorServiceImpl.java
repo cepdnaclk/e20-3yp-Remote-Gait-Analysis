@@ -27,7 +27,6 @@ import java.util.Set;
 @Service
 @RequiredArgsConstructor
 public class DoctorServiceImpl implements DoctorService{
-    private final ClinicRepository clinicRepository;
     private final DoctorRepository doctorRepository;
     private final AuthenticationService authService;
     private final DoctorMapper doctorMapper;
@@ -83,6 +82,7 @@ public class DoctorServiceImpl implements DoctorService{
                 .map(doctorMapper::toDoctorInfoResponse)
                 .toList();
     }
+
 
     //*********************** P R I V A T E  M E T H O D S ************************************
 
