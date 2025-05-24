@@ -1,5 +1,6 @@
 package com._yp.gaitMate.service.sensorKitService;
 
+import com._yp.gaitMate.dto.sensorKit.AssignSensorKitsRequest;
 import com._yp.gaitMate.dto.sensorKit.CreateSensorKitRequest;
 import com._yp.gaitMate.dto.sensorKit.SensorKitResponse;
 import com._yp.gaitMate.exception.ApiException;
@@ -9,6 +10,7 @@ import com._yp.gaitMate.model.Clinic;
 import com._yp.gaitMate.model.SensorKit;
 import com._yp.gaitMate.repository.ClinicRepository;
 import com._yp.gaitMate.repository.SensorKitRepository;
+import com._yp.gaitMate.security.utils.AuthUtil;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,6 +26,8 @@ public class SensorKitServiceImpl implements SensorKitService {
     private static final Logger log = LoggerFactory.getLogger(SensorKitServiceImpl.class);
     private final SensorKitRepository sensorKitRepository;
     private final SensorKitMapper sensorKitMapper;
+    private final AuthUtil authUtil;
+    private final ClinicRepository clinicRepository;
 
     @Override
     public SensorKitResponse createSensorKit(CreateSensorKitRequest request) {
@@ -85,6 +89,47 @@ public class SensorKitServiceImpl implements SensorKitService {
 
         return sensorKit.getPatient().getUser().getUsername();
     }
+
+
+
+    @Override
+    public void assignToClinic(AssignSensorKitsRequest request) {
+        Clinic clinic = clinicRepository.findById(request.getClinicId())
+                .orElseThrow(() -> new ResourceNotFoundException("Clinic", "id", request.getClinicId()));
+
+        List<SensorKit> kits = sensorKitRepository.findAllByIdIn(request.getSensorKitIds());
+
+        if (kits.size() != request.getSensorKitIds().size()) {
+            throw new ApiException("Some sensor kits do not exist");
+        }
+
+        for (SensorKit kit : kits) {
+            if (kit.getStatus() != SensorKit.Status.IN_STOCK) {
+                throw new ApiException("SensorKit " + kit.getId() + " is not in IN_STOCK status");
+            }
+            kit.setClinic(clinic);
+            kit.setStatus(SensorKit.Status.AVAILABLE); // Assuming status transitions from IN_STOCK → AVAILABLE
+        }
+
+        sensorKitRepository.saveAll(kits);
+    }
+
+    @Override
+    public List<SensorKitResponse> getSensorKitsOfLoggedInClinicByStatus(SensorKit.Status status) {
+        List<SensorKit> kits;
+
+
+        Clinic clinic = authUtil.getLoggedInClinic();
+        kits = (status != null)
+                ? sensorKitRepository.findByClinicAndStatus(clinic, status)
+                : sensorKitRepository.findByClinic(clinic);
+
+
+        return kits.stream()
+                .map(sensorKitMapper::toSensorKitResponse)
+                .toList();
+    }
+
 
 }
 

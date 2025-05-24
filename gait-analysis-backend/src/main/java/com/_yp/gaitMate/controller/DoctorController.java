@@ -14,13 +14,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import com._yp.gaitMate.model.Doctor;
-import com._yp.gaitMate.model.Patient;
 import com._yp.gaitMate.repository.PatientRepository;
 import com._yp.gaitMate.mapper.PatientMapper;
-import com._yp.gaitMate.dto.patient.PatientInfoResponse;
 import com._yp.gaitMate.security.utils.AuthUtil;
-import com._yp.gaitMate.dto.patient.PatientInfoResponse;
 
 import java.util.List;
 
@@ -130,14 +126,7 @@ public class DoctorController {
     @PutMapping("/doctors/{id}")
     @PreAuthorize("hasRole('DOCTOR')")
     @Operation(summary = "Update logged-in doctor's profile [TODO]")
-    public ResponseEntity<DoctorInfoResponse> updateDoctor(@RequestBody @Valid CreateDoctorRequest request) {
-        throw new NotImplementedException();
-    }
-
-    @GetMapping("/doctors")
-    @PreAuthorize("hasRole('CLINIC')")
-    @Operation(summary = "List all doctors for the clinic [TODO]")
-    public ResponseEntity<?> getAllDoctorsForClinic() {
+    public ResponseEntity<DoctorInfoResponse> updateDoctor(@RequestBody @Valid CreateDoctorRequest request, @PathVariable String id) {
         throw new NotImplementedException();
     }
 
