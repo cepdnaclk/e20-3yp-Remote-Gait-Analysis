@@ -1,4 +1,4 @@
-package com._yp.gaitMate.websocket;
+package com._yp.gaitMate.websocket.message;
 
 import lombok.*;
 
@@ -9,7 +9,7 @@ import lombok.*;
 @Builder
 @ToString
 public class CalibrationStatusWebSocketMessage {
-    private String type;        // Always "CAL_STATUS"
+    private WebSocketMessageType type;        // Always "CAL_STATUS"
     private Long deviceId;
     private Long timestamp;
 

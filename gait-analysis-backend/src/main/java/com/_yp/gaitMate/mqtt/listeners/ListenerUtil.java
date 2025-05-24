@@ -1,111 +1,104 @@
 package com._yp.gaitMate.mqtt.listeners;
 
-import com._yp.gaitMate.websocket.CalibrationStatusWebSocketMessage;
-import com._yp.gaitMate.websocket.NotificationMessage;
+import com._yp.gaitMate.websocket.message.*;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 
-import java.time.Instant;
-import java.time.LocalDateTime;
-
+@Slf4j
 public class ListenerUtil {
 
-    /**
-     * Extracts and validates an incoming MQTT message payload and topic.
-     *
-     * @param topic        the full MQTT topic (e.g., "device/5/status/calibration")
-     * @param payload      the JSON payload
-     * @param expectedType the expected type field in the payload (e.g., "cal_status", "alive")
-     * @return a populated NotificationMessage
-     * @throws IllegalArgumentException if the topic or payload is invalid
-     */
-    public static NotificationMessage extractAndValidateMessage(String topic, String payload, String expectedType) {
-        // Validate topic structure: device/{deviceId}/status/{type}
-        String[] parts = topic.split("/");
-        if (parts.length < 4 || !"device".equals(parts[0])) {
-            throw new IllegalArgumentException("Invalid topic format: " + topic);
-        }
+    private static final ObjectMapper objectMapper = new ObjectMapper();
 
-        long deviceId;
+    public static Long parseDeviceIdFromTopic(String topic) {
         try {
-            deviceId = Long.parseLong(parts[1]);
-        } catch (NumberFormatException e) {
-            throw new IllegalArgumentException("Invalid device ID in topic: " + topic);
-        }
-
-        // Parse JSON
-        JsonNode json;
-        try {
-            ObjectMapper mapper = new ObjectMapper();
-            json = mapper.readTree(payload);
+            String[] parts = topic.split("/");
+            return Long.parseLong(parts[1]);
         } catch (Exception e) {
-            throw new IllegalArgumentException("Invalid JSON payload");
+            throw new IllegalArgumentException("Invalid topic: " + topic);
         }
-
-        // Validate payload structure
-        if (!json.has("type") || !json.has("status")) {
-            throw new IllegalArgumentException("Payload missing required fields");
-        }
-
-        String type = json.get("type").asText();
-        if (!expectedType.equals(type)) {
-            throw new IllegalArgumentException("Unexpected type: " + type);
-        }
-
-        boolean status = json.get("status").asBoolean();
-
-        return NotificationMessage.builder()
-                .type(type)
-                .deviceId(deviceId)
-                .status(status)
-                .timestamp(LocalDateTime.now().toString())
-                .build();
     }
 
-    /**
-     * Extracts and validates calibration payload and builds WebSocket message.
-     */
-    public static CalibrationStatusWebSocketMessage extractAndValidateCalibrationMessage(String topic, String payload) {
-        String[] parts = topic.split("/");
-        if (parts.length < 4 || !"device".equals(parts[0])) {
-            throw new IllegalArgumentException("Invalid topic format: " + topic);
-        }
-
-        Long deviceId;
+    private static JsonNode parseJson(String payload, WebSocketMessageType expectedType) {
         try {
-            deviceId = Long.parseLong(parts[1]);
-        } catch (NumberFormatException e) {
-            throw new IllegalArgumentException("Invalid numeric device ID in topic: " + topic);
-        }
-
-        JsonNode json;
-        try {
-            ObjectMapper mapper = new ObjectMapper();
-            json = mapper.readTree(payload);
+            JsonNode json = objectMapper.readTree(payload);
+            String type = json.has("type") ? json.get("type").asText() : null;
+            if (type == null || !expectedType.name().equalsIgnoreCase(type)) {
+                throw new IllegalArgumentException("Unexpected or missing type in payload: " + type);
+            }
+            return json;
         } catch (Exception e) {
-            throw new IllegalArgumentException("Invalid JSON payload");
+            throw new IllegalArgumentException("Invalid JSON payload: " + e.getMessage());
         }
+    }
 
-        if (!json.has("type") || !json.has("status")) {
-            throw new IllegalArgumentException("Payload missing required fields");
-        }
-
-        String type = json.get("type").asText();
-        if (!"cal_status".equals(type)) {
-            throw new IllegalArgumentException("Unexpected type: " + type);
-        }
+    public static CalibrationStatusWebSocketMessage extractCalibrationStatus(String topic, String payload) {
+        Long deviceId = parseDeviceIdFromTopic(topic);
+        JsonNode json = parseJson(payload, WebSocketMessageType.CALIBRATION_STATUS);
 
         return CalibrationStatusWebSocketMessage.builder()
-                .type("cal_status")
+                .type(WebSocketMessageType.CALIBRATION_STATUS)
                 .deviceId(deviceId)
-                .timestamp(json.has("timestamp") ? json.get("timestamp").asLong() : Instant.now().getEpochSecond())
-                .sys(json.has("sys") ? json.get("sys").asInt() : 0)
-                .gyro(json.has("gyro") ? json.get("gyro").asInt() : 0)
-                .accel(json.has("accel") ? json.get("accel").asInt() : 0)
-                .mag(json.has("mag") ? json.get("mag").asInt() : 0)
+                .timestamp(json.get("timestamp").asLong())
+                .sys(json.get("sys_cal").asInt())
+                .gyro(json.get("gyro_cal").asInt())
+                .accel(json.get("accel_cal").asInt())
+                .mag(json.get("mag_cal").asInt())
                 .status(json.get("status").asBoolean())
                 .build();
     }
 
+    public static DeviceAliveWebSocketMessage extractAliveStatus(String topic, String payload) {
+        Long deviceId = parseDeviceIdFromTopic(topic);
+        JsonNode json = parseJson(payload, WebSocketMessageType.DEVICE_ALIVE);
 
+        return DeviceAliveWebSocketMessage.builder()
+                .type(WebSocketMessageType.DEVICE_ALIVE)
+                .deviceId(deviceId)
+                .timestamp(json.get("timestamp").asLong())
+                .status(json.get("status").asBoolean())
+                .build();
+    }
+
+    public static OrientationWebSocketMessage extractOrientationStatus(String topic, String payload) {
+        Long deviceId = parseDeviceIdFromTopic(topic);
+        JsonNode json = parseJson(payload, WebSocketMessageType.ORIENTATION_CAPTURED);
+
+        return OrientationWebSocketMessage.builder()
+                .type(WebSocketMessageType.ORIENTATION_CAPTURED)
+                .deviceId(deviceId)
+                .timestamp(json.get("timestamp").asLong())
+                .status(json.get("status").asBoolean())
+                .build();
+    }
+
+    public static SensorDataWebSocketMessage extractSensorData(String topic, String payload) {
+        Long deviceId = parseDeviceIdFromTopic(topic);
+        JsonNode json = parseJson(payload, WebSocketMessageType.SENSOR_DATA);
+
+        return SensorDataWebSocketMessage.builder()
+                .type(WebSocketMessageType.SENSOR_DATA)
+                .deviceId(deviceId)
+                .timestamp(json.get("timestamp").asLong())
+                .FSR_1(json.get("FSR_1").asInt())
+                .FSR_2(json.get("FSR_2").asInt())
+                .yaw((float) json.get("yaw").asDouble())
+                .pitch((float) json.get("pitch").asDouble())
+                .roll((float) json.get("roll").asDouble())
+                .q0((float) json.get("q0").asDouble())
+                .q1((float) json.get("q1").asDouble())
+                .q2((float) json.get("q2").asDouble())
+                .q3((float) json.get("q3").asDouble())
+                .ax((float) json.get("ax").asDouble())
+                .ay((float) json.get("ay").asDouble())
+                .az((float) json.get("az").asDouble())
+                .gx((float) json.get("gx").asDouble())
+                .gy((float) json.get("gy").asDouble())
+                .gz((float) json.get("gz").asDouble())
+                .sysCal(json.get("sysCal").asInt())
+                .gyroCal(json.get("gyroCal").asInt())
+                .accelCal(json.get("accelCal").asInt())
+                .magCal(json.get("magCal").asInt())
+                .build();
+    }
 }

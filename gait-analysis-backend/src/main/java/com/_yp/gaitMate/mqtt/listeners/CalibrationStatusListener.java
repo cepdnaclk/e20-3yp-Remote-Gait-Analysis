@@ -2,8 +2,7 @@ package com._yp.gaitMate.mqtt.listeners;
 
 import com._yp.gaitMate.mqtt.core.AbstractTopicListener;
 import com._yp.gaitMate.service.sensorKitService.SensorKitService;
-import com._yp.gaitMate.websocket.CalibrationStatusWebSocketMessage;
-import com._yp.gaitMate.websocket.NotificationMessage;
+import com._yp.gaitMate.websocket.message.CalibrationStatusWebSocketMessage;
 import com._yp.gaitMate.websocket.NotificationService;
 import com.amazonaws.services.iot.client.AWSIotQos;
 import lombok.extern.slf4j.Slf4j;
@@ -59,7 +58,7 @@ public class CalibrationStatusListener extends AbstractTopicListener {
     public void handleMessage(String topic, String payload) {
         try {
             // Parse MQTT payload into DTO
-            CalibrationStatusWebSocketMessage calMsg = ListenerUtil.extractAndValidateCalibrationMessage(topic, payload);
+            CalibrationStatusWebSocketMessage calMsg = ListenerUtil.extractCalibrationStatus(topic, payload);
 
             // Only update DB if calibrated
             if (calMsg.isStatus()) {
@@ -75,8 +74,8 @@ public class CalibrationStatusListener extends AbstractTopicListener {
 
 
             // Broadcast to WebSocket subscribers
-            notificationService.broadcastCalibration(username,calMsg);
-            log.info("📡 Sent calibration update to /topic/cal_status for device [{}]", calMsg.getDeviceId());
+            notificationService.sendCalibrationStatusToUser(username,calMsg);
+            log.info("📡 Sent calibration update to /topic/status/calibration for device [{}]", calMsg.getDeviceId());
 
         } catch (IllegalArgumentException e) {
             log.warn("❌ Failed to parse calibration status message: {}", e.getMessage());

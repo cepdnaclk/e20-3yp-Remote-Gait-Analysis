@@ -4,6 +4,7 @@ import com._yp.gaitMate.mqtt.core.AbstractTopicListener;
 import com._yp.gaitMate.service.sensorKitService.SensorKitService;
 import com._yp.gaitMate.websocket.message.DeviceAliveWebSocketMessage;
 import com._yp.gaitMate.websocket.NotificationService;
+import com._yp.gaitMate.websocket.message.SensorDataWebSocketMessage;
 import com.amazonaws.services.iot.client.AWSIotQos;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -40,13 +41,13 @@ import org.springframework.stereotype.Component;
 //}
 @Component
 @Slf4j
-public class AliveSignalListener extends AbstractTopicListener {
+public class SensorDataListener extends AbstractTopicListener {
 
     private final SensorKitService sensorKitService;
     private final NotificationService notificationService;
 
-    public AliveSignalListener(SensorKitService sensorKitService, NotificationService notificationService) {
-        super("device/+/status/alive", AWSIotQos.QOS1);
+    public SensorDataListener(SensorKitService sensorKitService, NotificationService notificationService) {
+        super("device/+/sensor_data", AWSIotQos.QOS1);
         this.sensorKitService = sensorKitService;
         this.notificationService = notificationService;
     }
@@ -54,7 +55,7 @@ public class AliveSignalListener extends AbstractTopicListener {
     @Override
     public void handleMessage(String topic, String payload) {
         try {
-            DeviceAliveWebSocketMessage message = ListenerUtil.extractAliveStatus(topic, payload);
+            SensorDataWebSocketMessage message = ListenerUtil.extractSensorData(topic, payload);
 
             String username = sensorKitService.getUsernameBySensorKitId(message.getDeviceId());
             if (username == null) {
@@ -62,11 +63,11 @@ public class AliveSignalListener extends AbstractTopicListener {
                 return;
             }
 
-            notificationService.sendDeviceAliveToUser(username, message);
-            log.info("Alive signal forwarded to user [{}] for device [{}]", username, message.getDeviceId());
+            notificationService.sendSensorDataToUser(username, message);
+            log.info("sensor data forwarded to user [{}] for device [{}]", username, message.getDeviceId());
 
         } catch (IllegalArgumentException e) {
-            log.warn("Failed to handle alive signal: {}", e.getMessage());
+            log.warn("Failed to handle sensor data: {}", e.getMessage());
         }
     }
 }
