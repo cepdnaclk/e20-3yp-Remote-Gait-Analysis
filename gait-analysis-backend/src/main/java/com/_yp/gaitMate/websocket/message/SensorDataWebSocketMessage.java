@@ -11,8 +11,8 @@ import lombok.*;
 public class SensorDataWebSocketMessage {
 
     private WebSocketMessageType type;   // Always SENSOR_DATA
-    private String deviceId;
-    private long timestamp;
+    private Long deviceId;
+    private Long timestamp;
 
     // FSR values
     private int FSR_1;

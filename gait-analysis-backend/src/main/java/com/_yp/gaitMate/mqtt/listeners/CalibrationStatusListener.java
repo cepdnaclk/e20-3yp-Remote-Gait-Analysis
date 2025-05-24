@@ -58,7 +58,7 @@ public class CalibrationStatusListener extends AbstractTopicListener {
     public void handleMessage(String topic, String payload) {
         try {
             // Parse MQTT payload into DTO
-            CalibrationStatusWebSocketMessage calMsg = ListenerUtil.extractAndValidateCalibrationMessage(topic, payload);
+            CalibrationStatusWebSocketMessage calMsg = ListenerUtil.extractCalibrationStatus(topic, payload);
 
             // Only update DB if calibrated
             if (calMsg.isStatus()) {
@@ -74,8 +74,8 @@ public class CalibrationStatusListener extends AbstractTopicListener {
 
 
             // Broadcast to WebSocket subscribers
-            notificationService.broadcastCalibration(username,calMsg);
-            log.info("📡 Sent calibration update to /topic/cal_status for device [{}]", calMsg.getDeviceId());
+            notificationService.sendCalibrationStatusToUser(username,calMsg);
+            log.info("📡 Sent calibration update to /topic/status/calibration for device [{}]", calMsg.getDeviceId());
 
         } catch (IllegalArgumentException e) {
             log.warn("❌ Failed to parse calibration status message: {}", e.getMessage());

@@ -2,8 +2,8 @@ package com._yp.gaitMate.mqtt.listeners;
 
 import com._yp.gaitMate.mqtt.core.AbstractTopicListener;
 import com._yp.gaitMate.service.sensorKitService.SensorKitService;
-import com._yp.gaitMate.websocket.message.NotificationMessage;
 import com._yp.gaitMate.websocket.NotificationService;
+import com._yp.gaitMate.websocket.message.OrientationWebSocketMessage;
 import com.amazonaws.services.iot.client.AWSIotQos;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -53,8 +53,7 @@ public class OrientationStatusListener extends AbstractTopicListener {
     @Override
     public void handleMessage(String topic, String payload) throws Exception {
         try {
-            NotificationMessage message = ListenerUtil.extractAndValidateMessage(
-                    topic, payload, "orientation_captured");
+            OrientationWebSocketMessage message = ListenerUtil.extractOrientationStatus(topic, payload);
 
             String username = sensorKitService.getUsernameBySensorKitId(message.getDeviceId());
             if (username == null) {
@@ -62,7 +61,7 @@ public class OrientationStatusListener extends AbstractTopicListener {
                 return;
             }
 
-            notificationService.sendToUser(username, message);
+            notificationService.sendOrientationStatusToUser(username, message);
             log.info("Orientation update sent to user [{}] for device [{}]", username, message.getDeviceId());
 
         } catch (IllegalArgumentException e) {
