@@ -26,4 +26,10 @@ public class NotificationService {
         log.info("📡 Sending WebSocket message to user [{}]: {}", username, message);
         messagingTemplate.convertAndSendToUser(username, destination, message);
     }
+
+    public void broadcastCalibration(String username , CalibrationStatusWebSocketMessage message) {
+        String destination = "/topic/cal_status";
+        messagingTemplate.convertAndSendToUser(username, destination, message);
+    }
+
 }

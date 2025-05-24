@@ -23,7 +23,6 @@ import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
-@Slf4j
 public class TestSessionServiceImpl implements TestSessionService {
 
     private static final Logger log = LoggerFactory.getLogger(TestSessionServiceImpl.class);
@@ -39,7 +38,7 @@ public class TestSessionServiceImpl implements TestSessionService {
     @Override
     public StartTestSessionResponse startSession(TestSessionActionDto request) {
         // 1. Validate action
-        validateAction(request.getAction(), "START");
+        validateAction(request.getAction(), "GO");
 
         // 2. Get current patient from user context
         Patient patient = getLoggedInPatient();
@@ -184,7 +183,7 @@ public class TestSessionServiceImpl implements TestSessionService {
     private Patient getLoggedInPatient() {
         Long userId = authUtil.loggedInUserId();
 
-        return patientRepository.findById(userId)
+        return patientRepository.findByUser_UserId(userId)
                 .orElseThrow(() -> new ApiException("Patient not found for user ID: " + userId));
     }
 

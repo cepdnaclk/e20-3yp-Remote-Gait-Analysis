@@ -21,10 +21,14 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api")
-@RequiredArgsConstructor
+//@RequiredArgsConstructor
 public class ClinicController {
 
     private final ClinicService clinicService;
+
+    public ClinicController(ClinicService clinicService) {
+        this.clinicService = clinicService;
+    }
 
     @PostMapping("/clinics")
     @PreAuthorize("hasRole('ADMIN')")
@@ -266,12 +270,7 @@ public class ClinicController {
         return ResponseEntity.ok(clinics);
     }
 
-    @GetMapping("/clinics/me/doctors")
-    @PreAuthorize("hasRole('CLINIC')")
-    public ResponseEntity<List<DoctorInfoResponse>> getMyDoctors() {
-        List<DoctorInfoResponse> doctors = clinicService.getDoctorsOfLoggedInClinic();
-        return ResponseEntity.ok(doctors);
-    }
+
 
 
 

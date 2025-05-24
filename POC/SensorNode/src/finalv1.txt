@@ -5,8 +5,6 @@
 #include <utility/imumaths.h>
 
 #define UART_BAUD_RATE 115200
-#define DEVICE_ID "601"
-
 Adafruit_BNO055 bno = Adafruit_BNO055();
 
 const int fsrPins[16] = {36, 39, 34, 35, 32, 33, 25, 26, 27, 14, 12, 13, 4, 0, 2, 15};
@@ -19,44 +17,6 @@ bool waitingForCalibration = true;
 imu::Quaternion initialQuat;
 float initialYaw = 0, initialPitch = 0, initialRoll = 0;
 
-void sendCalibrationStatus() {
-  uint8_t sysCal, gyroCal, accelCal, magCal;
-  bno.getCalibration(&sysCal, &gyroCal, &accelCal, &magCal);
-  bool complete = (sysCal > 0 && gyroCal == 3 && accelCal > 0 && magCal == 3);
-
-  unsigned long ts = syncedTime + (millis() - lastSyncTime) / 1000;
-
-  String calJSON = "{ \"type\": \"cal_status\", " +
-                   String("\"device_id\": \"") + DEVICE_ID + "\", " +
-                   "\"timestamp\": " + String(ts) +
-                   ", \"sys\": " + sysCal +
-                   ", \"gyro\": " + gyroCal +
-                   ", \"accel\": " + accelCal +
-                   ", \"mag\": " + magCal +
-                   ", \"status\": " + (complete ? "true" : "false") + " }";
-
-  Serial2.println(calJSON);
-  Serial.println("Sent calibration status: " + calJSON);
-}
-
-void captureOrientationAndRespond() {
-  initialQuat = bno.getQuat();
-  imu::Vector<3> euler = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
-  initialYaw = euler.x();
-  initialPitch = euler.y();
-  initialRoll = euler.z();
-
-  unsigned long ts = syncedTime + (millis() - lastSyncTime) / 1000;
-
-  String msg = "{ \"type\": \"orientation_captured\", " +
-               String("\"device_id\": \"") + DEVICE_ID + "\", " +
-               "\"timestamp\": " + String(ts) +
-               ", \"status\": true }";
-
-  Serial2.println(msg);
-  Serial.println("Captured initial orientation and sent confirmation.");
-}
-
 void startCalibration() {
   uint8_t sysCal, gyroCal, accelCal, magCal;
 
@@ -64,32 +24,47 @@ void startCalibration() {
 
   while (true) {
     bno.getCalibration(&sysCal, &gyroCal, &accelCal, &magCal);
-    bool complete = (sysCal = 3 && gyroCal == 3 && accelCal > 0 && magCal == 3);
+    bool complete = (sysCal > 0 && gyroCal == 3 && accelCal > 0 && magCal == 3);
 
-    unsigned long ts = syncedTime + (millis() - lastSyncTime) / 1000;
+    if (!complete) {
+      // Send cal_status JSON only while still calibrating
+      String calJSON = "{ \"type\": \"cal_status\", \"device_id\": \"esp-001\", " +
+                       String("\"sys\": ") + sysCal +
+                       ", \"gyro\": " + gyroCal +
+                       ", \"accel\": " + accelCal +
+                       ", \"mag\": " + magCal +
+                       ", \"completed\": false }";
+      Serial2.println(calJSON);
+      Serial.println(calJSON);
+      delay(500);
+      continue;
+    }
 
-    String calJSON = "{ \"type\": \"cal_status\", " +
-                     String("\"device_id\": \"") + DEVICE_ID + "\", " +
-                     "\"timestamp\": " + String(ts) +
-                     ", \"sys\": " + sysCal +
+    // Sensor is fully calibrated
+    delay(3000); // settle
+    Serial.println("Calibration complete. Capturing initial orientation...");
+    delay(2000);
+
+    initialQuat = bno.getQuat();
+    imu::Vector<3> euler = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
+    initialYaw = euler.x();
+    initialPitch = euler.y();
+    initialRoll = euler.z();
+
+    // ✅ Send only now: final status with completed = true
+    String calJSON = "{ \"type\": \"cal_status\", \"device_id\": \"esp-001\", " +
+                     String("\"sys\": ") + sysCal +
                      ", \"gyro\": " + gyroCal +
                      ", \"accel\": " + accelCal +
                      ", \"mag\": " + magCal +
-                     ", \"status\": " + (complete ? "true" : "false") + " }";
+                     ", \"completed\": true }";
 
     Serial2.println(calJSON);
     Serial.println(calJSON);
 
-    if (complete) {
-      delay(3000);
-      Serial.println("Calibration complete. Waiting for CAPTURE_ORIENTATION...");
-      delay(2000);
-      calibrated = true;
-      waitingForCalibration = false;
-      break;
-    }
-
-    delay(500);
+    calibrated = true;
+    waitingForCalibration = false;
+    break;
   }
 }
 
@@ -115,7 +90,7 @@ String generateSensorData(unsigned long timestamp) {
   uint8_t sysCal, gyroCal, accelCal, magCal;
   bno.getCalibration(&sysCal, &gyroCal, &accelCal, &magCal);
 
-  String json = "{ \"type\": \"sensor_data\", \"device_id\": \"" + String(DEVICE_ID) + "\", \"timestamp\": " + String(timestamp);
+  String json = "{ \"timestamp\": " + String(timestamp);
   for (int i = 0; i < 16; i++) json += ", \"FSR_" + String(i + 1) + "\": " + String(fsrValues[i]);
 
   json += ", \"yaw\": " + String(rYaw) +
@@ -152,7 +127,7 @@ void setup() {
 
   bno.setMode(OPERATION_MODE_NDOF);
   bno.setExtCrystalUse(true);
-  Serial.println("Waiting for commands...");
+  Serial.println("Waiting for START_CALIBRATION...");
 }
 
 void loop() {
@@ -172,10 +147,6 @@ void loop() {
       calibrated = false;
       waitingForCalibration = true;
       startCalibration();
-    } else if (command == "REQ_CAL_STATUS") {
-      sendCalibrationStatus();
-    } else if (command == "CAPTURE_ORIENTATION") {
-      captureOrientationAndRespond();
     } else if (command == "REQ_DATA") {
       if (!calibrated) {
         Serial2.println("{ \"error\": \"NotCalibrated\" }");
