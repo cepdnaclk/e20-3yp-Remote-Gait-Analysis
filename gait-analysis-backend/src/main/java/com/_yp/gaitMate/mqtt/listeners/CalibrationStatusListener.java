@@ -2,6 +2,7 @@ package com._yp.gaitMate.mqtt.listeners;
 
 import com._yp.gaitMate.mqtt.core.AbstractTopicListener;
 import com._yp.gaitMate.service.sensorKitService.SensorKitService;
+import com._yp.gaitMate.websocket.CalibrationStatusWebSocketMessage;
 import com._yp.gaitMate.websocket.NotificationMessage;
 import com._yp.gaitMate.websocket.NotificationService;
 import com.amazonaws.services.iot.client.AWSIotQos;
@@ -57,21 +58,28 @@ public class CalibrationStatusListener extends AbstractTopicListener {
     @Override
     public void handleMessage(String topic, String payload) {
         try {
-            NotificationMessage message = ListenerUtil.extractAndValidateMessage(topic, payload, "cal_status");
+            // Parse MQTT payload into DTO
+            CalibrationStatusWebSocketMessage calMsg = ListenerUtil.extractAndValidateCalibrationMessage(topic, payload);
 
-            sensorKitService.setCalibrationStatus(message.getDeviceId(), message.getStatus());
+            // Only update DB if calibrated
+            if (calMsg.isStatus()) {
+                sensorKitService.setCalibrationStatus(calMsg.getDeviceId(), true);
+            }
 
-            String username = sensorKitService.getUsernameBySensorKitId(message.getDeviceId());
+            // Get username linked to the device
+            String username = sensorKitService.getUsernameBySensorKitId(calMsg.getDeviceId());
             if (username == null) {
-                log.warn("No user associated with device {}", message.getDeviceId());
+                log.warn("No user associated with device {}", calMsg.getDeviceId());
                 return;
             }
 
-            notificationService.sendToUser(username, message);
-            log.info("Calibration status update sent to user [{}] for device [{}]", username, message.getDeviceId());
+
+            // Broadcast to WebSocket subscribers
+            notificationService.broadcastCalibration(username,calMsg);
+            log.info("📡 Sent calibration update to /topic/cal_status for device [{}]", calMsg.getDeviceId());
 
         } catch (IllegalArgumentException e) {
-            log.warn("Failed to handle calibration status message: {}", e.getMessage());
+            log.warn("❌ Failed to parse calibration status message: {}", e.getMessage());
         }
     }
 }

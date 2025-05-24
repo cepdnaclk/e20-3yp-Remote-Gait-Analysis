@@ -38,7 +38,7 @@ public class TestSessionServiceImpl implements TestSessionService {
     @Override
     public StartTestSessionResponse startSession(TestSessionActionDto request) {
         // 1. Validate action
-        validateAction(request.getAction(), "START");
+        validateAction(request.getAction(), "GO");
 
         // 2. Get current patient from user context
         Patient patient = getLoggedInPatient();

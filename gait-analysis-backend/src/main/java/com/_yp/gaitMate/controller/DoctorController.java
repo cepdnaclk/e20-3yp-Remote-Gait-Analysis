@@ -30,6 +30,10 @@ public class DoctorController {
     private final PatientMapper patientMapper;
     private final DoctorService doctorService;
 
+//    public DoctorController(DoctorService doctorService) {
+//        this.doctorService = doctorService;
+//    }
+
     @PostMapping("/doctors")
     @PreAuthorize("hasRole('CLINIC')")
     @Operation(
