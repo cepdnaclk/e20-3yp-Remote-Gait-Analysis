@@ -4,7 +4,7 @@ import com._yp.gaitMate.dto.testSession.ProcessingRequestDto;
 import com._yp.gaitMate.model.TestSession;
 import com._yp.gaitMate.repository.TestSessionRepository;
 import com._yp.gaitMate.security.utils.AuthUtil;
-import com._yp.gaitMate.websocket.NotificationMessage;
+import com._yp.gaitMate.websocket.message.NotificationMessage;
 import com._yp.gaitMate.websocket.NotificationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

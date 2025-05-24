@@ -1,5 +1,7 @@
 package com._yp.gaitMate.websocket;
 
+import com._yp.gaitMate.websocket.message.CalibrationStatusWebSocketMessage;
+import com._yp.gaitMate.websocket.message.NotificationMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.simp.SimpMessagingTemplate;

@@ -2,8 +2,7 @@ package com._yp.gaitMate.mqtt.listeners;
 
 import com._yp.gaitMate.mqtt.core.AbstractTopicListener;
 import com._yp.gaitMate.service.sensorKitService.SensorKitService;
-import com._yp.gaitMate.websocket.CalibrationStatusWebSocketMessage;
-import com._yp.gaitMate.websocket.NotificationMessage;
+import com._yp.gaitMate.websocket.message.CalibrationStatusWebSocketMessage;
 import com._yp.gaitMate.websocket.NotificationService;
 import com.amazonaws.services.iot.client.AWSIotQos;
 import lombok.extern.slf4j.Slf4j;

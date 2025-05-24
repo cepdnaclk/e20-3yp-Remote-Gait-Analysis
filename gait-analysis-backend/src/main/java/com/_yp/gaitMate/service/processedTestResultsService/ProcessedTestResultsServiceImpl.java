@@ -2,12 +2,11 @@ package com._yp.gaitMate.service.processedTestResultsService;
 
 
 import com._yp.gaitMate.dto.results.ProcessedTestResultsRequestDto;
-import com._yp.gaitMate.exception.ApiException;
 import com._yp.gaitMate.model.ProcessedTestResults;
 import com._yp.gaitMate.model.TestSession;
 import com._yp.gaitMate.repository.ProcessedTestResultsRepository;
 import com._yp.gaitMate.repository.TestSessionRepository;
-import com._yp.gaitMate.websocket.NotificationMessage;
+import com._yp.gaitMate.websocket.message.NotificationMessage;
 import com._yp.gaitMate.websocket.NotificationService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;

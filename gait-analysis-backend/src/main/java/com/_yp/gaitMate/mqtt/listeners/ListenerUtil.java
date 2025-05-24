@@ -1,7 +1,7 @@
 package com._yp.gaitMate.mqtt.listeners;
 
-import com._yp.gaitMate.websocket.CalibrationStatusWebSocketMessage;
-import com._yp.gaitMate.websocket.NotificationMessage;
+import com._yp.gaitMate.websocket.message.CalibrationStatusWebSocketMessage;
+import com._yp.gaitMate.websocket.message.NotificationMessage;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
