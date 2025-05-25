@@ -13,7 +13,9 @@ const StepCalibration = ({
   isCalibrating,
   calibrationProgress,
   startCalibration,
-  setActiveStep
+  setActiveStep,
+  calibrationRequested,          // ✅ new
+  setCalibrationRequested        // ✅ new
 }) => {
   useEffect(() => {
     if (deviceStatus.deviceAlive && !deviceStatus.deviceCalibrated) {
@@ -82,7 +84,7 @@ const StepCalibration = ({
               ))}
             </Paper>
 
-            <Box width="100%" mt={5}>
+            {/* <Box width="100%" mt={5}>
               <Paper elevation={0} sx={{
                 p: 2.5, borderRadius: 3,
                 background: 'linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%)',
@@ -100,7 +102,35 @@ const StepCalibration = ({
                   }
                 }} />
               </Paper>
-            </Box>
+            </Box> */}
+
+            <Box width="100%" mt={5}>
+                <Paper elevation={0} sx={{
+                  p: 2.5, borderRadius: 3,
+                  background: 'linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%)',
+                  border: '1px solid #bbf7d0'
+                }}>
+                  <Box display="flex" justifyContent="space-between" mb={1.5}>
+                    <Typography variant="body1" fontWeight="600">Calibration Progress</Typography>
+                    <Typography variant="body1" fontWeight="600" color="success.main">
+                      {calibrationRequested ? `${calibrationProgress}%` : '0%'}
+                    </Typography>
+                  </Box>
+                  <LinearProgress
+                    variant="determinate"
+                    value={calibrationRequested ? calibrationProgress : 0}
+                    sx={{
+                      height: 8, borderRadius: 4,
+                      bgcolor: 'rgba(34, 197, 94, 0.1)',
+                      '& .MuiLinearProgress-bar': {
+                        background: 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)',
+                        borderRadius: 4
+                      }
+                    }}
+                  />
+                </Paper>
+            </Box>  
+
 
             <Box display="flex" gap={3} flexWrap="wrap" mt={5} alignItems="flex-end">
               <Button
@@ -109,6 +139,7 @@ const StepCalibration = ({
                 onClick={async () => {
                   await sendCommand('start_calibration');
                   startCalibration();
+                  setCalibrationRequested(true);   // ✅ enables the UI to show progress bar
                 }}
                 disabled={isCalibrating}
                 startIcon={isCalibrating ? <CircularProgress size={20} color="inherit" /> : <Replay />}

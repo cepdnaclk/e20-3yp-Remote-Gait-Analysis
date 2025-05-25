@@ -1,7 +1,7 @@
 // File: hooks/useGaitTestState.js
 import { useState, useEffect } from 'react';
 
-const useGaitTestState = ({ deviceAliveWS, calibrationStatusWS, orientationCapturedWS }) => {
+const useGaitTestState = ({ deviceAliveWS, calibrationStatusWS, orientationCapturedWS , calibrationRequested }) => {
   const [activeStep, setActiveStep] = useState(0);
   const [deviceStatus, setDeviceStatus] = useState({
     deviceAlive: false,
@@ -18,19 +18,37 @@ const useGaitTestState = ({ deviceAliveWS, calibrationStatusWS, orientationCaptu
     setDeviceStatus(prev => ({ ...prev, deviceAlive: deviceAliveWS }));
   }, [deviceAliveWS]);
 
-  useEffect(() => {
-    if (calibrationStatusWS) {
-      const { status, sys, gyro, accel, mag } = calibrationStatusWS;
-      const average = (sys + gyro + accel + mag) / 4;
+  // useEffect(() => {
+  //   if (calibrationStatusWS) {
+  //     const { status, sys, gyro, accel, mag } = calibrationStatusWS;
+  //     const average = (sys + gyro + accel + mag) / 4;
 
+  //     setIsCalibrating(!status);
+  //     setCalibrationProgress(Math.round((average / 3) * 100)); // assuming each component max is 3
+
+  //     if (status) {
+  //       setDeviceStatus(prev => ({ ...prev, deviceCalibrated: true }));
+  //     }
+  //   }
+  // }, [calibrationStatusWS]);
+
+  useEffect(() => {
+  if (calibrationStatusWS) {
+    const { status, sys, gyro, accel, mag } = calibrationStatusWS;
+
+    // ✅ Only update calibration logic if user triggered it
+    if (calibrationRequested) {
+      const average = (sys + gyro + accel + mag) / 4;
       setIsCalibrating(!status);
-      setCalibrationProgress(Math.round((average / 3) * 100)); // assuming each component max is 3
+      setCalibrationProgress(Math.round((average / 3) * 100));
 
       if (status) {
         setDeviceStatus(prev => ({ ...prev, deviceCalibrated: true }));
       }
     }
-  }, [calibrationStatusWS]);
+  }
+}, [calibrationStatusWS, calibrationRequested]);
+
 
   useEffect(() => {
     setDeviceStatus(prev => {

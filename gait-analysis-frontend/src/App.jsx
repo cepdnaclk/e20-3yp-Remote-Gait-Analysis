@@ -89,7 +89,7 @@ export default function App() {
           {/* Patient test Page Route */}
           <Route path="/patient/test-session" element={
             <RoleBasedRoute allowedRoles={["ROLE_PATIENT"]}>
-            <WebSocketDashboard/>
+            <PatientTestSession/>
             </RoleBasedRoute>
           } />
 
