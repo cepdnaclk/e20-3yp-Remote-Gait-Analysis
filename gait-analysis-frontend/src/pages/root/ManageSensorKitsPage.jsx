@@ -119,7 +119,7 @@ export default function ManageSensorKitsPage() {
                 <TableCell>{kit.firmwareVersion}</TableCell>
                 <TableCell>{kit.status}</TableCell>
                 <TableCell>
-                  {kit.clinicName || (kit.status === 'AVAILABLE' ? 'Assigned' : '-')}
+                {kit.clinic_id || (['AVAILABLE', 'IN_USE'].includes(kit.status) ? 'Assigned' : '-')}
                 </TableCell>
                 <TableCell>
                   {kit.status === 'IN_STOCK' && (

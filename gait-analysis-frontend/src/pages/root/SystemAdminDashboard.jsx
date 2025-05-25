@@ -69,8 +69,8 @@ export default function SystemAdminDashboard() {
       default:
         return (
           <Grid container spacing={3} mt={1}>
-            <Grid item xs={12} sm={6} md={4}>
-              <Card sx={{ p: 2, textAlign: "center", backgroundColor: "#E3F2FD", boxShadow: 3 }}>
+            <Grid item xs={6} sm={6} md={6}>
+              <Card sx={{ p: 2, textAlign: "center", background: "radial-gradient(rgb(136, 223, 255),rgb(130, 205, 255))", boxShadow: 6 }}>
                 <CardContent>
                   <BusinessIcon fontSize="large" />
                   <Typography variant="h6">Total Clinics</Typography>
@@ -78,8 +78,17 @@ export default function SystemAdminDashboard() {
                 </CardContent>
               </Card>
             </Grid>
-            <Grid item xs={12} sm={6} md={4}>
-              <Card sx={{ p: 2, textAlign: "center", backgroundColor: "#E8F5E9", boxShadow: 3 }}>
+            <Grid item xs={6} sm={6} md={6}>
+              <Card sx={{ p: 2, textAlign: "center", background: "radial-gradient(rgb(136, 223, 255),rgb(130, 205, 255))", boxShadow: 6}}>
+                <CardContent>
+                  <BusinessIcon fontSize="large" />
+                  <Typography variant="h6">Total Sensor Kits</Typography>
+                  <Typography variant="h4">{kits.length}</Typography>
+                </CardContent>
+              </Card>
+            </Grid>
+            <Grid item xs={6} sm={6} md={6}>
+              <Card sx={{ p: 2, textAlign: "center", background: "radial-gradient(rgb(136, 223, 255),rgb(130, 205, 255))", boxShadow: 6 }}>
                 <CardContent>
                   <DevicesIcon fontSize="large" />
                   <Typography variant="h6">In Stock Kits</Typography>
@@ -89,16 +98,13 @@ export default function SystemAdminDashboard() {
                 </CardContent>
               </Card>
             </Grid>
-            <Grid item xs={12} sm={6} md={4}>
-              <Card sx={{ p: 2, textAlign: "center", backgroundColor: "#FFF3E0", boxShadow: 3 }}>
+            <Grid item xs={6} sm={6} md={6}>
+              <Card sx={{ p: 2, textAlign: "center", background: "radial-gradient(rgb(136, 223, 255),rgb(130, 205, 255))", boxShadow: 6}}>
                 <CardContent>
                   <AssignmentIcon fontSize="large" />
                   <Typography variant="h6">Assigned Kits</Typography>
                   <Typography variant="h4">
-                    <Chip
-                      label={`${kits.filter((k) => k.status === "AVAILABLE").length} Assigned`}
-                      color="primary"
-                    />
+                    {kits.filter((k) => k.status === "AVAILABLE").length}
                   </Typography>
                 </CardContent>
               </Card>
