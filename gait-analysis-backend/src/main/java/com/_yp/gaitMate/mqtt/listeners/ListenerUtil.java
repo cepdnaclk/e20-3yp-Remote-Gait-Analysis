@@ -34,16 +34,16 @@ public class ListenerUtil {
 
     public static CalibrationStatusWebSocketMessage extractCalibrationStatus(String topic, String payload) {
         Long deviceId = parseDeviceIdFromTopic(topic);
-        JsonNode json = parseJson(payload, WebSocketMessageType.CALIBRATION_STATUS);
+        JsonNode json = parseJson(payload, WebSocketMessageType.CAL_STATUS);
 
         return CalibrationStatusWebSocketMessage.builder()
-                .type(WebSocketMessageType.CALIBRATION_STATUS)
+                .type(WebSocketMessageType.CAL_STATUS)
                 .deviceId(deviceId)
                 .timestamp(json.get("timestamp").asLong())
-                .sys(json.get("sys_cal").asInt())
-                .gyro(json.get("gyro_cal").asInt())
-                .accel(json.get("accel_cal").asInt())
-                .mag(json.get("mag_cal").asInt())
+                .sys(json.get("sys").asInt())
+                .gyro(json.get("gyro").asInt())
+                .accel(json.get("accel").asInt())
+                .mag(json.get("mag").asInt())
                 .status(json.get("status").asBoolean())
                 .build();
     }
@@ -82,6 +82,20 @@ public class ListenerUtil {
                 .timestamp(json.get("timestamp").asLong())
                 .FSR_1(json.get("FSR_1").asInt())
                 .FSR_2(json.get("FSR_2").asInt())
+                .FSR_3(json.get("FSR_3").asInt())
+                .FSR_4(json.get("FSR_4").asInt())
+                .FSR_5(json.get("FSR_5").asInt())
+                .FSR_6(json.get("FSR_6").asInt())
+                .FSR_7(json.get("FSR_7").asInt())
+                .FSR_8(json.get("FSR_8").asInt())
+                .FSR_9(json.get("FSR_9").asInt())
+                .FSR_10(json.get("FSR_10").asInt())
+                .FSR_11(json.get("FSR_11").asInt())
+                .FSR_12(json.get("FSR_12").asInt())
+                .FSR_13(json.get("FSR_13").asInt())
+                .FSR_14(json.get("FSR_14").asInt())
+                .FSR_15(json.get("FSR_15").asInt())
+                .FSR_16(json.get("FSR_16").asInt())
                 .yaw((float) json.get("yaw").asDouble())
                 .pitch((float) json.get("pitch").asDouble())
                 .roll((float) json.get("roll").asDouble())
@@ -95,10 +109,10 @@ public class ListenerUtil {
                 .gx((float) json.get("gx").asDouble())
                 .gy((float) json.get("gy").asDouble())
                 .gz((float) json.get("gz").asDouble())
-                .sysCal(json.get("sysCal").asInt())
-                .gyroCal(json.get("gyroCal").asInt())
-                .accelCal(json.get("accelCal").asInt())
-                .magCal(json.get("magCal").asInt())
+                .sysCal(json.get("sys_cal").asInt())
+                .gyroCal(json.get("gyro_cal").asInt())
+                .accelCal(json.get("accel_cal").asInt())
+                .magCal(json.get("mag_cal").asInt())
                 .build();
     }
 }

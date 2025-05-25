@@ -17,6 +17,20 @@ public class SensorDataWebSocketMessage {
     // FSR values
     private int FSR_1;
     private int FSR_2;
+    private int FSR_3;
+    private int FSR_4;
+    private int FSR_5;
+    private int FSR_6;
+    private int FSR_7;
+    private int FSR_8;
+    private int FSR_9;
+    private int FSR_10;
+    private int FSR_11;
+    private int FSR_12;
+    private int FSR_13;
+    private int FSR_14;
+    private int FSR_15;
+    private int FSR_16;
 
     // Orientation (Euler)
     private float yaw;

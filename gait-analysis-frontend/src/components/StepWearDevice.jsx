@@ -6,8 +6,9 @@ import {
 import { ArrowBack, Videocam, Wifi, CheckCircle } from '@mui/icons-material';
 import DeviceStatusCard from './DeviceStatusCard';
 import VideoCard from './VideoCard';
+import sendCommand from '../utils/sendCommand';
 
-const StepWearDevice = ({ orientationCaptured, setActiveStep, captureOrientation, deviceStatus }) => (
+const StepWearDevice = ({ orientationCaptured, setActiveStep, deviceStatus }) => (
   <Card elevation={0} sx={{
     borderRadius: 4,
     background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.9) 100%)',
@@ -87,7 +88,9 @@ const StepWearDevice = ({ orientationCaptured, setActiveStep, captureOrientation
             <Button
               variant="contained"
               size="large"
-              onClick={captureOrientation}
+              onClick={async () => {
+                await sendCommand('capture_orientation');
+              }}
               disabled={orientationCaptured}
               sx={{
                 minWidth: 200, py: 2, px: 4, borderRadius: 3,

@@ -21,6 +21,7 @@ import ClinicDashboard from "./pages/clinic/ClinicDashboard";
 import AddDoctor from "./pages/clinic/AddDoctor";
 import GaitAnalysisTest from "./pages/patient/trash/GaitAnalysisTest";
 import PatientTestSession from "./pages/patient/PatientTestSession";
+import WebSocketDashboard from "./pages/patient/WebSocketDashboard";
 
 
 // Create a Query Client instance for managing API data fetching, caching, and state updates
