@@ -31,7 +31,7 @@ import {
       Promise.all([getClinics(), getSensorKits()])
         .then(([clinicRes, kitRes]) => {
           setClinics(clinicRes.data);
-          setKits(kitRes.data.filter((k) => k.status === "IN_STOCK"));
+          setKits(kitRes.data.filter((k) => k.status === "IN_STOCK")); // <-- FIXED HERE
         })
         .catch(() => {
           setSnackbar({ open: true, message: "Failed to load data", severity: "error" });
@@ -48,7 +48,7 @@ import {
         setSelectedClinic("");
         setSelectedKits([]);
         const refreshedKits = await getSensorKits();
-        setKits(refreshedKits.data.filter((k) => k.status === "IN_STOCK"));
+        setKits(refreshedKits.data.filter((k) => k.status === "AVAILABLE")); 
       } catch (err) {
         setSnackbar({ open: true, message: "Assignment failed", severity: "error" });
       }
@@ -81,6 +81,7 @@ import {
             displayEmpty
           >
             <MenuItem disabled value="">
+            
             </MenuItem>
             {clinics.map((clinic) => (
               <MenuItem key={clinic.id} value={clinic.id}>
@@ -99,36 +100,34 @@ import {
             renderValue={(selected) => selected.join(", ")}
           >
             {kits.map((kit) => (
-              <MenuItem key={kit.serialNo} value={kit.serialNo}>
-                <Checkbox checked={selectedKits.includes(kit.serialNo)} />
-                <ListItemText primary={kit.serialNo} />
+              <MenuItem key={kit.id} value={kit.id}>
+                <Checkbox checked={selectedKits.includes(kit.id)} />
+                <ListItemText primary={`${kit.serialNo} - v${kit.firmwareVersion}`} />
               </MenuItem>
             ))}
           </Select>
         </FormControl>
   
         <Box sx={{ mt: 3, display: 'flex', gap: 2 }}>
-            <Button
-                variant="contained"
-                onClick={handleAssign}
-                disabled={!selectedClinic || selectedKits.length === 0}
-            >
-                Assign Kits
-            </Button>
-
-            <Button
-                variant="outlined"
-                color="secondary"
-                onClick={() => {
-                setSelectedClinic("");
-                setSelectedKits([]);
-                }}
-            >
-                Clear
-            </Button>
-            </Box>
-
-        
+          <Button
+            variant="contained"
+            onClick={handleAssign}
+            disabled={!selectedClinic || selectedKits.length === 0}
+          >
+            Assign Kits
+          </Button>
+  
+          <Button
+            variant="outlined"
+            color="secondary"
+            onClick={() => {
+              setSelectedClinic("");
+              setSelectedKits([]);
+            }}
+          >
+            Clear
+          </Button>
+        </Box>
   
         <Snackbar open={snackbar.open} autoHideDuration={4000} onClose={handleCloseSnackbar}>
           <Alert onClose={handleCloseSnackbar} severity={snackbar.severity} sx={{ width: "100%" }}>
