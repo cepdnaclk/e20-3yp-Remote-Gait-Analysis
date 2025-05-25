@@ -10,7 +10,7 @@ import AboutUs from "./pages/AboutUs";
 
 // SEMESTER 6
 import RoleBasedRoute from "./components/RoleBasedRoute";
-import RootDashboard from "./pages/root/RootDashboard";
+import RootDashboard from "./pages/root/SystemAdminDashboard";
 import AddClinicAdmin from "./pages/root/AddClinicAdmin";
 import Unauthorized from "./pages/Unauthorized";
 import PatientDashboard from "./pages/patient/PatientDashboard";
