@@ -93,8 +93,8 @@ public class ProcessedTestResultsServiceImpl implements ProcessedTestResultsServ
                 .timestamp(LocalDateTime.now().toString())
                 .build();
 
-        notificationService.sendToUser(username, message);
-        log.info("✅ WebSocket notification [results_ready] sent to user [{}] for session [{}]", username, session.getId());
+//        notificationService.sendToUser(username, message);
+//        log.info("✅ WebSocket notification [results_ready] sent to user [{}] for session [{}]", username, session.getId());
 
     }
 }

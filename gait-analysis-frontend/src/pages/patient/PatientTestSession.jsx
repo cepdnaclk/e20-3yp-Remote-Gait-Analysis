@@ -1,157 +1,104 @@
-// /* File: pages/patient/PatientTestSession.jsx */
-// import React from 'react';
-// import { Box, Container, Card, CardContent, Typography } from '@mui/material';
-// import useGaitTestState from '../../hooks/useGaitTestState';
-// import StepperHeader from '../../components/StepperHeader';
-// import StepCalibration from '../../components/StepCalibration';
-// import StepWearDevice from '../../components/StepWearDevice';
-// import StepStartTest from '../../components/StepStartTest';
-// import formatTime from '../../utils/formatTime';
-
-// const steps = ['Calibrate Device', 'Wear Device', 'Start Test'];
-
-// const PatientTestSession = () => {
-//   const gaitState = useGaitTestState();
-
-//   return (
-//     <Box sx={{ minHeight: '100vh', background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', py: 4 }}>
-//       <Container maxWidth="xl">
-//         <Card elevation={0} sx={{
-//           mb: 4,
-//           borderRadius: 4,
-//           background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.9) 100%)',
-//           backdropFilter: 'blur(20px)',
-//           border: '1px solid rgba(255, 255, 255, 0.2)'
-//         }}>
-//           <CardContent sx={{ p: 4 }}>
-//             <Box textAlign="center" mb={4}>
-//               <Typography variant="h3" fontWeight="700" sx={{
-//                 mb: 2,
-//                 background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-//                 backgroundClip: 'text',
-//                 WebkitBackgroundClip: 'text',
-//                 WebkitTextFillColor: 'transparent'
-//               }}>
-//                 Gait Analysis Test Session
-//               </Typography>
-//               <Typography variant="h6" color="text.secondary" fontWeight="400">
-//                 Follow the steps below to conduct your gait analysis test
-//               </Typography>
-//             </Box>
-//             <StepperHeader steps={steps} activeStep={gaitState.activeStep} />
-//           </CardContent>
-//         </Card>
-
-//         {gaitState.activeStep === 0 && (
-//           <StepCalibration
-//             deviceStatus={gaitState.deviceStatus}
-//             isCalibrating={gaitState.isCalibrating}
-//             calibrationProgress={gaitState.calibrationProgress}
-//             startCalibration={gaitState.startCalibration}
-//             setActiveStep={gaitState.setActiveStep}
-//           />
-//         )}
-
-//         {gaitState.activeStep === 1 && (
-//           <StepWearDevice
-//             orientationCaptured={gaitState.orientationCaptured}
-//             setActiveStep={gaitState.setActiveStep}
-//             captureOrientation={gaitState.captureOrientation}
-//           />
-//         )}
-
-//         {gaitState.activeStep === 2 && (
-//           <StepStartTest
-//             isRecording={gaitState.isRecording}
-//             recordingTime={gaitState.recordingTime}
-//             formatTime={formatTime}
-//             setIsRecording={gaitState.setIsRecording}
-//             setRecordingTime={gaitState.setRecordingTime}
-//             setActiveStep={gaitState.setActiveStep}
-//           />
-//         )}
-//       </Container>
-//     </Box>
-//   );
-// };
-
-// export default PatientTestSession;
-
-
-/* File: pages/patient/PatientTestSession.jsx */
-import React from 'react';
-import { Box, Container, Card, CardContent, Typography } from '@mui/material';
-import useGaitTestState from '../../hooks/useGaitTestState';
+// File: PatientTestSession.jsx
+import React, { useEffect, useState } from 'react';
+import { Box, Container } from '@mui/material';
 import StepperHeader from '../../components/StepperHeader';
 import StepCalibration from '../../components/StepCalibration';
 import StepWearDevice from '../../components/StepWearDevice';
 import StepStartTest from '../../components/StepStartTest';
+import useGaitTestState from '../../hooks/useGaitTestState';
+import useWebSocketStatus from '../../hooks/useWebSocketStatus';
+import sendCommand from '../../utils/sendCommand';
 import formatTime from '../../utils/formatTime';
 
-const steps = ['Calibrate Device', 'Wear Device', 'Start Test'];
-
 const PatientTestSession = () => {
-  const gaitState = useGaitTestState();
+  const wsStatus = useWebSocketStatus();
+  const [sessionId, setSessionId] = useState(null);
+
+  const {
+    activeStep,
+    setActiveStep,
+    deviceStatus,
+    isCalibrating,
+    calibrationProgress,
+    startCalibration,
+    captureOrientation,
+    isRecording,
+    setIsRecording,
+    recordingTime,
+    setRecordingTime,
+    setDeviceStatus,
+    setCalibrationProgress,
+    setOrientationCaptured
+  } = useGaitTestState({
+    deviceAliveWS: wsStatus.deviceAlive,
+    calibrationStatusWS: wsStatus.calibrationStatus,
+    orientationCapturedWS: wsStatus.orientationCaptured
+  });
+
+  // Automatically trigger calibration check if device is alive
+  useEffect(() => {
+    if (wsStatus.deviceAlive) {
+      sendCommand('check_calibration');
+    }
+  }, [wsStatus.deviceAlive]);
+
+  // Move to step 2 once calibration is completed
+  useEffect(() => {
+    if (deviceStatus.deviceCalibrated && activeStep === 0) {
+      setTimeout(() => {
+        setActiveStep(1);
+      }, 1000);
+    }
+  }, [deviceStatus.deviceCalibrated]);
+
+  // Move to step 3 once orientation is captured
+  useEffect(() => {
+    if (wsStatus.orientationCaptured && activeStep === 1) {
+      setTimeout(() => {
+        setActiveStep(2);
+      }, 1000);
+    }
+  }, [wsStatus.orientationCaptured]);
 
   return (
-    <Box sx={{ minHeight: '100vh', background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', py: 3 }}>
+    <Box sx={{ minHeight: '100vh', background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', py: 4 }}>
       <Container maxWidth="xl">
-        <Card elevation={0} sx={{
-          mb: 3,
-          borderRadius: 3,
-          background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.9) 100%)',
-          backdropFilter: 'blur(20px)',
-          border: '1px solid rgba(255, 255, 255, 0.2)'
-        }}>
-          <CardContent sx={{ p: 3 }}>
-            <Box textAlign="center" mb={3}>
-              <Typography variant="h4" fontWeight="700" sx={{
-                mb: 1,
-                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                backgroundClip: 'text',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent'
-              }}>
-                Gait Analysis Test Session
-              </Typography>
-              <Typography variant="body1" color="text.secondary" fontWeight="400">
-                Follow the steps below to conduct your gait analysis test
-              </Typography>
-            </Box>
-            <StepperHeader steps={steps} activeStep={gaitState.activeStep} />
-          </CardContent>
-        </Card>
+        <StepperHeader activeStep={activeStep} />
 
-        {gaitState.activeStep === 0 && (
+        {activeStep === 0 && (
           <StepCalibration
-            deviceStatus={gaitState.deviceStatus}
-            isCalibrating={gaitState.isCalibrating}
-            calibrationProgress={gaitState.calibrationProgress}
-            startCalibration={gaitState.startCalibration}
-            setActiveStep={gaitState.setActiveStep}
-            orientationCaptured={gaitState.orientationCaptured}
+            deviceStatus={deviceStatus}
+            isCalibrating={isCalibrating}
+            calibrationProgress={calibrationProgress}
+            startCalibration={startCalibration}
+            setActiveStep={setActiveStep}
+            orientationCaptured={wsStatus.orientationCaptured}
           />
         )}
 
-        {gaitState.activeStep === 1 && (
+        {activeStep === 1 && (
           <StepWearDevice
-            orientationCaptured={gaitState.orientationCaptured}
-            setActiveStep={gaitState.setActiveStep}
-            captureOrientation={gaitState.captureOrientation}
-            deviceStatus={gaitState.deviceStatus}
+            deviceStatus={deviceStatus}
+            setActiveStep={setActiveStep}
+            captureOrientation={() => {
+              sendCommand('capture_orientation');
+            }}
+            orientationCaptured={wsStatus.orientationCaptured}
           />
         )}
 
-        {gaitState.activeStep === 2 && (
+        {activeStep === 2 && (
           <StepStartTest
-            deviceStatus={gaitState.deviceStatus}
-            isRecording={gaitState.isRecording}
-            recordingTime={gaitState.recordingTime}
+            deviceStatus={deviceStatus}
+            isRecording={isRecording}
+            setIsRecording={setIsRecording}
+            recordingTime={recordingTime}
+            setRecordingTime={setRecordingTime}
             formatTime={formatTime}
-            setIsRecording={gaitState.setIsRecording}
-            setRecordingTime={gaitState.setRecordingTime}
-            setActiveStep={gaitState.setActiveStep}
-            orientationCaptured = {gaitState.orientationCaptured}
+            setActiveStep={setActiveStep}
+            orientationCaptured={wsStatus.orientationCaptured}
+            sessionId={sessionId}
+            setSessionId={setSessionId}
           />
         )}
       </Container>
