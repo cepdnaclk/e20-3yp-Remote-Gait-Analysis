@@ -101,7 +101,7 @@ import {
                 <TableCell>Clinic Name</TableCell>
                 <TableCell>Phone</TableCell>
                 <TableCell>Email</TableCell>
-                <TableCell>Username</TableCell>
+                {/*<TableCell>Username</TableCell> */}
               </TableRow>
             </TableHead>
             <TableBody>
@@ -115,7 +115,7 @@ import {
                   <TableCell>{clinic.name}</TableCell>
                   <TableCell>{clinic.phoneNumber}</TableCell>
                   <TableCell>{clinic.email}</TableCell>
-                  <TableCell>{clinic.username}</TableCell>
+                  {/*<TableCell>{clinic.username}</TableCell>*/}
                 </TableRow>
               ))}
             </TableBody>

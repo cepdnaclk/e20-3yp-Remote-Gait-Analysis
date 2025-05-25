@@ -126,7 +126,7 @@ export default function DoctorDashboard() {
     );
 
   return (
-    <Box sx={{ display: "flex", minheight: "100vh", bgcolor: "rgb(208, 218, 223)" }}>
+    <Box sx={{ display: "flex", minheight: "100vh", background: "rgb(255, 255, 255)" }}>
       
       {/* Sidebar */}
       <Drawer
@@ -193,39 +193,39 @@ export default function DoctorDashboard() {
         {/* Summary Cards */}
         <Grid container spacing={3} mt={2}>
           <Grid item xs={12} sm={6} md={3}>
-            <Card sx={{ padding: 2, textAlign: "center", backgroundColor: "#E3F2FD", boxShadow: 3 }}>
+            <Card sx={{ padding: 2, textAlign: "center", background: "radial-gradient(rgb(136, 223, 255),rgb(130, 205, 255))", boxShadow: 3 }}>
               <CardContent>
                 <PeopleIcon fontSize="large" />
-                <Typography variant="h6">Total Patients</Typography>
+                <Typography variant="h6" sx={{ fontWeight: 600 }}>Total Patients</Typography>
                 <Typography variant="h4">{patients?.length || 0}</Typography>
               </CardContent>
             </Card>
           </Grid>
           <Grid item xs={12} sm={6} md={3}>
-            <Card sx={{ padding: 2, textAlign: "center", backgroundColor: "#E8F5E9", boxShadow: 3 }}>
+            <Card sx={{ padding: 2, textAlign: "center", background: "radial-gradient(rgb(136, 223, 255),rgb(130, 205, 255))", boxShadow: 3 }}>
               <CardContent>
                 <CalendarTodayIcon fontSize="large" />
-                <Typography variant="h6">Today's Appointments</Typography>
+                <Typography variant="h6"sx={{ fontWeight: 600 }}>Today's Appointments</Typography>
                 <Typography variant="h4">{Math.floor(Math.random() * 20) + 5}</Typography>
               </CardContent>
             </Card>
           </Grid>
           <Grid item xs={12} sm={6} md={3}>
-            <Card sx={{ padding: 2, textAlign: "center", backgroundColor: "#FFF3E0", boxShadow: 3 }}>
+            <Card sx={{ padding: 2, textAlign: "center", background: "radial-gradient(rgb(136, 223, 255),rgb(130, 205, 255))", boxShadow: 3 }}>
               <CardContent>
                 <DescriptionIcon fontSize="large" />
-                <Typography variant="h6">Pending Reports</Typography>
+                <Typography variant="h6"sx={{ fontWeight: 600 }}>Pending Reports</Typography>
                 <Typography variant="h4">
-                  <Chip label={`${Math.floor(Math.random() * 10) + 1} Pending`} color="warning" />
+                  <Chip label={`${Math.floor(Math.random() * 10) + 1} Pending`} color="primary" />
                 </Typography>
               </CardContent>
             </Card>
           </Grid>
           <Grid item xs={12} sm={6} md={3}>
-            <Card sx={{ padding: 2, textAlign: "center", backgroundColor: "#EDE7F6", boxShadow: 3 }}>
+            <Card sx={{ padding: 2, textAlign: "center", background: "radial-gradient(rgb(136, 223, 255),rgb(130, 205, 255))", boxShadow: 3 }}>
               <CardContent>
                 <ChatIcon fontSize="large" />
-                <Typography variant="h6">New Messages</Typography>
+                <Typography variant="h6"sx={{ fontWeight: 600 }}>New Messages</Typography>
                 <Typography variant="h4">{Math.floor(Math.random() * 10)}</Typography>
               </CardContent>
             </Card>
