@@ -18,36 +18,60 @@ const useGaitTestState = ({ deviceAliveWS, calibrationStatusWS, orientationCaptu
     setDeviceStatus(prev => ({ ...prev, deviceAlive: deviceAliveWS }));
   }, [deviceAliveWS]);
 
-  // useEffect(() => {
-  //   if (calibrationStatusWS) {
-  //     const { status, sys, gyro, accel, mag } = calibrationStatusWS;
-  //     const average = (sys + gyro + accel + mag) / 4;
 
-  //     setIsCalibrating(!status);
-  //     setCalibrationProgress(Math.round((average / 3) * 100)); // assuming each component max is 3
+// useEffect(() => {
+//   if (calibrationStatusWS) {
+//     const { status, sys, gyro, accel, mag } = calibrationStatusWS;
 
-  //     if (status) {
-  //       setDeviceStatus(prev => ({ ...prev, deviceCalibrated: true }));
-  //     }
-  //   }
-  // }, [calibrationStatusWS]);
+//     if (calibrationRequested) {
+//       let progress = 0;
+//       if (gyro === 3) progress += 25;
+//       if (mag === 3) progress += 25;
+//       if (sys > 0) progress += 25;
+//       if (accel > 0) progress += 25;
 
-  useEffect(() => {
+//       setCalibrationProgress(progress);
+//       setIsCalibrating(!status);
+
+//       if (status) {
+//         setDeviceStatus(prev => ({ ...prev, deviceCalibrated: true }));
+//       }
+//     }
+//   }
+// }, [calibrationStatusWS, calibrationRequested]);
+
+useEffect(() => {
   if (calibrationStatusWS) {
     const { status, sys, gyro, accel, mag } = calibrationStatusWS;
 
-    // ✅ Only update calibration logic if user triggered it
-    if (calibrationRequested) {
-      const average = (sys + gyro + accel + mag) / 4;
-      setIsCalibrating(!status);
-      setCalibrationProgress(Math.round((average / 3) * 100));
+    // 🔁 Determine progress based on backend rules
+    let progress = 0;
+    if (gyro === 3) progress += 25;
+    if (mag === 3) progress += 25;
+    if (sys > 0) progress += 25;
+    if (accel > 0) progress += 25;
 
+    // ✅ Always show progress, even if calibration hasn't been started
+    setCalibrationProgress(progress);
+
+    // ✅ Case: device is already calibrated even before user action
+    if (status && !calibrationRequested) {
+      setDeviceStatus(prev => ({ ...prev, deviceCalibrated: true }));
+      setIsCalibrating(false); // ensure button stays enabled
+      return;
+    }
+
+    // ✅ Case: calibration in progress (only if user clicked start)
+    if (calibrationRequested) {
+      setIsCalibrating(!status);
       if (status) {
         setDeviceStatus(prev => ({ ...prev, deviceCalibrated: true }));
       }
     }
   }
 }, [calibrationStatusWS, calibrationRequested]);
+
+
 
 
   useEffect(() => {
