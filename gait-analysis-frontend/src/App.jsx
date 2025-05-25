@@ -7,6 +7,7 @@ import PatientProfile from "./pages/doctor/PatientProfile";
 import RealTimeDashboard from "./pages/RealTimeDashboard";
 import Signup from "./pages/Signup";
 import AboutUs from "./pages/AboutUs";
+import ClinicDetailsPage from './pages/root/ClinicDetailsPage'; 
 
 // SEMESTER 6
 import RoleBasedRoute from "./components/RoleBasedRoute";
@@ -60,6 +61,12 @@ export default function App() {
           <Route path="/root/dashboard" element={
             <RoleBasedRoute allowedRoles={["ROLE_ADMIN"]}>
             <RootDashboard />
+            </RoleBasedRoute>
+          } />
+
+          <Route path="/root/clinics/:clinicId" element={
+            <RoleBasedRoute allowedRoles={["ROLE_ADMIN"]}>
+              <ClinicDetailsPage />
             </RoleBasedRoute>
           } />
 
