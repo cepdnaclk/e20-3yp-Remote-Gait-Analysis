@@ -22,6 +22,7 @@ import AddDoctor from "./pages/clinic/AddDoctor";
 import GaitAnalysisTest from "./pages/patient/trash/GaitAnalysisTest";
 import PatientTestSession from "./pages/patient/PatientTestSession";
 import WebSocketDashboard from "./pages/patient/WebSocketDashboard";
+import AddPatient from "./pages/clinic/AddPatient";
 
 
 // Create a Query Client instance for managing API data fetching, caching, and state updates
@@ -85,6 +86,13 @@ export default function App() {
           } />
 
           {/* Add Patient Page Route */}
+          <Route path="/clinic/add-patient" element={
+            <RoleBasedRoute allowedRoles={["ROLE_CLINIC"]}>
+            <AddPatient />
+            </RoleBasedRoute>
+          } />
+
+          {/* Gait Analysis Test Page Route */}
 
           {/* Patient Dashboard Page Route */}
           <Route path="/patient/dashboard" element={
