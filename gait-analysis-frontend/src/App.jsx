@@ -17,11 +17,12 @@ import Unauthorized from "./pages/Unauthorized";
 import PatientDashboard from "./pages/patient/PatientDashboard";
 import TestResult from "./pages/patient/TestResult";
 import Feedback from "./pages/patient/Feedback";
-import ClinicDashboard from "./pages/clinic/ClinicDashboard";
+import ClinicDashboard from "./pages/clinic/ClinicAdminDashboard";
 import AddDoctor from "./pages/clinic/AddDoctor";
 import GaitAnalysisTest from "./pages/patient/trash/GaitAnalysisTest";
 import PatientTestSession from "./pages/patient/PatientTestSession";
 import WebSocketDashboard from "./pages/patient/WebSocketDashboard";
+import AddPatient from "./pages/clinic/AddPatient";
 
 
 // Create a Query Client instance for managing API data fetching, caching, and state updates
@@ -44,7 +45,7 @@ export default function App() {
           <Route path="/Signup" element={<Signup />} />
           {/* About Us Page Route */}
           <Route path="/about" element={<AboutUs />} />
-          {/* Dashboard Page Route */}
+          {/* doctor Dashboard Page Route */}
           <Route path="/doctor/dashboard" element={
             <RoleBasedRoute allowedRoles={["ROLE_DOCTOR"]}>
              <DoctorDashboard />
@@ -85,6 +86,13 @@ export default function App() {
           } />
 
           {/* Add Patient Page Route */}
+          <Route path="/clinic/add-patient" element={
+            <RoleBasedRoute allowedRoles={["ROLE_CLINIC"]}>
+            <AddPatient />
+            </RoleBasedRoute>
+          } />
+
+          {/* Gait Analysis Test Page Route */}
 
           {/* Patient Dashboard Page Route */}
           <Route path="/patient/dashboard" element={

@@ -91,9 +91,7 @@ export default function RecentPatients({ patients, isLoading, error }) {
       {/* Header Section */}
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
         <Typography variant="h5">👤 Recent Patients</Typography>
-        <Button variant="contained" color="primary" startIcon={<AddIcon />} onClick={handleOpenModal}>
-          Add Patient
-        </Button>
+        
       </Box>
 
       {/* Search Bar */}
