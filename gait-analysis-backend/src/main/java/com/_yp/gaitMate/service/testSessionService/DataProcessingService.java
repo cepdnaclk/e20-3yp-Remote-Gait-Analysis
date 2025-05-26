@@ -4,7 +4,7 @@ import com._yp.gaitMate.dto.testSession.ProcessingRequestDto;
 import com._yp.gaitMate.model.TestSession;
 import com._yp.gaitMate.repository.TestSessionRepository;
 import com._yp.gaitMate.security.utils.AuthUtil;
-import com._yp.gaitMate.websocket.NotificationMessage;
+import com._yp.gaitMate.websocket.message.NotificationMessage;
 import com._yp.gaitMate.websocket.NotificationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -50,16 +50,16 @@ public class DataProcessingService {
             markSessionAsFailed(request.getSessionId());
 
 
-            NotificationMessage message = NotificationMessage.builder()
-                    .type("results_ready")
-                    //.deviceId(deviceId)
-                    .status(false)
-                    .timestamp(LocalDateTime.now().toString())
-                    .message(e.getMessage())
-                    .build();
-
-            notificationService.sendToUser(username, message);
-//            log.info("✅ WebSocket notification [results_ready] sent to user [{}]", username);
+//            NotificationMessage message = NotificationMessage.builder()
+//                    .type("results_ready")
+//                    //.deviceId(deviceId)
+//                    .status(false)
+//                    .timestamp(LocalDateTime.now().toString())
+//                    .message(e.getMessage())
+//                    .build();
+//
+//            notificationService.sendToUser(username, message);
+////            log.info("✅ WebSocket notification [results_ready] sent to user [{}]", username);
 
         }
     }

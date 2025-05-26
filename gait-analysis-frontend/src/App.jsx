@@ -7,10 +7,11 @@ import PatientProfile from "./pages/doctor/PatientProfile";
 import RealTimeDashboard from "./pages/RealTimeDashboard";
 import Signup from "./pages/Signup";
 import AboutUs from "./pages/AboutUs";
+import ClinicDetailsPage from './pages/root/ClinicDetailsPage'; 
 
 // SEMESTER 6
 import RoleBasedRoute from "./components/RoleBasedRoute";
-import RootDashboard from "./pages/root/RootDashboard";
+import RootDashboard from "./pages/root/SystemAdminDashboard";
 import AddClinicAdmin from "./pages/root/AddClinicAdmin";
 import Unauthorized from "./pages/Unauthorized";
 import PatientDashboard from "./pages/patient/PatientDashboard";
@@ -18,6 +19,9 @@ import TestResult from "./pages/patient/TestResult";
 import Feedback from "./pages/patient/Feedback";
 import ClinicDashboard from "./pages/clinic/ClinicDashboard";
 import AddDoctor from "./pages/clinic/AddDoctor";
+import GaitAnalysisTest from "./pages/patient/trash/GaitAnalysisTest";
+import PatientTestSession from "./pages/patient/PatientTestSession";
+import WebSocketDashboard from "./pages/patient/WebSocketDashboard";
 
 
 // Create a Query Client instance for managing API data fetching, caching, and state updates
@@ -60,6 +64,12 @@ export default function App() {
             </RoleBasedRoute>
           } />
 
+          <Route path="/root/clinics/:clinicId" element={
+            <RoleBasedRoute allowedRoles={["ROLE_ADMIN"]}>
+              <ClinicDetailsPage />
+            </RoleBasedRoute>
+          } />
+
           {/* Clinic Admin Pages */}
           <Route path="/clinic/dashboard" element={
             <RoleBasedRoute allowedRoles={["ROLE_CLINIC"]}>
@@ -80,6 +90,13 @@ export default function App() {
           <Route path="/patient/dashboard" element={
             <RoleBasedRoute allowedRoles={["ROLE_PATIENT"]}>
             <PatientDashboard />
+            </RoleBasedRoute>
+          } />
+
+          {/* Patient test Page Route */}
+          <Route path="/patient/test-session" element={
+            <RoleBasedRoute allowedRoles={["ROLE_PATIENT"]}>
+            <PatientTestSession/>
             </RoleBasedRoute>
           } />
 

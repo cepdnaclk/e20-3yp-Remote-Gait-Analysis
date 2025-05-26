@@ -98,6 +98,9 @@
             border-radius: 8px;
             background-color: #2c2c2c;
         }
+        .progress-bar {
+            transition: width 0.4s ease;
+        }
     </style>
 </head>
 
@@ -137,7 +140,20 @@
             <div id="status-cards">
                 <!-- Status cards will be created dynamically -->
             </div>
+            <!-- ✅ Calibration Progress View -->
+            <div class="mt-3">
+                <h5>Calibration Progress</h5>
+                <div class="progress" style="height: 25px;">
+                    <div id="calibration-progress-bar"
+                         class="progress-bar progress-bar-striped bg-warning"
+                         role="progressbar" style="width: 0%;">
+                        Waiting...
+                    </div>
+                </div>
+            </div>
         </div>
+
+    </div>
 
         <div id="processing-indicator" class="mt-3 d-none">
             <div class="alert alert-info">
@@ -568,6 +584,63 @@
         $("#login-div").addClass("d-none");
         $("#control-panel").removeClass("d-none");
     }
+
+    function updateCalibrationProgress(data) {
+        const { sys, gyro, accel, mag, status } = data;
+        let progress = 0;
+        if (sys === 3) progress += 1;
+        if (gyro === 3) progress += 1;
+        if (mag === 3) progress += 1;
+        if (accel > 0) progress += 1;
+
+        const percent = (progress / 4) * 100;
+        const bar = document.getElementById("calibration-progress-bar");
+        bar.style.width = percent + "%";
+        bar.innerText = status ? "Calibrated!" : `Calibrating... (${percent}%)`;
+        bar.classList.remove("bg-warning", "bg-success");
+        bar.classList.add(status ? "bg-success" : "bg-warning");
+    }
+
+    function connectWS() {
+        const socket = new SockJS(`${baseUrl}/ws`);
+        stompClient = Stomp.over(socket);
+        stompClient.connect({ Authorization: `Bearer ${getItem("token")}` }, (frame) => {
+            $("#connect").text("Connected").attr("disabled", true);
+            $("#connection-status").text("");
+            $("#overlay").hide();
+            $("#actions-container").removeClass("d-none");
+
+            stompClient.subscribe("/user/topic", (msg) => {
+                const data = JSON.parse(msg.body);
+                if (data.type && typeof data.status !== 'undefined') {
+                    if (data.type !== "results_ready") {
+                        statusMap[data.type] = data.status;
+                        updateCard(data.type, data.status);
+                    } else if (data.type === "results_ready") {
+                        $("#processing-indicator").addClass("d-none");
+                        if (data.status === true) {
+                            $("#results-ready").removeClass("d-none");
+                        } else {
+                            showNotification(data.message || "Processing failed", "danger");
+                        }
+                    }
+                }
+            });
+
+            // ✅ Subscribe to calibration progress
+            stompClient.subscribe("/user/topic/cal_status", (msg) => {
+                const data = JSON.parse(msg.body);
+                console.log("Calibration Status:", data);
+                updateCalibrationProgress(data);
+            });
+        }, () => {
+            $("#connection-status").text("Connection lost");
+            $("#connect").text("Reconnect").attr("disabled", false);
+            $("#overlay").show();
+            $("#actions-container").addClass("d-none");
+        });
+    }
+
 </script>
 
 </body>

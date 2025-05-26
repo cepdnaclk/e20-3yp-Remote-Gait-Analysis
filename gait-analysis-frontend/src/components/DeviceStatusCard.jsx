@@ -1,0 +1,47 @@
+/* File: components/DeviceStatusCard.jsx */
+import React from 'react';
+import { Box, Paper, Typography, Chip } from '@mui/material';
+
+const DeviceStatusCard = ({ status, label, icon: IconComponent }) => (
+  <Paper elevation={0} sx={{
+    py: 2, px: 2, textAlign: 'center', height: '100%', border: '1px solid',
+    borderColor: status ? 'success.light' : 'error.light', borderRadius: 3,
+    background: status
+      ? 'linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%)'
+      : 'linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%)',
+    transition: 'all 0.3s ease',
+    '&:hover': {
+      transform: 'translateY(-2px)',
+      boxShadow: status
+        ? '0 8px 25px rgba(34, 197, 94, 0.15)'
+        : '0 8px 25px rgba(239, 68, 68, 0.15)'
+    }
+  }}>
+    <Box display="flex" flexDirection="column" alignItems="center" gap={1}>
+      <Box sx={{
+        width: 44, height: 44, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center',
+        background: status
+          ? 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)'
+          : 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
+        boxShadow: status
+          ? '0 4px 15px rgba(34, 197, 94, 0.2)'
+          : '0 4px 15px rgba(239, 68, 68, 0.2)'
+      }}>
+        <IconComponent sx={{ fontSize: 22, color: 'white' }} />
+      </Box>
+      <Box>
+        <Typography variant="subtitle2" fontWeight={600} sx={{ mb: 0.5 }}>
+          {label}
+        </Typography>
+        <Chip
+          label={status ? 'Connected' : 'Error'}
+          color={status ? 'success' : 'error'}
+          size="small"
+          sx={{ borderRadius: 2, fontWeight: 600, fontSize: '0.7rem' }}
+        />
+      </Box>
+    </Box>
+  </Paper>
+);
+
+export default DeviceStatusCard;

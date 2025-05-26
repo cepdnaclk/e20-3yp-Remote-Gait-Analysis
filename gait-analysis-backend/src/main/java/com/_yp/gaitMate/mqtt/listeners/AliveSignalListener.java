@@ -2,7 +2,7 @@ package com._yp.gaitMate.mqtt.listeners;
 
 import com._yp.gaitMate.mqtt.core.AbstractTopicListener;
 import com._yp.gaitMate.service.sensorKitService.SensorKitService;
-import com._yp.gaitMate.websocket.NotificationMessage;
+import com._yp.gaitMate.websocket.message.DeviceAliveWebSocketMessage;
 import com._yp.gaitMate.websocket.NotificationService;
 import com.amazonaws.services.iot.client.AWSIotQos;
 import lombok.extern.slf4j.Slf4j;
@@ -54,7 +54,7 @@ public class AliveSignalListener extends AbstractTopicListener {
     @Override
     public void handleMessage(String topic, String payload) {
         try {
-            NotificationMessage message = ListenerUtil.extractAndValidateMessage(topic, payload, "device_alive");
+            DeviceAliveWebSocketMessage message = ListenerUtil.extractAliveStatus(topic, payload);
 
             String username = sensorKitService.getUsernameBySensorKitId(message.getDeviceId());
             if (username == null) {
@@ -62,7 +62,7 @@ public class AliveSignalListener extends AbstractTopicListener {
                 return;
             }
 
-            notificationService.sendToUser(username, message);
+            notificationService.sendDeviceAliveToUser(username, message);
             log.info("Alive signal forwarded to user [{}] for device [{}]", username, message.getDeviceId());
 
         } catch (IllegalArgumentException e) {

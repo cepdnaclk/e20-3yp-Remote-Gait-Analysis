@@ -21,10 +21,14 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api")
-@RequiredArgsConstructor
+//@RequiredArgsConstructor
 public class ClinicController {
 
     private final ClinicService clinicService;
+
+    public ClinicController(ClinicService clinicService) {
+        this.clinicService = clinicService;
+    }
 
     @PostMapping("/clinics")
     @PreAuthorize("hasRole('ADMIN')")

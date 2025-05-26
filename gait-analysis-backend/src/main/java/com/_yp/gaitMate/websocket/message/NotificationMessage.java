@@ -1,4 +1,4 @@
-package com._yp.gaitMate.websocket;
+package com._yp.gaitMate.websocket.message;
 
 import lombok.*;
 
@@ -25,3 +25,4 @@ public class NotificationMessage {
         RESULTS_READY
     }
 }
+

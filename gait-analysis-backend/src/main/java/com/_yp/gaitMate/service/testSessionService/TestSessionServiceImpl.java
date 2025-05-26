@@ -1,10 +1,7 @@
 package com._yp.gaitMate.service.testSessionService;
 
 import com._yp.gaitMate.dto.ApiResponse;
-import com._yp.gaitMate.dto.testSession.ProcessingRequestDto;
-import com._yp.gaitMate.dto.testSession.StartTestSessionResponse;
-import com._yp.gaitMate.dto.testSession.TestSessionActionDto;
-import com._yp.gaitMate.dto.testSession.TestSessionDetailsResponse;
+import com._yp.gaitMate.dto.testSession.*;
 import com._yp.gaitMate.exception.ApiException;
 import com._yp.gaitMate.mapper.TestSessionMapper;
 import com._yp.gaitMate.model.*;
@@ -14,7 +11,6 @@ import com._yp.gaitMate.repository.TestSessionRepository;
 import com._yp.gaitMate.security.utils.AuthUtil;
 import com.amazonaws.services.iot.client.AWSIotQos;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -38,7 +34,7 @@ public class TestSessionServiceImpl implements TestSessionService {
     @Override
     public StartTestSessionResponse startSession(TestSessionActionDto request) {
         // 1. Validate action
-        validateAction(request.getAction(), "START");
+        validateAction(request.getAction(), TestSessionActionType.START);
 
         // 2. Get current patient from user context
         Patient patient = getLoggedInPatient();
@@ -73,7 +69,7 @@ public class TestSessionServiceImpl implements TestSessionService {
     @Override
     public ApiResponse stopSession(Long sessionId, TestSessionActionDto request) {
         // 1. Validate action
-        validateAction(request.getAction(), "STOP");
+        validateAction(request.getAction(), TestSessionActionType.STOP);
 
         // 2. Get current patient from user context
         Patient patient = getLoggedInPatient();
@@ -171,8 +167,8 @@ public class TestSessionServiceImpl implements TestSessionService {
     /**
      * Validates that the action matches the expected keyword.
      */
-    private void validateAction(String inputAction, String expectedAction) {
-        if (!expectedAction.equalsIgnoreCase(inputAction)) {
+    private void validateAction(TestSessionActionType inputAction, TestSessionActionType expectedAction) {
+        if (!expectedAction.equals(inputAction)) {
             throw new ApiException("Unsupported action: " + inputAction);
         }
     }
@@ -209,7 +205,7 @@ public class TestSessionServiceImpl implements TestSessionService {
     }
 
     /**
-     * Parses and validates that the timestamp is close to server time (±2 seconds).
+     * Parses and validates that the timestamp is close to server time (±5 seconds).
      */
     private LocalDateTime validateTimestampCloseToNow(String timestampStr) {
         LocalDateTime parsed = LocalDateTime.parse(timestampStr);
@@ -218,8 +214,8 @@ public class TestSessionServiceImpl implements TestSessionService {
         long diffInSeconds = Math.abs(java.time.Duration.between(now, parsed).getSeconds());
 
         // ⚠️ Uncomment this if needed for testing
-        if (diffInSeconds > 2) {
-            throw new ApiException("Timestamp must be within ±2 seconds of server time");
+        if (diffInSeconds >5 ) {
+            throw new ApiException("Timestamp must be within ±5 seconds of server time");
         }
 
         return parsed;

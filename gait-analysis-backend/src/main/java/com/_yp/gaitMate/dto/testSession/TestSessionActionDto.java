@@ -19,7 +19,7 @@ import lombok.Setter;
 public class TestSessionActionDto {
 
     @NotBlank
-    private String action;
+    private TestSessionActionType action;
 
     @NotBlank
     private String timestamp;

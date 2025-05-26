@@ -5,18 +5,29 @@
 #include <WiFiUdp.h>
 #include <Arduino.h>
 
-// wifi node
-// WiFi & AWS Config
+// Configuration
 const char* ssid = "Yohan's Galaxy A52";
 const char* password = "11111111";
 const char* mqtt_server = "a18e6b70jffugd-ats.iot.eu-north-1.amazonaws.com";
+const String DEVICE_ID = "601";
 
-// NTP Time Sync
+bool stopStreaming = true;
+bool calibrationComplete = false;
+bool streamingActive = false;
+
+// Time settings
 WiFiUDP ntpUDP;
 NTPClient timeClient(ntpUDP, "pool.ntp.org", 0, 60000);
+const unsigned long TIME_SYNC_INTERVAL_MS = 5000;
+const unsigned long SENSOR_INTERVAL_MS = 100;
+const unsigned long DEVICE_ALIVE_INTERVAL_MS = 30000;
 
-// Static User ID (Appended at ESP32 #1)
-const String user_id = "user_001";
+unsigned long lastTimeSync = 0;
+unsigned long lastSensorRequest = 0;
+unsigned long lastAliveSent = 0;
+
+WiFiClientSecure espClient;
+PubSubClient client(espClient);
 
 // AWS IoT Certificates
 const char AWS_CERT_CA[] = R"EOF(
@@ -40,9 +51,9 @@ o/ufQJVtMVT8QtPHRh8jrdkPSHCa2XV4cdFyQzR1bldZwgJcJmApzyMZFo6IQ6XU
 5MsI+yMRQ+hDKXJioaldXgjUkK642M4UwtBV8ob2xJNDd2ZhwLnoQdeXeGADbkpy
 rqXRfboQnoZsG4q5WTP468SQvvG5
 -----END CERTIFICATE-----
-  )EOF";
-  
-  const char AWS_CERT_CRT[] = R"EOF(
+)EOF";
+
+const char AWS_CERT_CRT[] = R"EOF(
 -----BEGIN CERTIFICATE-----
 MIIDWTCCAkGgAwIBAgIUM2xti76vd4XX3NFM/RIJQv0hpeIwDQYJKoZIhvcNAQEL
 BQAwTTFLMEkGA1UECwxCQW1hem9uIFdlYiBTZXJ2aWNlcyBPPUFtYXpvbi5jb20g
@@ -63,9 +74,9 @@ tHXIi2btyek2KzKOErOmmn4K621iXLgLc3jKqpsFeeN7qkSLgNTxfxBN1ZEo8nQk
 QSV3FDaJFT2eg89KL5p6kbENBmpXsLoFeKhWHYz8Irg5xM6pp4qdmk7RbJUTuO5C
 Xg8Yn/XlsIBL9xSi+x39zNRJyFUISi281+9X/8lKk3ojvxcwM9He3lUY9WaY
 -----END CERTIFICATE-----
-  )EOF";
-  
-  const char AWS_CERT_PRIVATE[] = R"EOF(
+)EOF";
+
+const char AWS_CERT_PRIVATE[] = R"EOF(
 -----BEGIN RSA PRIVATE KEY-----
 MIIEpgIBAAKCAQEAyXQROuyvshDYdzd/K2LE4KqxaJ+ZEuI+wTw8ZSVeIziHm7Hh
 0o45rxkfmzwmY0dbzS+jMR8XBz0Z3EvvsBpIhhdRzE7y1T/G2EAM5lHaoqYm449D
@@ -93,158 +104,166 @@ yfIY6CWDAoGBAJFBa+9L1ORf1mivb9+z+qj9pwKJV78UpTH/EEATlhL43LDjPWUo
 g1fZUCJtDRE4QbW2bYATuURTfugtDF1dJbIGLcbm9LA8Ydv0J9zzsH65tBmEqb2o
 mYFN+v2f6ri4+C7mXZTX49RLmA5OCaZyh0YK/onQ7hX7cUcJBdpMEDtH
 -----END RSA PRIVATE KEY-----
-  )EOF";
-
-
-WiFiClientSecure espClient;
-PubSubClient client(espClient);
+)EOF";
 
 void connectWiFi() {
-    Serial.print("Connecting to WiFi...");
-    WiFi.begin(ssid, password);
-    while (WiFi.status() != WL_CONNECTED) {
-        Serial.print(".");
-        delay(1000);
-    }
-    Serial.println("\nWiFi Connected!");
+  Serial.print("Connecting to WiFi...");
+  WiFi.begin(ssid, password);
+  while (WiFi.status() != WL_CONNECTED) {
+    Serial.print(".");
+    delay(1000);
+  }
+  Serial.println("\nWiFi Connected!");
 }
 
 void connectAWS() {
-    espClient.setCACert(AWS_CERT_CA);
-    espClient.setCertificate(AWS_CERT_CRT);
-    espClient.setPrivateKey(AWS_CERT_PRIVATE);
-    client.setServer(mqtt_server, 8883);
+  espClient.setCACert(AWS_CERT_CA);
+  espClient.setCertificate(AWS_CERT_CRT);
+  espClient.setPrivateKey(AWS_CERT_PRIVATE);
+  client.setServer(mqtt_server, 8883);
 
-    while (!client.connected()) {
-        Serial.print("Connecting to AWS IoT...");
-        if (client.connect("ESP32_Insole_Sensor")) {
-            Serial.println("Connected!");
-        } else {
-            Serial.print("Failed, rc=");
-            Serial.print(client.state());
-            Serial.println(" Retrying in 5s...");
-            delay(5000);
-        }
+  while (!client.connected()) {
+    Serial.print("Connecting to AWS IoT...");
+    if (client.connect("ESP32_Insole_Sensor")) {
+      Serial.println("Connected to AWS!");
+    } else {
+      Serial.print("Failed, rc=");
+      Serial.print(client.state());
+      Serial.println(" Retrying in 5s...");
+      delay(5000);
     }
+  }
+}
+
+void publishDeviceAlive() {
+  unsigned long ts = timeClient.getEpochTime();
+  String topic = "device/" + DEVICE_ID + "/status/alive";
+  String payload = "{ \"type\": \"device_alive\", \"device_id\": \"" + DEVICE_ID + "\", \"status\": true, \"timestamp\": " + String(ts) + " }";
+  client.publish(topic.c_str(), payload.c_str());
+  Serial.println("Published device_alive heartbeat.");
+}
+
+void mqttCallback(char* topic, byte* payload, unsigned int length) {
+  String message;
+  for (unsigned int i = 0; i < length; i++) message += (char)payload[i];
+
+  Serial.println("MQTT Command Received: " + message);
+
+  if (message.indexOf("\"command\":") != -1) {
+    if (message.indexOf("check_calibration") != -1) {
+      Serial2.println("REQ_CAL_STATUS");
+      Serial.println("requesting cal status");
+    } else if (message.indexOf("start_calibration") != -1) {
+      Serial2.println("START_CALIBRATION");
+      calibrationComplete = false;
+    } else if (message.indexOf("capture_orientation") != -1) {
+      Serial2.println("CAPTURE_ORIENTATION");
+    } else if (message.indexOf("start_streaming") != -1) {
+      Serial.println("Start streaming session...");
+      stopStreaming = false;
+      streamingActive = true;
+    } else if (message.indexOf("stop_streaming") != -1) {
+      Serial.println("Stop streaming session...");
+      stopStreaming = true;
+      streamingActive = false;
+    }
+  }
 }
 
 void setup() {
   Serial.begin(115200);
-  Serial2.begin(115200, SERIAL_8N1, 16, 17);  // UART TX=16, RX=17
+  Serial2.begin(115200, SERIAL_8N1, 16, 17);
 
   connectWiFi();
   timeClient.begin();
   connectAWS();
+  client.setBufferSize(1024);
+  client.setCallback(mqttCallback);
 
-  client.setBufferSize(512);  //Increase buffer size to avoid payload limit issues
+  String commandTopic = "device/" + DEVICE_ID + "/command";
+  client.subscribe(commandTopic.c_str());
+  Serial.println("Subscribed to command topic: " + commandTopic);
 
-  // Handshake to ensure ESP32 #2 is ready
+  // Sensor Node Handshake
   bool sensorNodeReady = false;
-  for (int i = 0; i < 200; i++) { // Retry up to 20 times
-      Serial.println("Sending PING to ESP32 #2...");
-      Serial2.println("PING");  // Request handshake
-      delay(500);  
-
-      if (Serial2.available()) {
-          String response = Serial2.readStringUntil('\n');
-          response.trim();  // Remove extra newlines/spaces
-          Serial.print("ESP32 #2 Response: ");
-          Serial.println(response);
-
-          if (response == "ACK") {  // Check for exact "ACK"
-              Serial.println("ESP32 #2 is ready!");
-              sensorNodeReady = true;
-              break;  // Exit loop properly
-          }
-      } else {
-          Serial.println("No response from ESP32 #2, retrying...");
+  for (int i = 0; i < 20; i++) {
+    Serial2.println("PING");
+    delay(500);
+    if (Serial2.available()) {
+      String response = Serial2.readStringUntil('\n');
+      response.trim();
+      if (response == "ACK") {
+        sensorNodeReady = true;
+        break;
       }
+    }
   }
 
   if (!sensorNodeReady) {
-      Serial.println(" ESP32 #2 did not respond. Check wiring and reset both ESPs.");
-      while (true) { delay(1000); }  // Stop execution if no handshake
+    Serial.println("Sensor Node not responding to PING.");
+    while (true) delay(1000);
   }
-}
 
+  publishDeviceAlive();  // First heartbeat
+  lastAliveSent = millis();
+}
 
 void loop() {
-    if (!client.connected()) {
-        Serial.println("MQTT Disconnected! Reconnecting...");
-        connectAWS();
-    }
-    client.loop();
+  if (!client.connected()) connectAWS();
+  client.loop();
 
+  unsigned long now = millis();
+
+  // Time sync
+  if (now - lastTimeSync >= TIME_SYNC_INTERVAL_MS) {
     timeClient.update();
-    unsigned long timestamp = timeClient.getEpochTime();
-    Serial2.printf("SYNC_TIME:%lu\n", timestamp);
-    delay(50);
+    unsigned long epoch = timeClient.getEpochTime();
+    Serial2.printf("SYNC_TIME:%lu\n", epoch);
+    lastTimeSync = now;
+    Serial.println("Time Synced");
+  }
 
+  // Periodic device_alive status
+  if (now - lastAliveSent >= DEVICE_ALIVE_INTERVAL_MS) {
+    publishDeviceAlive();
+    lastAliveSent = now;
+  }
+
+  // Read sensor messages and publish without modification
+  if (Serial2.available()) {
+    String line = Serial2.readStringUntil('\n');
+    line.trim();
+
+    if (line.startsWith("{") && line.indexOf("\"type\":") != -1) {
+      if (line.indexOf("\"type\": \"cal_status\"") != -1) {
+        client.publish(("device/" + DEVICE_ID + "/status/calibration").c_str(), line.c_str());
+      } else if (line.indexOf("\"type\": \"orientation_captured\"") != -1) {
+        client.publish(("device/" + DEVICE_ID + "/status/orientation").c_str(), line.c_str());
+      } else {
+        Serial.println("Received unknown typed message: " + line);
+      }
+    }
+  }
+
+  // Sensor data request loop
+  if (!stopStreaming && streamingActive && (millis() - lastSensorRequest >= SENSOR_INTERVAL_MS)) {
+    lastSensorRequest = millis();
     Serial2.println("REQ_DATA");
 
-    // Adjust wait time for MPU6050 processing
-    unsigned long startTime = millis();
-    String receivedData = "";
-    bool dataReceived = false;
-
-    while (millis() - startTime < 100) { // Wait up to 100ms for full response
-        if (Serial2.available()) {
-            receivedData = Serial2.readStringUntil('\n');
-            if (receivedData.startsWith("{")) { // Validate JSON-like structure
-                Serial.printf("Received Sensor Data: %s\n", receivedData.c_str());
-
-                // Modify payload
-                String modifiedData = receivedData;
-                modifiedData.replace("{", "{ \"user_id\": \"" + user_id + "\", ");
-
-                // Ensure all expected fields are included
-                if (modifiedData.indexOf("\"q0\":") == -1 || modifiedData.indexOf("\"yaw\":") == -1) {
-                    Serial.println("Warning: Some MPU6050 data missing from payload!");
-                }
-                
-                // Publish data to AWS IoT Core
-                Serial.println("Publishing to AWS IoT Core...");
-                Serial.println("Payload: " + modifiedData);
-                
-                //checking payload size
-                // int payloadSize = modifiedData.length();  // Get payload size in bytes
-                // Serial.print("Payload Size: ");
-                // Serial.print(payloadSize);
-                // Serial.println(" bytes");
-
-                //Confirm MQTT connection before publishing
-                // if (client.connected()) {
-                //     bool pubSuccess = client.publish("esp32/insole/data", modifiedData.c_str());
-                //     if (pubSuccess) {
-                //         Serial.println("Successfully published to AWS IoT Core.");
-                //     } else {
-                //         Serial.println("Failed to publish to AWS IoT Core!");
-                //     }
-                // } else {
-                //     Serial.println("MQTT client is not connected! Skipping publish.");
-                // }
-
-                // bool success = client.publish("esp32/insole/data", "{\"test\": \"hello\"}");
-                // if (success) {
-                //     Serial.println("Test message published successfully!");
-                // } else {
-                //     Serial.println("Test message failed!");
-                // }
-
-                // Publish data to AWS IoT Core
-                client.publish("esp32/insole/data", modifiedData.c_str());
-
-
-                dataReceived = true;
-                break; // Exit the wait loop early once data is received
-            }
-        }
+    String sensorData = "";
+    unsigned long startWait = millis();
+    while (millis() - startWait < 100) {
+      if (Serial2.available()) {
+        sensorData = Serial2.readStringUntil('\n');
+        sensorData.trim();
+        break;
+      }
     }
 
-    if (!dataReceived) {
-        Serial.println("No response from ESP32 #2. Possible MPU6050 delay.");
+    if (sensorData.startsWith("{") && sensorData.indexOf("timestamp") != -1) {
+      // Just forward it directly (sensor already embeds device_id & timestamp)
+      String topic = "device/" + DEVICE_ID + "/sensor_data";
+      client.publish(topic.c_str(), sensorData.c_str());
     }
-
-    delay(10);  // Keep loop execution stable
+  }
 }
-
