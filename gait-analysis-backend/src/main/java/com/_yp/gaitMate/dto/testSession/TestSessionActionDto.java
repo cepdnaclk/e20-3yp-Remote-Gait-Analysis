@@ -1,8 +1,11 @@
 package com._yp.gaitMate.dto.testSession;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.time.Instant;
 
 /**
  * A generic DTO for handling test session actions such as START and STOP.
@@ -18,9 +21,9 @@ import lombok.Setter;
 @Setter
 public class TestSessionActionDto {
 
-    @NotBlank
+    @NotNull
     private TestSessionActionType action;
 
-    @NotBlank
-    private String timestamp;
+    @NotNull
+    private Instant timestamp;
 }
