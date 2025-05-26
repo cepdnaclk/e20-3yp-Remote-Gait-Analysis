@@ -8,7 +8,7 @@ import DeviceStatusCard from './DeviceStatusCard';
 import VideoCard from './VideoCard';
 import sendCommand from '../utils/sendCommand';
 
-const StepWearDevice = ({ orientationCaptured, setActiveStep, deviceStatus }) => (
+const StepWearDevice = ({ orientationCaptured, setActiveStep, deviceStatus , captureOrientation }) => (
   <Card elevation={0} sx={{
     borderRadius: 4,
     background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.9) 100%)',
@@ -85,7 +85,7 @@ const StepWearDevice = ({ orientationCaptured, setActiveStep, deviceStatus }) =>
             >
               Back
             </Button>
-            <Button
+            {/* <Button
               variant="contained"
               size="large"
               onClick={async () => {
@@ -117,6 +117,38 @@ const StepWearDevice = ({ orientationCaptured, setActiveStep, deviceStatus }) =>
               ) : (
                 "I'm Ready"
               )}
+            </Button> */}
+
+              <Button
+                  variant="contained"
+                  size="large"
+                  onClick={captureOrientation} // ✅ uses prop
+                  disabled={orientationCaptured}
+                  sx={{
+                    minWidth: 200, py: 2, px: 4, borderRadius: 3,
+                    background: orientationCaptured
+                      ? 'linear-gradient(135deg, #94a3b8 0%, #64748b 100%)'
+                      : 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)',
+                    boxShadow: orientationCaptured
+                      ? '0 8px 30px rgba(148, 163, 184, 0.3)'
+                      : '0 8px 30px rgba(34, 197, 94, 0.3)',
+                    fontSize: '1.1rem', fontWeight: 600,
+                    '&:hover': {
+                      background: orientationCaptured
+                        ? 'linear-gradient(135deg, #94a3b8 0%, #64748b 100%)'
+                        : 'linear-gradient(135deg, #16a34a 0%, #15803d 100%)',
+                      transform: orientationCaptured ? 'none' : 'translateY(-2px)'
+                    }
+                  }}
+                >
+                  {orientationCaptured ? (
+                    <>
+                      <CircularProgress size={20} sx={{ mr: 1 }} color="inherit" />
+                      Processing...
+                    </>
+                  ) : (
+                    "I'm Ready"
+                  )}
             </Button>
           </Box>
         </Grid>

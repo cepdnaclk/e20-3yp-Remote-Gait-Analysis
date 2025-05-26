@@ -136,8 +136,14 @@ const PatientTestSession = () => {
           <StepWearDevice
             deviceStatus={deviceStatus}
             setActiveStep={setActiveStep}
-            captureOrientation={() => sendCommand('capture_orientation')}
             orientationCaptured={orientationCaptured}
+            captureOrientation={async () => {
+                  await sendCommand('capture_orientation');
+                  await new Promise((r) => setTimeout(r, 1000)); // wait for capture to complete
+                  await sendCommand('start_streaming');
+                  await new Promise((r) => setTimeout(r, 700)); // wait before proceeding
+                  setActiveStep(2); // go to Start Test
+                }}
           />
         )}
 
