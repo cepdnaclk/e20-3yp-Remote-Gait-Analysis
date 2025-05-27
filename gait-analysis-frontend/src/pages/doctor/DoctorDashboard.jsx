@@ -21,7 +21,7 @@ import {
   IconButton,
   Avatar,
   Chip,
-  Collapse
+  Collapse 
 } from "@mui/material";
 
 import PeopleIcon from "@mui/icons-material/People";
@@ -33,6 +33,7 @@ import ChatIcon from "@mui/icons-material/Chat";
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import MenuIcon from "@mui/icons-material/Menu";
 import NotificationsIcon from "@mui/icons-material/Notifications";
+import LogoutIcon from "@mui/icons-material/Logout";
 
 import { useNavigate, Link } from "react-router-dom";
 import RecentPatients from "../RecentPatients";
@@ -179,6 +180,24 @@ export default function DoctorDashboard() {
               </ListItemButton>
             </ListItem>
           ))}
+
+          <ListItem disablePadding>
+            <ListItemButton
+              onClick={() => {
+                localStorage.removeItem("token");
+                navigate("/");
+              }}
+              sx={{
+                color: "#ffdddd",
+                "&:hover": { backgroundColor: "rgba(255, 0, 0, 0.2)" },
+              }}
+            >
+              <ListItemIcon sx={{ color: "#ffdddd" }}>
+                <LogoutIcon /> 
+              </ListItemIcon>
+              {sidebarOpen && <ListItemText primary="Logout" />}
+            </ListItemButton>
+          </ListItem>
         </List>
       </Drawer>
 
