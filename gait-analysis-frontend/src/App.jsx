@@ -20,9 +20,9 @@ import Feedback from "./pages/patient/Feedback";
 import ClinicDashboard from "./pages/clinic/ClinicAdminDashboard";
 import AddDoctor from "./pages/clinic/AddDoctor";
 import GaitAnalysisTest from "./pages/patient/trash/GaitAnalysisTest";
-import PatientTestSession from "./pages/patient/PatientTestSession";
 import WebSocketDashboard from "./pages/patient/WebSocketDashboard";
 import AddPatient from "./pages/clinic/AddPatient";
+import PatientTestSession from "./pages/patient/PatientTestSession";
 
 
 // Create a Query Client instance for managing API data fetching, caching, and state updates
@@ -57,6 +57,15 @@ export default function App() {
           <Route path="/patients/:id/realtime" element={
             <RealTimeDashboard allowedRoles = {["ROLE_DOCTOR"]}>
             </RealTimeDashboard>} />
+          {/* Patient Test Session Page Route */}
+          <Route path="/patient/test-session" element={
+            <RoleBasedRoute allowedRoles={["ROLE_PATIENT"]}>
+              <PatientTestSession />
+            </RoleBasedRoute>
+          } />
+
+
+          {/* WebSocket Dashboard Page Route */}
 
           {/* Root (Superadmin) Pages */}
           <Route path="/root/dashboard" element={
