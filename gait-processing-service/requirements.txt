@@ -1,0 +1,3 @@
+boto3             # AWS SDK for accessing SQS and DynamoDB
+requests          # To call the backend API
+python-dotenv     # Optional: for loading environment variables from .env
