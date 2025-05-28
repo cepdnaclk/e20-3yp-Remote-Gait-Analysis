@@ -32,6 +32,21 @@ mqtt:
     accessKey: {MQTT_AWS_ACCESS_KEY}
     accessId: {MQTT_AWS_ACCESS_ID}
 
+cloud:
+  aws:
+    credentials:
+      access-key: ${AWS_ACCESS_KEY}
+      secret-key: ${AWS_SECRET_KEY}
+    region:
+      static: eu-north-1
+      auto: false
+
+
+app:
+  sqs:
+    queue-name: rehabgait-processing-request-dev
+
+
 
 microservices:
   data:
