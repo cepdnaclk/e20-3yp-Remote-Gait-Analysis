@@ -14,7 +14,7 @@ sensor_id = 601
 # end_time = datetime.fromisoformat("2025-05-28T12:16:11.157")
 
 start_time = datetime.fromtimestamp(1747892951)
-end_time = datetime.fromtimestamp(1747892981)
+end_time = datetime.fromtimestamp(1747892952)
 
 data = fetch_session_data(sensor_id, start_time, end_time)
 
