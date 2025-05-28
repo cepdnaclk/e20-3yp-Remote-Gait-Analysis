@@ -35,8 +35,8 @@ mqtt:
 cloud:
   aws:
     credentials:
-      access-key: ${AWS_ACCESS_KEY}
-      secret-key: ${AWS_SECRET_KEY}
+      access-key: ${MQTT_AWS_ACCESS_ID}
+      secret-key: ${MQTT_AWS_ACCESS_KEY}
     region:
       static: eu-north-1
       auto: false
