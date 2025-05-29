@@ -59,11 +59,11 @@ public class SensorKitController {
 
     @GetMapping("/sensor-kits")
     @Operation(
-            summary = "Get all sensor kits",
-            description = "Returns a list of all sensor kits in the system."
+            summary = "Get all sensor kits by status",
+            description = "If the status is not provided, all the sensorKits will be sent"
     )
-    public ResponseEntity<List<SensorKitResponse>> getAllSensorKits() {
-        List<SensorKitResponse> responses = sensorKitService.getAllSensorKits();
+    public ResponseEntity<List<SensorKitResponse>> getAllSensorKits(@RequestParam(required = false) SensorKit.Status status) {
+        List<SensorKitResponse> responses = sensorKitService.getAllSensorKits(status);
         return new ResponseEntity<>(responses, HttpStatus.OK);
     }
 

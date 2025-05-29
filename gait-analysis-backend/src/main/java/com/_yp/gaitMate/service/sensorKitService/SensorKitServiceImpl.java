@@ -17,7 +17,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -50,9 +49,15 @@ public class SensorKitServiceImpl implements SensorKitService {
     }
 
     @Override
-    public List<SensorKitResponse> getAllSensorKits() {
-        return sensorKitRepository.findAll()
-                .stream()
+    public List<SensorKitResponse> getAllSensorKits(SensorKit.Status status) {
+        List<SensorKit> kits;
+
+        kits = (status != null)
+                ? sensorKitRepository.findAllByStatus(status)
+                : sensorKitRepository.findAll();
+
+
+        return kits.stream()
                 .map(sensorKitMapper::toSensorKitResponse)
                 .toList();
     }

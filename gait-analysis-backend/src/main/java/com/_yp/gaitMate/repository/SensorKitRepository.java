@@ -14,6 +14,8 @@ public interface SensorKitRepository extends JpaRepository<SensorKit, Long> {
 
     List<SensorKit> findByClinic(Clinic clinic);
 
+    List<SensorKit> findAllByStatus(SensorKit.Status status);
+
     List<SensorKit> findAllByIdIn(Collection<Long> ids);
 
     List<SensorKit> findByClinicAndStatus(Clinic clinic, SensorKit.Status status);
