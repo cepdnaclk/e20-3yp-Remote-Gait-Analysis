@@ -1,9 +1,10 @@
 package com._yp.gaitMate.dto.results;
 
-import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.util.List;
 
 /**
  * DTO for receiving processed test results from the data processing microservice.
@@ -11,31 +12,34 @@ import lombok.Setter;
 @Getter
 @Setter
 public class ProcessedTestResultsRequestDto {
+
     @NotNull
     private Boolean status;
 
     @NotNull
     private Long sessionId;
 
-    
-    private Integer cadence;
+    private Integer steps;
 
-    
-    private Integer stepLength;
+    private Double cadence;
 
-    
-    private Integer strideLength;
+    private Double avgHeelForce;
 
-    
-    private Double stepTime;
+    private Double avgToeForce;
 
-    
-    private Double strideTime;
+    private Double avgMidfootForce;
 
-  
-    private Double speed;
+    private Double balanceScore;
 
-    private Double symmetryIndex;
+    private Integer peakImpact;
+
+    private Double durationSeconds;
+
+    private Double avgSwingTime;
+
+    private Double avgStanceTime;
 
     private String pressureResultsPath;
+
+    private List<Double> strideTimes;
 }
