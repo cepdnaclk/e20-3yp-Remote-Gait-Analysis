@@ -1,6 +1,8 @@
 package com._yp.gaitMate.security.utils;
 
 import com._yp.gaitMate.exception.ResourceNotFoundException;
+import com._yp.gaitMate.model.Patient;
+import com._yp.gaitMate.repository.PatientRepository;
 import com._yp.gaitMate.security.dto.UserInfoResponse;
 import com._yp.gaitMate.security.mapper.Mapper;
 import com._yp.gaitMate.security.model.User;
@@ -26,6 +28,7 @@ public class AuthUtil {
 
     private final ClinicRepository clinicRepository;
     private final DoctorRepository doctorRepository;
+    private final PatientRepository patientRepository;
 
 
     public String loggedInEmail(){
@@ -107,5 +110,15 @@ public class AuthUtil {
                 .orElseThrow(() -> new ResourceNotFoundException("Doctor", "userId", doctorUserId));
 
         return doctor;
+    }
+    public Patient getLoggedInPatient() {
+        // Get currently logged-in patient's user ID
+        Long patientUserId = loggedInUserId();
+
+        // find the patient attached to the logged-in user
+        Patient patient = patientRepository.findByUser_UserId(patientUserId)
+                .orElseThrow(() -> new ResourceNotFoundException("Patient", "userId", patientUserId));
+
+        return patient;
     }
 }
