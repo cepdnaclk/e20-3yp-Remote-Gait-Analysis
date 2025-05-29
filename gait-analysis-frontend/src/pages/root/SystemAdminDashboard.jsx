@@ -27,8 +27,11 @@ import { getClinics, getSensorKits } from "../../services/rootServices";
 import ManageClinicsPage from "./ManageClinicsPage";
 import ManageSensorKitsPage from "./ManageSensorKitsPage";
 import AssignSensorKitsPage from "./AssignSensorKitsPage";
+import { useNavigate } from "react-router-dom";
+import LogoutIcon from "@mui/icons-material/Logout";
 
 export default function SystemAdminDashboard() {
+  const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [selectedSection, setSelectedSection] = useState("Dashboard");
   const [clinics, setClinics] = useState([]);
@@ -167,6 +170,22 @@ export default function SystemAdminDashboard() {
               </ListItemButton>
             </ListItem>
           ))}
+            <ListItem disablePadding>
+                <ListItemButton
+                onClick={() => {
+                    localStorage.removeItem("token");
+                    navigate("/");
+                }}
+                sx={{
+                    "&:hover": { backgroundColor: "rgba(255, 0, 0, 0.2)" },
+                }}
+                >
+                <ListItemIcon sx={{ color: "#fff" }}>
+                    <LogoutIcon />
+                </ListItemIcon>
+                {sidebarOpen && <ListItemText primary="Logout" />}
+                </ListItemButton>
+            </ListItem>
         </List>
       </Drawer>
 

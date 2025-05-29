@@ -20,7 +20,8 @@ import PeopleIcon from "@mui/icons-material/People";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import AssignmentIndIcon from "@mui/icons-material/AssignmentInd";
 import DashboardIcon from "@mui/icons-material/Dashboard";
-
+import { useNavigate, Link } from "react-router-dom";
+import LogoutIcon from "@mui/icons-material/Logout";
 import {
   getDoctors,
   getPatients,
@@ -32,6 +33,7 @@ import PatientManagementPage from "./PatientManagementPage";
 import AddPatientPage from "./AddPatientPage"; // includes doctor + kit assignment
 
 export default function ClinicAdminDashboard() {
+  const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [selectedSection, setSelectedSection] = useState("Dashboard");
 
@@ -170,6 +172,24 @@ export default function ClinicAdminDashboard() {
               </ListItemButton>
             </ListItem>
           ))}
+
+          <ListItem disablePadding>
+            <ListItemButton
+            onClick={() => {
+                localStorage.removeItem("token");
+                navigate("/");
+            }}
+            sx={{
+                color: "#ffdddd",
+                "&:hover": { backgroundColor: "rgba(255, 0, 0, 0.2)" },
+            }}
+            >
+            <ListItemIcon sx={{ color: "#ffdddd" }}>
+                <LogoutIcon /> 
+            </ListItemIcon>
+            {sidebarOpen && <ListItemText primary="Logout" />}
+            </ListItemButton>
+        </ListItem>
         </List>
       </Drawer>
 
