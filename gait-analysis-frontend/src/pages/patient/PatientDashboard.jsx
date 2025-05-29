@@ -6,75 +6,59 @@ import {
   Paper,
   Grid,
   Button,
-  Avatar,
   Divider,
+  CircularProgress,
 } from "@mui/material";
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 import DescriptionIcon from "@mui/icons-material/Description";
 import PersonIcon from "@mui/icons-material/Person";
 import AssessmentIcon from "@mui/icons-material/Assessment";
-//import axios from "axios";
+
+import { getPatientById } from "../../services/patientServices";
 
 export default function PatientDashboard() {
-
   const navigate = useNavigate();
-  // Replace with API call later
-  // Replace the setPatient(...) with an API call like GET /api/patient/me
-  //const [patient, setPatient] = useState(null);
-  //const [isLoading, setIsLoading] = useState(true);
-  //const [error, setError] = useState(null);
 
- const [patient, setPatient] = useState({
-    name: "Jane Perera",
-    email: "jane@example.com",
-    age: 34,
-    gender: "FEMALE",
-    phoneNumber: "0712345678",
-    height: 165,
-   weight: 63,
-    nextAppointment: "2025-03-05",
-    doctor: "Dr. Keerthi Ilukkumbura",
-  });
+  const [patient, setPatient] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-//useEffect(() => {
-  // const fetchPatientData = async () => {
-  //   try {
-  //     const res = await axios.get("http://localhost:8080/api/patients/me", {
-  //       headers: {
-  //         Authorization: `Bearer ${localStorage.getItem("token")}`,
-  //       },
-  //     });
-//       setPatient(res.data);
-//     } catch (err) {
-//       console.error("Failed to load patient data", err);
-//       setError(err);
-//     } finally {
-//       setIsLoading(false);
-//     }
-//   };
+  // retrieve the logged in patient's ID
+  //const patientId = localStorage.getItem("patientId");
 
-//   fetchPatientData();
-// }, []);
+  // ✅ Extract user ID from JWT
+  const getLoggedInUserId = () => {
+    const token = localStorage.getItem("token");
+    if (!token) return null;
+    console.log("JWT payload:", payload);
 
-// if (isLoading) {
-//   return (
-//     <Box display="flex" justifyContent="center" alignItems="center" height="100vh">
-//       <Typography variant="h6" color="white">Loading your data...</Typography>
-//     </Box>
-//   );
-// }
+    const payload = JSON.parse(atob(token.split(".")[1]));
+    return payload.id || payload.sub || null;
+  };
 
-// if (error) {
-//   return (
-//     <Box display="flex" justifyContent="center" alignItems="center" height="100vh">
-//       <Typography variant="h6" color="error">Failed to load data: {error.message}</Typography>
-//     </Box>
-//   );
-// }
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const userId = getLoggedInUserId();
+        if (!userId) throw new Error("User not logged in"); 
+        const res = await getPatientById(userId);
+        setPatient(res.data);
+      } catch (err) {
+        console.error("Failed to fetch patient profile", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+      fetchProfile();
+  }, []);
 
-// if (!patient) return null;
-
-
+  if (loading || !patient) {
+    return (
+      <Box display="flex" justifyContent="center" alignItems="center" height="100vh">
+        <CircularProgress color="inherit" />
+        <Typography ml={2}>Loading patient dashboard...</Typography>
+      </Box>
+    );
+  }
 
   return (
     <Box
@@ -98,10 +82,10 @@ export default function PatientDashboard() {
             <CalendarTodayIcon fontSize="large" />
             <Typography variant="h6">Next Appointment</Typography>
             <Typography variant="body1" mt={1}>
-              {patient.nextAppointment}
+              {patient.nextAppointment || "Not Scheduled"}
             </Typography>
             <Typography variant="body2" color="lightgray">
-              with {patient.doctor}
+              with {patient.doctor?.name || "N/A"}
             </Typography>
           </Paper>
         </Grid>
@@ -111,6 +95,7 @@ export default function PatientDashboard() {
             <DescriptionIcon fontSize="large" />
             <Typography variant="h6">Latest Report</Typography>
             <Typography variant="body1" mt={1}>
+              {/* Placeholder until dynamic date added */}
               Reviewed on 2025-02-20
             </Typography>
             <Button variant="outlined" color="inherit" sx={{ mt: 2 }}>
@@ -130,13 +115,12 @@ export default function PatientDashboard() {
               variant="contained"
               color="secondary"
               sx={{ mt: 2 }}
-              onClick={() => navigate("/patient/test-session")} // Replace with actual route
+              onClick={() => navigate("/patient/test-session")}
             >
               Go to Test Session
             </Button>
           </Paper>
         </Grid>
-
 
         <Grid item xs={12} sm={4}>
           <Paper sx={{ p: 3, backgroundColor: "#5c6bc0", color: "white" }}>
@@ -168,7 +152,9 @@ export default function PatientDashboard() {
             <Typography>Phone: {patient.phoneNumber}</Typography>
           </Grid>
           <Grid item xs={12} sm={6}>
-            <Typography>Assigned Doctor: {patient.doctor}</Typography>
+            <Typography>
+              Assigned Doctor: {patient.doctor?.name || "Not Assigned"}
+            </Typography>
             <Button
               variant="contained"
               color="secondary"

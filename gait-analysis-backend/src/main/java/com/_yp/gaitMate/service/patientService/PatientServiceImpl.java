@@ -140,6 +140,13 @@ public class PatientServiceImpl implements PatientService{
         return response;
     }
 
+    @Override
+    public PatientInfoResponse getMyPatientProfile() {
+        Patient patient = authUtil.getLoggedInPatient();
+
+        PatientInfoResponse patientInfoResponse = patientMapper.toPatientInfoResponse(patient);
+        return patientInfoResponse;
+    }
 
 
     //*********************** P R I V A T E  M E T H O D S ************************************

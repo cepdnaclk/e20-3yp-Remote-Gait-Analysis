@@ -12,4 +12,6 @@ public interface PatientService {
     List<PatientInfoResponse> getPatientsOfLoggedInDoctor();
 
     List<PatientInfoResponse> getPatientsOfLoggedInClinic();
+
+    PatientInfoResponse getMyPatientProfile();
 }

@@ -153,13 +153,12 @@ public class PatientController {
         return ResponseEntity.ok(patients);
     }
 
-
-    // TODO:
     @GetMapping("patients/me")
     @PreAuthorize("hasRole('PATIENT')")
     @Operation(summary = "Get the logged in patient's patient profile [TODO]")
     public ResponseEntity<PatientInfoResponse> getMyPatientProfile(){
-        throw new NotImplementedException();
+        PatientInfoResponse response = patientService.getMyPatientProfile();
+        return ResponseEntity.ok(response);
     }
 
     // TODO:
