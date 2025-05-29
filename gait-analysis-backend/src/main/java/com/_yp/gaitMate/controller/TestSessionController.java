@@ -5,12 +5,15 @@ import com._yp.gaitMate.dto.testSession.TestSessionActionDto;
 import com._yp.gaitMate.dto.testSession.StartTestSessionResponse;
 import com._yp.gaitMate.dto.testSession.TestSessionDetailsResponse;
 import com._yp.gaitMate.service.testSessionService.TestSessionService;
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/test-sessions")
@@ -54,10 +57,31 @@ public class TestSessionController {
      */
     @PreAuthorize("hasRole('PATIENT')")
     @GetMapping("/{id}")
+    @Operation(
+            summary = "Get session details by session-id"
+    )
     public ResponseEntity<TestSessionDetailsResponse> getSession(@PathVariable("id") Long sessionId) {
         TestSessionDetailsResponse response = testSessionService.getTestSessionById(sessionId);
         return ResponseEntity.ok(response);
     }
+
+
+
+    @PreAuthorize("hasRole('PATIENT')")
+    @GetMapping("/me")
+    @Operation(
+            summary = "Get all sessions details of the logged in patient"
+    )
+    public ResponseEntity<List<TestSessionDetailsResponse>> getSessionsOfLoggedInPatient() {
+        List<TestSessionDetailsResponse> response = testSessionService.getSessionsOfLoggedInPatient();
+        return ResponseEntity.ok(response);
+    }
+
+
+
+
+
+
 
 
 }

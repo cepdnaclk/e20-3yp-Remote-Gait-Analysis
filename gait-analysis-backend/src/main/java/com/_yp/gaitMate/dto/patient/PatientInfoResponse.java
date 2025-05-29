@@ -19,6 +19,7 @@ public class PatientInfoResponse {
     private String gender;
     private String createdAt;
     private Long doctorId;
+    private String doctorName;
     private Long sensorKitId;
     private String nic;
 }
