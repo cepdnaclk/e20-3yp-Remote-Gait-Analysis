@@ -52,8 +52,7 @@ public class TestSession {
     /**
      * The processed gait analysis results for this test.
      */
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "results_id")
+    @OneToOne(mappedBy = "session", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private ProcessedTestResults results;
 
     /**
@@ -80,4 +79,3 @@ public class TestSession {
         FAILED
     }
 }
-

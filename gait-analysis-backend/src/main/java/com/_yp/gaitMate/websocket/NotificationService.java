@@ -53,4 +53,13 @@ public class NotificationService {
             log.error("❌ Failed to send SENSOR_DATA to [{}]: {}", username, e.getMessage());
         }
     }
+
+    public void sendNotificationToUser(String username, ResultsNotificationMessage message) {
+        try {
+            log.info("📡 Sending SENSOR_DATA to [{}]: {}", username, message);
+            messagingTemplate.convertAndSendToUser(username, TOPIC_SENSOR_DATA, message);
+        } catch (Exception e) {
+            log.error("❌ Failed to send SENSOR_DATA to [{}]: {}", username, e.getMessage());
+        }
+    }
 }
