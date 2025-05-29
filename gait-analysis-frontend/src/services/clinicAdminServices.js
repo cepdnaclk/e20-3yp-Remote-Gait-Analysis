@@ -1,18 +1,18 @@
 import axiosInstance from './axiosInstance';
 
 // Get all doctors for the logged in clinic
-export const getDoctors = () => axiosInstance.get('/clinics/me/doctors');
+export const getDoctors = () => axiosInstance.get('/api/clinics/me/doctors');
 
 // Add a new doctor
 export const addDoctor = (doctorData) =>
-  axiosInstance.post('/doctors', doctorData);
+  axiosInstance.post('/api/doctors', doctorData);
 
 // Get all patients for the clinic
-export const getPatients = () => axiosInstance.get('/clinics/me/patients');
+export const getPatients = () => axiosInstance.get('/api/clinics/me/patients');
 
 // Add a new patient
 export const addPatient = (patientData) =>
-  axiosInstance.post('/clinic/patients', patientData);
+  axiosInstance.post('/api/clinic/patients', patientData);
 
 // // Assign a patient to a doctor
 // export const assignPatientToDoctor = (patientId, doctorId) =>
@@ -20,7 +20,7 @@ export const addPatient = (patientData) =>
 
 // Get available sensor kits assigned to this clinic
 export const getAvailableSensorKits = () =>
-  axiosInstance.get('/clinics/me/sensor-kits?status=AVAILABLE');
+  axiosInstance.get('/api/clinics/me/sensor-kits?status=AVAILABLE');
 
 // // Assign a sensor kit to a patient
 // export const assignSensorKitToPatient = (patientId, sensorKitId) =>

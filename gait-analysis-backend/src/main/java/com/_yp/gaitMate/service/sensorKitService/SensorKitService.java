@@ -4,7 +4,6 @@ import com._yp.gaitMate.dto.sensorKit.AssignSensorKitsRequest;
 import com._yp.gaitMate.dto.sensorKit.CreateSensorKitRequest;
 import com._yp.gaitMate.dto.sensorKit.SensorKitResponse;
 import com._yp.gaitMate.model.SensorKit;
-import jakarta.validation.Valid;
 
 import java.util.List;
 
@@ -14,7 +13,7 @@ public interface SensorKitService {
 
     SensorKitResponse getSensorKit(Long id);
 
-    List<SensorKitResponse> getAllSensorKits();
+    List<SensorKitResponse> getAllSensorKits(SensorKit.Status status);
 
     void deleteSensorKit(Long id);
 
