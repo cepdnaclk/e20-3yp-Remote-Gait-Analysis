@@ -15,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 
 @Service
@@ -207,14 +208,13 @@ public class TestSessionServiceImpl implements TestSessionService {
     /**
      * Parses and validates that the timestamp is close to server time (±5 seconds).
      */
-    private LocalDateTime validateTimestampCloseToNow(String timestampStr) {
-        LocalDateTime parsed = LocalDateTime.parse(timestampStr);
+    private LocalDateTime validateTimestampCloseToNow(Instant timestamp) {
+        LocalDateTime parsed = timestamp.atZone(java.time.ZoneId.systemDefault()).toLocalDateTime();
         LocalDateTime now = LocalDateTime.now();
 
         long diffInSeconds = Math.abs(java.time.Duration.between(now, parsed).getSeconds());
 
-        // ⚠️ Uncomment this if needed for testing
-        if (diffInSeconds >5 ) {
+        if (diffInSeconds > 5) {
             throw new ApiException("Timestamp must be within ±5 seconds of server time");
         }
 
