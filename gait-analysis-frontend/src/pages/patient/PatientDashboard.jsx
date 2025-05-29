@@ -14,7 +14,7 @@ import DescriptionIcon from "@mui/icons-material/Description";
 import PersonIcon from "@mui/icons-material/Person";
 import AssessmentIcon from "@mui/icons-material/Assessment";
 
-import { getPatientById } from "../../services/patientServices";
+import { getPatientProfile } from "../../services/patientServices";
 
 export default function PatientDashboard() {
   const navigate = useNavigate();
@@ -38,9 +38,7 @@ export default function PatientDashboard() {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const userId = getLoggedInUserId();
-        if (!userId) throw new Error("User not logged in"); 
-        const res = await getPatientById(userId);
+        const res = await getPatientProfile();
         setPatient(res.data);
       } catch (err) {
         console.error("Failed to fetch patient profile", err);
