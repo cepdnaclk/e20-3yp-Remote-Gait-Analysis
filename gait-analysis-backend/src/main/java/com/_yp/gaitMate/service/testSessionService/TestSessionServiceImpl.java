@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -137,6 +138,17 @@ public class TestSessionServiceImpl implements TestSessionService {
         }
 
         return testSessionMapper.toDetailsResponse(session);
+    }
+
+    @Override
+    public List<TestSessionDetailsResponse> getSessionsOfLoggedInPatient() {
+        Patient loggedInPatient = authUtil.getLoggedInPatient();
+
+        List<TestSession> sessions = testSessionRepository.findAllByPatient(loggedInPatient);
+
+        return sessions.stream()
+                .map(testSessionMapper::toDetailsResponse)
+                .toList();
     }
 
     // =====================================
