@@ -26,12 +26,22 @@ def process_gait_data(message: dict):
         print(f"📦 Retrieved {len(raw_data)} data points from DynamoDB")
 
         # 2. Process raw data (placeholder)
+         # 2. Dummy result matching Java DTO structure
         processed_result = {
+            "status": True,
             "sessionId": session_id,
-            "steps": 42,  # Example dummy data
-            "avg_force": 12.3,
-            "balance_score": 0.89,
-            # Add more computed metrics here
+            "steps": 42,
+            "cadence": 108.5,
+            "avgHeelForce": 120.4,
+            "avgToeForce": 234.2,
+            "avgMidfootForce": 145.0,
+            "balanceScore": 0.91,
+            "peakImpact": 980,
+            "durationSeconds": 11.7,
+            "avgSwingTime": 0.45,
+            "avgStanceTime": 0.67,
+            "pressureResultsPath": "s3://dummy/path/pressure-map.png",
+            "strideTimes": [1.01, 1.03, 1.02]
         }
 
         # 3. Send results to main backend
