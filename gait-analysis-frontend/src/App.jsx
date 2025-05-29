@@ -18,10 +18,10 @@ import PatientDashboard from "./pages/patient/PatientDashboard";
 import TestResult from "./pages/patient/TestResult";
 import Feedback from "./pages/patient/Feedback";
 import ClinicDashboard from "./pages/clinic/ClinicAdminDashboard";
-import AddDoctor from "./pages/clinic/AddDoctor";
+import AddDoctor from "./pages/clinic/DoctorManagementPage";
 import GaitAnalysisTest from "./pages/patient/trash/GaitAnalysisTest";
 import WebSocketDashboard from "./pages/patient/WebSocketDashboard";
-import AddPatient from "./pages/clinic/AddPatient";
+import AddPatient from "./pages/clinic/AddPatientPage";
 import PatientTestSession from "./pages/patient/PatientTestSession";
 
 
