@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Box,
   Typography,
@@ -11,21 +12,69 @@ import {
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 import DescriptionIcon from "@mui/icons-material/Description";
 import PersonIcon from "@mui/icons-material/Person";
+import AssessmentIcon from "@mui/icons-material/Assessment";
+//import axios from "axios";
 
 export default function PatientDashboard() {
+
+  const navigate = useNavigate();
   // Replace with API call later
   // Replace the setPatient(...) with an API call like GET /api/patient/me
-  const [patient, setPatient] = useState({
+  //const [patient, setPatient] = useState(null);
+  //const [isLoading, setIsLoading] = useState(true);
+  //const [error, setError] = useState(null);
+
+ const [patient, setPatient] = useState({
     name: "Jane Perera",
     email: "jane@example.com",
     age: 34,
     gender: "FEMALE",
     phoneNumber: "0712345678",
     height: 165,
-    weight: 63,
+   weight: 63,
     nextAppointment: "2025-03-05",
     doctor: "Dr. Keerthi Ilukkumbura",
   });
+
+//useEffect(() => {
+  // const fetchPatientData = async () => {
+  //   try {
+  //     const res = await axios.get("http://localhost:8080/api/patients/me", {
+  //       headers: {
+  //         Authorization: `Bearer ${localStorage.getItem("token")}`,
+  //       },
+  //     });
+//       setPatient(res.data);
+//     } catch (err) {
+//       console.error("Failed to load patient data", err);
+//       setError(err);
+//     } finally {
+//       setIsLoading(false);
+//     }
+//   };
+
+//   fetchPatientData();
+// }, []);
+
+// if (isLoading) {
+//   return (
+//     <Box display="flex" justifyContent="center" alignItems="center" height="100vh">
+//       <Typography variant="h6" color="white">Loading your data...</Typography>
+//     </Box>
+//   );
+// }
+
+// if (error) {
+//   return (
+//     <Box display="flex" justifyContent="center" alignItems="center" height="100vh">
+//       <Typography variant="h6" color="error">Failed to load data: {error.message}</Typography>
+//     </Box>
+//   );
+// }
+
+// if (!patient) return null;
+
+
 
   return (
     <Box
@@ -69,6 +118,25 @@ export default function PatientDashboard() {
             </Button>
           </Paper>
         </Grid>
+
+        <Grid item xs={12} sm={4}>
+          <Paper sx={{ p: 3, backgroundColor: "#7986cb", color: "white" }}>
+            <AssessmentIcon fontSize="large" />
+            <Typography variant="h6">Test Sessions</Typography>
+            <Typography variant="body1" mt={1}>
+              View and manage your gait test sessions.
+            </Typography>
+            <Button
+              variant="contained"
+              color="secondary"
+              sx={{ mt: 2 }}
+              onClick={() => navigate("/patient/test-session")} // Replace with actual route
+            >
+              Go to Test Session
+            </Button>
+          </Paper>
+        </Grid>
+
 
         <Grid item xs={12} sm={4}>
           <Paper sx={{ p: 3, backgroundColor: "#5c6bc0", color: "white" }}>
