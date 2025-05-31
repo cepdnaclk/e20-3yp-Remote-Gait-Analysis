@@ -1,88 +1,74 @@
-import axios from "axios";
 import { useEffect, useState } from "react";
-
-import { useQuery } from "@tanstack/react-query";
-import { 
-  CircularProgress, 
-  Typography, 
-  Box, 
-  Grid,
+import {
+  Box,
+  Typography,
   Drawer,
   List,
   ListItem,
-  ListItemIcon,
   ListItemButton,
+  ListItemIcon,
   ListItemText,
   Card,
   CardContent,
-  Paper,
-  TextField,
-  Button,
+  Grid,
   IconButton,
   Avatar,
   Chip,
-  Collapse 
+  Collapse,
+  CircularProgress,
 } from "@mui/material";
 
-import PeopleIcon from "@mui/icons-material/People";
-import AddIcon from "@mui/icons-material/Add";
-import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
-import DescriptionIcon from "@mui/icons-material/Description";
-import SettingsIcon from "@mui/icons-material/Settings";
-import ChatIcon from "@mui/icons-material/Chat";
-import DashboardIcon from "@mui/icons-material/Dashboard";
-import MenuIcon from "@mui/icons-material/Menu";
-import NotificationsIcon from "@mui/icons-material/Notifications";
-import LogoutIcon from "@mui/icons-material/Logout";
+import {
+  People as PeopleIcon,
+  CalendarToday as CalendarTodayIcon,
+  Description as DescriptionIcon,
+  Settings as SettingsIcon,
+  Chat as ChatIcon,
+  Dashboard as DashboardIcon,
+  Menu as MenuIcon,
+  Logout as LogoutIcon,
+} from "@mui/icons-material";
 
 import { useNavigate, Link } from "react-router-dom";
-import RecentPatients from "../RecentPatients";
+import { getDoctorPatients } from "../../services/doctorServices";
+//import RecentPatients from "../RecentPatients";
+import DoctorPatientsPage from "./DoctorPatientsPage";
+
 import Appointments from "../Appointments";
 import Reports from "../Reports";
 import Messages from "../Messages";
 import Settings from "../Settings";
-import NavbarAuth from "../../components/NavbarAuth";
 
 export default function DoctorDashboard() {
   const navigate = useNavigate();
   const [patients, setPatients] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
-
   const [selectedSection, setSelectedSection] = useState("Dashboard");
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
   const token = localStorage.getItem("token");
   let doctorName = "";
-  
-  if (token) {
-    const decoded = JSON.parse(atob(token.split('.')[1]));
-    doctorName = decoded.sub; // or use `decoded.name` if available
-  }
 
-  
+  if (token) {
+    const decoded = JSON.parse(atob(token.split(".")[1]));
+    doctorName = decoded.sub;
+  }
 
   useEffect(() => {
     const fetchPatients = async () => {
       try {
-      const res = await axios.get("http://localhost:8080/api/doctors/me/patients", {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      });
-      setPatients(res.data);
-    } catch (err) {
-      console.error("Failed to load patients", err);
-      setError(err);
-    } finally {
-      setIsLoading(false);
-    }
-  };  
-
+        const res = await getDoctorPatients();
+        setPatients(res.data);
+      } catch (err) {
+        console.error("Failed to load patients", err);
+        setError(err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
     fetchPatients();
   }, []);
-
-  
 
   const menuItems = [
     { text: "Dashboard", icon: <DashboardIcon /> },
@@ -95,9 +81,8 @@ export default function DoctorDashboard() {
 
   const renderContent = () => {
     switch (selectedSection) {
-      case "Dashboard":
       case "Patients":
-        return <RecentPatients patients={patients} isLoading={isLoading} error={error} />;
+        return <DoctorPatientsPage patients={patients} isLoading={isLoading} error={error} />;
       case "Appointments":
         return <Appointments />;
       case "Reports":
@@ -107,7 +92,44 @@ export default function DoctorDashboard() {
       case "Settings":
         return <Settings />;
       default:
-        return <RecentPatients patients={patients} isLoading={isLoading} error={error} />;
+        return (
+          <>
+            <Grid container spacing={3} mt={2}>
+              <Grid item xs={12} sm={6} md={4}>
+                <Card sx={{ p: 2, textAlign: "center", background: "radial-gradient(rgb(136, 223, 255),rgb(130, 205, 255))", boxShadow: 3 }}>
+                  <CardContent>
+                    <PeopleIcon fontSize="large" />
+                    <Typography variant="h6" sx={{ fontWeight: 600 }}>Total Patients</Typography>
+                    <Typography variant="h4">{patients?.length || 0}</Typography>
+                  </CardContent>
+                </Card>
+              </Grid>
+              <Grid item xs={12} sm={6} md={4}>
+                <Card sx={{ p: 2, textAlign: "center", background: "radial-gradient(rgb(136, 223, 255),rgb(130, 205, 255))", boxShadow: 3 }}>
+                  <CardContent>
+                    <CalendarTodayIcon fontSize="large" />
+                    <Typography variant="h6" sx={{ fontWeight: 600 }}>Today's Appointments</Typography>
+                    <Typography variant="h4">{Math.floor(Math.random() * 20) + 5}</Typography>
+                  </CardContent>
+                </Card>
+              </Grid>
+              <Grid item xs={12} sm={6} md={4}>
+                <Card sx={{ p: 2, textAlign: "center", background: "radial-gradient(rgb(136, 223, 255),rgb(130, 205, 255))", boxShadow: 3 }}>
+                  <CardContent>
+                    <DescriptionIcon fontSize="large" />
+                    <Typography variant="h6" sx={{ fontWeight: 600 }}>Pending Reports</Typography>
+                    <Typography variant="h4">
+                      <Chip label={`${Math.floor(Math.random() * 10) + 1} Pending`} color="primary" />
+                    </Typography>
+                  </CardContent>
+                </Card>
+              </Grid>
+            </Grid>
+            <Box mt={3}>
+              <DoctorPatientsPage patients={patients} isLoading={isLoading} error={error} />
+            </Box>
+          </>
+        );
     }
   };
 
@@ -127,9 +149,7 @@ export default function DoctorDashboard() {
     );
 
   return (
-    <Box sx={{ display: "flex", minheight: "100vh", background: "rgb(255, 255, 255)" }}>
-      
-      {/* Sidebar */}
+    <Box sx={{ display: "flex", minHeight: "100vh", background: "#ffffff" }}>
       <Drawer
         variant="permanent"
         sx={{
@@ -145,8 +165,11 @@ export default function DoctorDashboard() {
         }}
       >
         <Box sx={{ padding: 2, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-          {sidebarOpen && (<Typography variant="h6" component={Link} to="/" sx={{ textDecoration: "none", color: "white", fontWeight: "bold" }}
-              >RehabGait</Typography>)}
+          {sidebarOpen && (
+            <Typography variant="h6" component={Link} to="/" sx={{ textDecoration: "none", color: "white", fontWeight: "bold" }}>
+              RehabGait
+            </Typography>
+          )}
           <IconButton onClick={() => setSidebarOpen(!sidebarOpen)} sx={{ color: "#fff" }}>
             <MenuIcon />
           </IconButton>
@@ -154,13 +177,12 @@ export default function DoctorDashboard() {
 
         <Collapse in={sidebarOpen}>
           <Box sx={{ textAlign: "center", p: 2 }}>
-          <Avatar sx={{ width: 75, height: 75, margin: "auto" }}>
-            {doctorName.charAt(0).toUpperCase()}
-          </Avatar>
-          <Typography variant="body1" mt={1}>
-            Dr. {doctorName}
-          </Typography>
-
+            <Avatar sx={{ width: 75, height: 75, margin: "auto" }}>
+              {doctorName.charAt(0).toUpperCase()}
+            </Avatar>
+            <Typography variant="body1" mt={1}>
+              Dr. {doctorName}
+            </Typography>
           </Box>
         </Collapse>
 
@@ -171,8 +193,8 @@ export default function DoctorDashboard() {
                 selected={selectedSection === item.text}
                 onClick={() => setSelectedSection(item.text)}
                 sx={{
-                  "&.Mui-selected": { backgroundColor: "rgba(0,0,0,0.3)", color: "rgb(198, 202, 226)" },
-                  "&:hover": { backgroundColor: "rgba(255, 255, 255, 0.2)" },
+                  "&.Mui-selected": { backgroundColor: "rgba(0,0,0,0.3)", color: "#fff" },
+                  "&:hover": { backgroundColor: "rgba(255,255,255,0.2)" },
                 }}
               >
                 <ListItemIcon sx={{ color: "#fff" }}>{item.icon}</ListItemIcon>
@@ -193,7 +215,7 @@ export default function DoctorDashboard() {
               }}
             >
               <ListItemIcon sx={{ color: "#ffdddd" }}>
-                <LogoutIcon /> 
+                <LogoutIcon />
               </ListItemIcon>
               {sidebarOpen && <ListItemText primary="Logout" />}
             </ListItemButton>
@@ -201,57 +223,13 @@ export default function DoctorDashboard() {
         </List>
       </Drawer>
 
-      {/* Main Content */}
       <Box sx={{ flexGrow: 1, padding: 3 }}>
-        <Typography variant="h4">Welcome Back, Dr. {doctorName}</Typography>
-
+        <Typography variant="h4" gutterBottom>
+          Welcome Back, Dr. {doctorName}
+        </Typography>
         <Typography variant="h6" color="text.secondary">
           Here's what's happening with your patients today!
         </Typography>
-
-        {/* Summary Cards */}
-        <Grid container spacing={3} mt={2}>
-          <Grid item xs={12} sm={6} md={3}>
-            <Card sx={{ padding: 2, textAlign: "center", background: "radial-gradient(rgb(136, 223, 255),rgb(130, 205, 255))", boxShadow: 3 }}>
-              <CardContent>
-                <PeopleIcon fontSize="large" />
-                <Typography variant="h6" sx={{ fontWeight: 600 }}>Total Patients</Typography>
-                <Typography variant="h4">{patients?.length || 0}</Typography>
-              </CardContent>
-            </Card>
-          </Grid>
-          <Grid item xs={12} sm={6} md={3}>
-            <Card sx={{ padding: 2, textAlign: "center", background: "radial-gradient(rgb(136, 223, 255),rgb(130, 205, 255))", boxShadow: 3 }}>
-              <CardContent>
-                <CalendarTodayIcon fontSize="large" />
-                <Typography variant="h6"sx={{ fontWeight: 600 }}>Today's Appointments</Typography>
-                <Typography variant="h4">{Math.floor(Math.random() * 20) + 5}</Typography>
-              </CardContent>
-            </Card>
-          </Grid>
-          <Grid item xs={12} sm={6} md={3}>
-            <Card sx={{ padding: 2, textAlign: "center", background: "radial-gradient(rgb(136, 223, 255),rgb(130, 205, 255))", boxShadow: 3 }}>
-              <CardContent>
-                <DescriptionIcon fontSize="large" />
-                <Typography variant="h6"sx={{ fontWeight: 600 }}>Pending Reports</Typography>
-                <Typography variant="h4">
-                  <Chip label={`${Math.floor(Math.random() * 10) + 1} Pending`} color="primary" />
-                </Typography>
-              </CardContent>
-            </Card>
-          </Grid>
-          <Grid item xs={12} sm={6} md={3}>
-            <Card sx={{ padding: 2, textAlign: "center", background: "radial-gradient(rgb(136, 223, 255),rgb(130, 205, 255))", boxShadow: 3 }}>
-              <CardContent>
-                <ChatIcon fontSize="large" />
-                <Typography variant="h6"sx={{ fontWeight: 600 }}>New Messages</Typography>
-                <Typography variant="h4">{Math.floor(Math.random() * 10)}</Typography>
-              </CardContent>
-            </Card>
-          </Grid>
-        </Grid>
-
-        {/* Dynamic Content */}
         <Box mt={3}>{renderContent()}</Box>
       </Box>
     </Box>
