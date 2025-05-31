@@ -64,7 +64,7 @@ export default function PatientDashboard() {
     switch (selectedSection) {
       case "Profile":
         return (
-          <Card sx={{ p: 3, boxShadow: 3 }}>
+          <Card sx={{ p: 3, boxShadow: 3, borderRadius: 2, backgroundColor: "#ffffff" }}>
             <CardContent>
               <Typography variant="h5" fontWeight="bold" gutterBottom>
                 Profile Summary

@@ -90,7 +90,7 @@ export default function PatientTestResultPage() {
         Status: {session.status} | Duration: {results.durationSeconds}s
       </Typography>
 
-      <Grid container spacing={3}>
+      <Grid container spacing={3} >
         <Grid item xs={12} md={6}>
           <Paper sx={{ backgroundColor: "#ffffff", boxShadow: 4, p: 2, borderRadius: 2 }}>
             <Typography variant="h6" color="#212121">🕒 Session Details</Typography>
@@ -105,6 +105,12 @@ export default function PatientTestResultPage() {
             <Typography>Duration: {results.durationSeconds}s</Typography>
           </Paper>
         </Grid>
+
+      
+
+
+      
+
 
         <Grid item xs={12} md={6}>
           <Paper sx={{ backgroundColor: "#ffffff", boxShadow: 4, p: 2, borderRadius: 2 }}>
