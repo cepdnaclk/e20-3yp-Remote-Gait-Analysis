@@ -78,6 +78,17 @@ public class TestSessionController {
     }
 
 
+    @PreAuthorize("hasRole('DOCTOR')")
+    @GetMapping("/doctors/me/patients/{patient-id}")
+    @Operation(
+            summary = "Get session details of the selected patient of the logged in doctor"
+    )
+    public ResponseEntity<List<TestSessionDetailsResponse>> getSessionsByIdOfPatientsOfLoggedInDoctor(@PathVariable("patient-id") Long id) {
+        List<TestSessionDetailsResponse> response = testSessionService.getSessionsByIdOfPatientsOfLoggedInDoctor(id);
+        return ResponseEntity.ok(response);
+    }
+
+
 
 
 

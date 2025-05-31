@@ -15,4 +15,6 @@ public interface TestSessionService {
     TestSessionDetailsResponse getTestSessionById(Long sessionId);
 
     List<TestSessionDetailsResponse> getSessionsOfLoggedInPatient();
+
+    List<TestSessionDetailsResponse> getSessionsByIdOfPatientsOfLoggedInDoctor(Long id);
 }
