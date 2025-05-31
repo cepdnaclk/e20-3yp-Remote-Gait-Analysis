@@ -3,7 +3,7 @@ import os
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from datetime import datetime
-from app.dynamo import fetch_session_data
+from app.utils.dynamo import fetch_session_data
 from dotenv import load_dotenv
 
 load_dotenv()
