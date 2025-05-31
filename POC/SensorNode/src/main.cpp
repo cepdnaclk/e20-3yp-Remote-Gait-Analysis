@@ -11,8 +11,11 @@ Adafruit_BNO055 bno = Adafruit_BNO055();
 
 const int fsrPins[16] = {36, 39, 34, 35, 32, 33, 25, 26, 27, 14, 12, 13, 4, 0, 2, 15};
 
-unsigned long syncedTime = 0;
-unsigned long lastSyncTime = 0;
+// unsigned long syncedTime = 0;
+// unsigned long lastSyncTime = 0;
+uint64_t syncedTime = 0;
+unsigned long lastSyncTime = 0;  // still fine since millis() is uint32_t
+
 bool calibrated = false;
 bool waitingForCalibration = true;
 
@@ -24,7 +27,9 @@ void sendCalibrationStatus() {
   bno.getCalibration(&sysCal, &gyroCal, &accelCal, &magCal);
   bool complete = (sysCal > 0 && gyroCal == 3 && accelCal > 0 && magCal == 3);
 
-  unsigned long ts = syncedTime + (millis() - lastSyncTime) / 1000;
+  // unsigned long ts = syncedTime + (millis() - lastSyncTime) / 1000;
+  uint64_t ts = syncedTime + (millis() - lastSyncTime);
+
 
   String calJSON = "{ \"type\": \"cal_status\", " +
                    String("\"device_id\": \"") + DEVICE_ID + "\", " +
@@ -46,7 +51,9 @@ void captureOrientationAndRespond() {
   initialPitch = euler.y();
   initialRoll = euler.z();
 
-  unsigned long ts = syncedTime + (millis() - lastSyncTime) / 1000;
+  // unsigned long ts = syncedTime + (millis() - lastSyncTime) / 1000;
+  uint64_t ts = syncedTime + (millis() - lastSyncTime);
+
 
   String msg = "{ \"type\": \"orientation_captured\", " +
                String("\"device_id\": \"") + DEVICE_ID + "\", " +
@@ -64,9 +71,11 @@ void startCalibration() {
 
   while (true) {
     bno.getCalibration(&sysCal, &gyroCal, &accelCal, &magCal);
-    bool complete = (sysCal = 3 && gyroCal == 3 && accelCal > 0 && magCal == 3);
+    bool complete = (sysCal > 0 && gyroCal == 3 && accelCal > 0 && magCal == 3);
 
-    unsigned long ts = syncedTime + (millis() - lastSyncTime) / 1000;
+    // unsigned long ts = syncedTime + (millis() - lastSyncTime) / 1000;
+    uint64_t ts = syncedTime + (millis() - lastSyncTime);
+
 
     String calJSON = "{ \"type\": \"cal_status\", " +
                      String("\"device_id\": \"") + DEVICE_ID + "\", " +
@@ -97,7 +106,7 @@ int readFSR(int pin) {
   return analogRead(pin);
 }
 
-String generateSensorData(unsigned long timestamp) {
+String generateSensorData(uint64_t timestamp) {
   int fsrValues[16];
   for (int i = 0; i < 16; i++) fsrValues[i] = readFSR(fsrPins[i]);
 
@@ -163,11 +172,14 @@ void loop() {
 
     if (command == "PING") {
       Serial2.println("ACK");
-    } else if (command.startsWith("SYNC_TIME:")) {
+    } else if (command.startsWith("SYNC_TIME_MS:")) {
       String ts = command.substring(command.indexOf(":") + 1);
-      syncedTime = ts.toInt();
+      // syncedTime = ts.toInt();
+      syncedTime = strtoull(ts.c_str(), nullptr, 10);  // Convert string to uint64_t
       lastSyncTime = millis();
-      Serial.printf("Time synced: %lu\n", syncedTime);
+      //Serial.printf("Time synced: %lu\n", syncedTime);
+      Serial.printf("Time synced: %llu\n", syncedTime);
+
     } else if (command == "START_CALIBRATION") {
       calibrated = false;
       waitingForCalibration = true;
@@ -182,7 +194,9 @@ void loop() {
         return;
       }
 
-      unsigned long currentTime = syncedTime + (millis() - lastSyncTime) / 1000;
+      // unsigned long currentTime = syncedTime + (millis() - lastSyncTime) / 1000;
+      uint64_t currentTime = syncedTime + (millis() - lastSyncTime);
+      Serial.printf("Current Time: %llu\n", currentTime);
       String payload = generateSensorData(currentTime);
       Serial2.println(payload);
     } else {
