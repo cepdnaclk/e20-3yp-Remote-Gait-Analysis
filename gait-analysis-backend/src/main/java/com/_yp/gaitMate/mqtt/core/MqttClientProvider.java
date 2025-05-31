@@ -1,7 +1,8 @@
 package com._yp.gaitMate.mqtt.core;
 
-import com.amazonaws.services.iot.client.AWSIotMqttClient;
+import com.amazonaws.services.iot.client.AWSIotConnectionStatus;
 import com.amazonaws.services.iot.client.AWSIotException;
+import com.amazonaws.services.iot.client.AWSIotMqttClient;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -28,8 +29,14 @@ public class MqttClientProvider {
         if (client == null) {
             log.info("Initializing AWS IoT MQTT Client");
             client = new AWSIotMqttClient(clientEndpoint, clientId, awsAccessKeyId, awsSecretAccessKey);
+        }
+
+        if (client.getConnectionStatus() != AWSIotConnectionStatus.CONNECTED) {
+            log.info("Connecting to AWS IoT Core...");
             client.connect();
             log.info("Connected to AWS IoT Core");
+        } else {
+            log.info("MQTT client already connected.");
         }
 
         return client;
