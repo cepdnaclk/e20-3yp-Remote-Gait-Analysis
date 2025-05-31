@@ -23,6 +23,7 @@ import GaitAnalysisTest from "./pages/patient/trash/GaitAnalysisTest";
 import WebSocketDashboard from "./pages/patient/WebSocketDashboard";
 import AddPatient from "./pages/clinic/AddPatientPage";
 import PatientTestSession from "./pages/patient/PatientTestSession";
+import PatientTestResultPage from "./pages/patient/PatientTestResultPage";
 
 import DoctorPatientsPage from "./pages/doctor/DoctorPatientsPage";
 import DoctorPatientProfilePage from "./pages/doctor/DoctorPatientProfilePage";
@@ -66,6 +67,15 @@ export default function App() {
               <PatientTestSession />
             </RoleBasedRoute>
           } />
+          {/*Test session result page */}
+          <Route path="/patient/test-session/:id" element={
+            <RoleBasedRoute allowedRoles={["ROLE_PATIENT"]}>
+              <PatientTestResultPage />
+            </RoleBasedRoute>
+          } />
+
+          {/* Gait Analysis Test Page Route */}
+
 
 
           {/* WebSocket Dashboard Page Route */}
