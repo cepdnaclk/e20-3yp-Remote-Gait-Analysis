@@ -3,7 +3,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import Login from "./pages/Login";
 import Home from "./pages/Home";
 import DoctorDashboard from "./pages/doctor/DoctorDashboard";
-import PatientProfile from "./pages/doctor/PatientProfile";
+//import PatientProfile from "./pages/doctor/PatientProfile";
 import RealTimeDashboard from "./pages/RealTimeDashboard";
 import Signup from "./pages/Signup";
 import AboutUs from "./pages/AboutUs";
@@ -23,6 +23,9 @@ import GaitAnalysisTest from "./pages/patient/trash/GaitAnalysisTest";
 import WebSocketDashboard from "./pages/patient/WebSocketDashboard";
 import AddPatient from "./pages/clinic/AddPatientPage";
 import PatientTestSession from "./pages/patient/PatientTestSession";
+
+import DoctorPatientsPage from "./pages/doctor/DoctorPatientsPage";
+import DoctorPatientProfilePage from "./pages/doctor/DoctorPatientProfilePage";
 
 
 // Create a Query Client instance for managing API data fetching, caching, and state updates
@@ -52,7 +55,7 @@ export default function App() {
             </RoleBasedRoute>
           } />
           {/* Patient Profile Page Route */}
-          <Route path="/patients/:id" element={<PatientProfile />} />
+          <Route path="/patients/:id" element={<DoctorPatientProfilePage />} />
           {/* Real-time Dashboard Page Route */}
           <Route path="/patients/:id/realtime" element={
             <RealTimeDashboard allowedRoles = {["ROLE_DOCTOR"]}>

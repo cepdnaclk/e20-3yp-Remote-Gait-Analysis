@@ -151,6 +151,24 @@ public class TestSessionServiceImpl implements TestSessionService {
                 .toList();
     }
 
+    @Override
+    public List<TestSessionDetailsResponse> getSessionsByIdOfPatientsOfLoggedInDoctor(Long id) {
+        Doctor doctor = authUtil.getLoggedInDoctor();
+
+        Patient patient = patientRepository.findById(id)
+                .orElseThrow(() -> new ApiException("Patient not found for ID: " + id));
+
+        if (patient.getDoctor().getId() != doctor.getId()){
+            throw new ApiException("This patient is not registered under you");
+        }
+
+        List<TestSession> testSessions = patient.getTestSessions();
+
+        return testSessions.stream()
+                .map(testSessionMapper::toDetailsResponse)
+                .toList();
+    }
+
     // =====================================
     // 🔽 PRIVATE HELPERS
     // =====================================
