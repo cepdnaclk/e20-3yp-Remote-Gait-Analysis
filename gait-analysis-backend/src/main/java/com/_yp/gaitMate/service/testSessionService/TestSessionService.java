@@ -5,6 +5,8 @@ import com._yp.gaitMate.dto.testSession.TestSessionActionDto;
 import com._yp.gaitMate.dto.testSession.StartTestSessionResponse;
 import com._yp.gaitMate.dto.testSession.TestSessionDetailsResponse;
 
+import java.util.List;
+
 public interface TestSessionService {
     StartTestSessionResponse startSession(TestSessionActionDto request);
 
@@ -12,4 +14,5 @@ public interface TestSessionService {
 
     TestSessionDetailsResponse getTestSessionById(Long sessionId);
 
+    List<TestSessionDetailsResponse> getSessionsOfLoggedInPatient();
 }

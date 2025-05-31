@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -26,14 +27,25 @@ public class TestSessionDetailsResponse {
     @Setter
     @Builder
     public static class ProcessedResults {
-        private Integer cadence;
-        private Integer stepLength;
-        private Integer strideLength;
-        private Double stepTime;
-        private Double strideTime;
-        private Double speed;
-        private Double symmetryIndex;
+        private Integer steps;
+        private Double cadence;
+        private AvgForce avgForce;
+        private Double balanceScore;
+        private Integer peakImpact;
+        private Double durationSeconds;
+        private Double avgSwingTime;
+        private Double avgStanceTime;
+        private List<Double> strideTimes;
         private String pressureResultsPath;
+    }
+
+    @Getter
+    @Setter
+    @Builder
+    public static class AvgForce {
+        private Double heel;
+        private Double toe;
+        private Double midfoot;
     }
 
     @Getter

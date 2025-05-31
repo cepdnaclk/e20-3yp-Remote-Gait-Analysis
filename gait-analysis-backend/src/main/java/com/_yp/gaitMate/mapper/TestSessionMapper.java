@@ -7,9 +7,6 @@ import com._yp.gaitMate.model.RawSensorData;
 import com._yp.gaitMate.model.TestSession;
 import org.springframework.stereotype.Component;
 
-/**
- * Maps TestSession and its nested entities to a full TestSessionDetailsResponse DTO.
- */
 @Component
 public class TestSessionMapper {
 
@@ -24,23 +21,33 @@ public class TestSessionMapper {
                 .startTime(session.getStartTime())
                 .endTime(session.getEndTime())
                 .status(session.getStatus())
+
                 .results(r != null ? TestSessionDetailsResponse.ProcessedResults.builder()
+                        .steps(r.getSteps())
                         .cadence(r.getCadence())
-                        .stepLength(r.getStepLength())
-                        .strideLength(r.getStrideLength())
-                        .stepTime(r.getStepTime())
-                        .strideTime(r.getStrideTime())
-                        .speed(r.getSpeed())
-                        .symmetryIndex(r.getSymmetryIndex())
+                        .avgForce(TestSessionDetailsResponse.AvgForce.builder()
+                                .heel(r.getAvgHeelForce())
+                                .toe(r.getAvgToeForce())
+                                .midfoot(r.getAvgMidfootForce())
+                                .build())
+                        .balanceScore(r.getBalanceScore())
+                        .peakImpact(r.getPeakImpact())
+                        .durationSeconds(r.getDurationSeconds())
+                        .avgSwingTime(r.getAvgSwingTime())
+                        .avgStanceTime(r.getAvgStanceTime())
+                        .strideTimes(r.getStrideTimes()) // ✅ Decoded from JSON string
                         .pressureResultsPath(r.getPressureResultsPath())
                         .build() : null)
+
                 .feedback(f != null ? TestSessionDetailsResponse.FeedbackDetails.builder()
                         .notes(f.getNotes())
                         .createdAt(f.getCreatedAt())
                         .build() : null)
+
                 .rawSensorData(d != null ? TestSessionDetailsResponse.RawDataFile.builder()
                         .path(d.getPath())
                         .build() : null)
+
                 .build();
     }
 }
