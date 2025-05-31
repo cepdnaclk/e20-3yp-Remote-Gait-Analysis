@@ -217,8 +217,14 @@ void loop() {
   // Time sync
   if (now - lastTimeSync >= TIME_SYNC_INTERVAL_MS) {
     timeClient.update();
-    unsigned long epoch = timeClient.getEpochTime();
-    Serial2.printf("SYNC_TIME:%lu\n", epoch);
+    // unsigned long epoch = timeClient.getEpochTime();
+    // Serial2.printf("SYNC_TIME:%lu\n", epoch);
+    // unsigned long epoch_ms = timeClient.getEpochTime() * 1000 + (millis() % 1000);  // sync in milliseconds
+    // Serial2.printf("SYNC_TIME_MS:%lu\n", epoch_ms);
+    uint64_t epoch_ms = static_cast<uint64_t>(timeClient.getEpochTime()) * 1000 + (millis() % 1000);
+    Serial2.printf("SYNC_TIME_MS:%llu\n", epoch_ms);
+
+
     lastTimeSync = now;
     Serial.println("Time Synced");
   }
