@@ -104,3 +104,34 @@
 🚀 Results sent to backend for session 2
 ✅ Finished processing session 2
 ✅ Message processed and deleted.
+
+
+
+⚙️ Processing session 1 from 2025-05-31 23:31:38.368000 to 2025-05-31 23:32:10.213000 for sensor 601 - yohan - right - 20
+
+🔍 [DEBUG] Fetching data for Sensor ID: 601
+🕒 [DEBUG] Start Time: 2025-05-31 23:31:38.368000 -> 1748714498368
+🕒 [DEBUG] End Time:   2025-05-31 23:32:10.213000 -> 1748714530213
+📦 [DEBUG] Retrieved 308 items from DynamoDB.
+
+📦 Retrieved 308 data points from DynamoDB
+🧠 Running dummy gait processing logic...
+❌ Failed to send results to backend: HTTPConnectionPool(host='localhost', port=8080): Max retries exceeded with url: /api/results (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x00000290E6E5FC50>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+🚀 Results sent to backend for session 1
+✅ Finished processing session 1
+✅ Message processed and deleted.
+
+
+⚙️ Processing session 1 from 2025-05-31 23:09:16.722000 to 2025-05-31 23:09:40.685000 for sensor 601 - yohan - right - 17
+
+🔍 [DEBUG] Fetching data for Sensor ID: 601
+🕒 [DEBUG] Start Time: 2025-05-31 23:09:16.722000 -> 1748713156722
+🕒 [DEBUG] End Time:   2025-05-31 23:09:40.685000 -> 1748713180685
+📦 [DEBUG] Retrieved 238 items from DynamoDB.
+
+📦 Retrieved 238 data points from DynamoDB
+🧠 Running dummy gait processing logic...
+❌ Failed to send results to backend: HTTPConnectionPool(host='localhost', port=8080): Max retries exceeded with url: /api/results (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x00000290E6EE3440>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+🚀 Results sent to backend for session 1
+✅ Finished processing session 1
+✅ Message processed and deleted.
