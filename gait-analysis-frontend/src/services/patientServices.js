@@ -34,3 +34,8 @@ export const updatePatient = (id, updateData) => {
 export const deletePatient = (id) => {
   return axios.delete(`/api/patients/${id}`);
 };
+
+// GET /api/patients/test-sessions/me — Get all test sessions for a patient
+export const getMyTestSessions = () => {
+  return axios.get("/api/test-sessions/me");
+};
