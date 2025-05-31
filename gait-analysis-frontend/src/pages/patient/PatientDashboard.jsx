@@ -24,7 +24,8 @@ import AssessmentIcon from "@mui/icons-material/Assessment";
 import LogoutIcon from "@mui/icons-material/Logout";
 
 import { useNavigate } from "react-router-dom";
-import { getPatientProfile } from "../../services/patientServices";
+import { getPatientProfile, getMyTestSessions } from "../../services/patientServices";
+
 
 export default function PatientDashboard() {
   const navigate = useNavigate();
@@ -32,17 +33,23 @@ export default function PatientDashboard() {
   const [selectedSection, setSelectedSection] = useState("Dashboard");
   const [patient, setPatient] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [testSessions, setTestSessions] = useState([]);
 
   useEffect(() => {
     const fetchProfile = async () => {
       try {
         const res = await getPatientProfile();
         setPatient(res.data);
+
+        const testRes = await getMyTestSessions();
+        console.log("Loaded test sessions:", testRes.data); 
+        setTestSessions(testRes.data);
       } catch (err) {
         console.error("Failed to fetch patient profile", err);
       } finally {
         setLoading(false);
       }
+    
     };
     fetchProfile();
   }, []);
@@ -76,24 +83,74 @@ export default function PatientDashboard() {
             </CardContent>
           </Card>
         );
-      case "Test Sessions":
-        return (
-          <Card sx={{ p: 3, boxShadow: 3 }}>
-            <CardContent>
-              <Typography variant="h5" fontWeight="bold" gutterBottom>
-                Test Sessions
-              </Typography>
-              <Typography>View and manage your gait test sessions.</Typography>
-              <Button
-                variant="contained"
-                sx={{ mt: 2 }}
-                onClick={() => navigate("/patient/test-session")}
-              >
-                Go to Test Session
-              </Button>
-            </CardContent>
-          </Card>
-        );
+        case "Test Sessions":
+  return (
+    <Grid container spacing={3}>
+      {/* Left: Go to Test Session */}
+      <Grid item xs={12} sm={6}>
+        <Card sx={{ p: 3, backgroundColor: "#7986cb", color: "white" }}>
+          <AssessmentIcon fontSize="large" />
+          <Typography variant="h6" gutterBottom>Run New Session</Typography>
+          <Typography variant="body1">
+            Start a gait analysis session using your assigned sensor kit.
+          </Typography>
+          <Button
+            variant="contained"
+            color="secondary"
+            sx={{ mt: 2 }}
+            onClick={() => navigate("/patient/test-session")}
+          >
+            Go to Test Session
+          </Button>
+        </Card>
+      </Grid>
+
+      {/* Right: Test Session History */}
+      <Grid item xs={12} sm={6}>
+        <Card sx={{ p: 3, boxShadow: 3 }}>
+          <CardContent>
+            <Typography variant="h5" fontWeight="bold" gutterBottom>
+              Test Session History
+            </Typography>
+            {testSessions.length === 0 ? (
+              <Typography>No sessions found.</Typography>
+            ) : (
+              <Grid container spacing={2}>
+                {testSessions.map((session) => (
+                  <Grid item xs={12} key={session.sessionId}>
+                    <Card
+                      variant="outlined"
+                      sx={{
+                        p: 2,
+                        cursor: "pointer",
+                        "&:hover": { backgroundColor: "#f9f9f9" },
+                      }}
+                      onClick={() => navigate(`/patient/test-session/${session.sessionId}`)}
+                    >
+                      <Typography variant="subtitle1" fontWeight="bold">
+                        Session #{session.sessionId}
+                      </Typography>
+                      <Typography variant="body2">
+                        🕒 {new Date(session.startTime).toLocaleString()}
+                      </Typography>
+                      <Typography variant="body2">
+                        👣 Steps: {session.results?.steps ?? "N/A"} | ⚖️ Balance: {session.results?.balanceScore ?? "N/A"}
+                      </Typography>
+                      <Typography variant="body2">
+                        🗒️ Feedback: {session.feedback?.notes?.substring(0, 100) || "No feedback yet..."}
+                      </Typography>
+                    </Card>
+                  </Grid>
+                ))}
+              </Grid>
+            )}
+          </CardContent>
+        </Card>
+      </Grid>
+    </Grid>
+  );
+
+        
       default:
         return (
           <Grid container spacing={3} mt={1}>
