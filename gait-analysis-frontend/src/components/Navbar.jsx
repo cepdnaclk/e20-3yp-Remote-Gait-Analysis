@@ -58,9 +58,6 @@ export default function Navbar() {
             <Button color="inherit" component={Link} to="/login">
               Login
             </Button>
-            <Button color="inherit" component={Link} to="/signup">
-              Sign Up
-            </Button>
           </Box>
 
           {/* Mobile Menu Button */}
@@ -87,9 +84,7 @@ export default function Navbar() {
             <MenuItem component={Link} to="/login" onClick={handleMenuClose}>
               Login
             </MenuItem>
-            <MenuItem component={Link} to="/signup" onClick={handleMenuClose}>
-              Sign Up
-            </MenuItem>
+            
           </Menu>
         </CustomToolbar>
       </Container>

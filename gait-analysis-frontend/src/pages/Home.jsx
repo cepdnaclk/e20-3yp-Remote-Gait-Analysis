@@ -95,7 +95,7 @@ export default function Home() {
             color="primary"
             size="large"
             component={Link}
-            to="/signup"
+            to="/login"
             sx={{ mr: 2 }}
           >
             Get Started

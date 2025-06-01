@@ -62,6 +62,8 @@ export default function PatientDashboard() {
 
   const renderContent = () => {
     switch (selectedSection) {
+
+      // case PROFILE
       case "Profile":
         return (
           <Card sx={{ p: 3, boxShadow: 3, borderRadius: 2, backgroundColor: "#ffffff" }}>
@@ -83,12 +85,14 @@ export default function PatientDashboard() {
             </CardContent>
           </Card>
         );
+
+        // case TEST SESSIONS
         case "Test Sessions":
   return (
     <Grid container spacing={3}>
       {/* Left: Go to Test Session */}
       <Grid item xs={12} sm={6}>
-        <Card sx={{ p: 3, backgroundColor: "#7986cb", color: "white" }}>
+        <Card sx={{ p: 3, backgroundColor: "#7986cb", color: "white", boxShadow: 3 }}>
           <AssessmentIcon fontSize="large" />
           <Typography variant="h6" gutterBottom>Run New Session</Typography>
           <Typography variant="body1">
@@ -106,10 +110,10 @@ export default function PatientDashboard() {
       </Grid>
 
       {/* Right: Test Session History */}
-      <Grid item xs={12} sm={6}>
-        <Card sx={{ p: 3, boxShadow: 3 }}>
+      <Grid item xs={12} sm={6} >
+        <Card sx={{ p: 3, boxShadow: 4 }} bgcolor="#F2F4F7">
           <CardContent>
-            <Typography variant="h5" fontWeight="bold" gutterBottom>
+            <Typography variant="h5" fontWeight="bold"  gutterBottom>
               Test Session History
             </Typography>
             {testSessions.length === 0 ? (
@@ -123,9 +127,12 @@ export default function PatientDashboard() {
                       sx={{
                         p: 2,
                         cursor: "pointer",
-                        "&:hover": { backgroundColor: "#f9f9f9" },
+                        "&:hover": { backgroundColor: "#F2F4F7" },
+                        borderLeft: session.status === "FAILED" ? "5px solid red" : "5px solid #3f51b5",
+                        backgroundColor: session.status === "FAILED" ? "#fff0f0" : "inherit",
                       }}
-                      onClick={() => navigate(`/patient/test-session/${session.sessionId}`)}
+                      onClick={() => {
+                        if (session.status !== "FAILED") navigate(`/patient/test-session/${session.sessionId}`)}}
                     >
                       <Typography variant="subtitle1" fontWeight="bold">
                         Session #{session.sessionId}
@@ -256,16 +263,27 @@ export default function PatientDashboard() {
       </Drawer>
 
       {/* Main Content */}
-      <Box sx={{ flexGrow: 1, p: 3 }}>
-        <Typography variant="h4" gutterBottom>
-          Patient Dashboard
-        </Typography>
-        <Typography variant="h6" color="text.secondary">
-          Welcome {patient.name}, manage your sessions and view insights below.
-        </Typography>
+      <Box sx={{ flexGrow: 1, p: 2 }}>
+        <Box
+          sx={{
+            backgroundColor: "#ffffff",
+            borderRadius: 2,
+            p: 3,
+            boxShadow: 5,
+          }}
+        >
+          <Typography variant="h4" gutterBottom>
+            Patient Dashboard
+          </Typography>
+          <Typography variant="h6" color="text.secondary">
+            Welcome {patient.name}, manage your sessions and view insights below.
+          </Typography>
 
-        <Box mt={3}>{renderContent()}</Box>
+          <Box mt={3}>{renderContent()}</Box>
+        </Box>
       </Box>
+
+      
     </Box>
   );
 }

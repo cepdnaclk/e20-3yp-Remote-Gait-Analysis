@@ -82,7 +82,7 @@ export default function PatientTestResultPage() {
   };
 
   return (
-    <Box sx={{ backgroundColor: "#eeeeee", minHeight: "100vh", p: 3 }}>
+    <Box sx={{ backgroundColor: "#F2F4F7", minHeight: "100vh", p: 3 }}>
       <Typography variant="h4" fontWeight="bold" color="#3f51b5" gutterBottom>
         Test Session #{session.sessionId}
       </Typography>
