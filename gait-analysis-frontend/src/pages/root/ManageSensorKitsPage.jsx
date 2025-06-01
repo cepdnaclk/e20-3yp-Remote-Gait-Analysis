@@ -55,14 +55,17 @@ export default function ManageSensorKitsPage() {
   };
 
   const handleAssign = async (kitId, clinicId) => {
-    try {
-      await assignSensorKits(clinicId, [kitId]);
-      setSnackbar({ open: true, message: 'Sensor kit assigned', severity: 'success' });
-      fetchData();
-    } catch (err) {
-      setSnackbar({ open: true, message: 'Assignment failed', severity: 'error' });
-    }
-  };
+  try {
+    console.log("Assigning kit", kitId, "to clinic", clinicId);
+    await assignSensorKits(clinicId, [kitId]);
+    setSnackbar({ open: true, message: 'Sensor kit assigned', severity: 'success' });
+    fetchData();
+  } catch (err) {
+    console.error("Assignment error:", err.response?.data || err.message);
+    setSnackbar({ open: true, message: 'Assignment failed', severity: 'error' });
+  }
+};
+
 
   const handleAddKit = async () => {
     try {
@@ -126,7 +129,7 @@ export default function ManageSensorKitsPage() {
                     <Select
                       displayEmpty
                       value=""
-                      onChange={(e) => handleAssign(kit.serialNo, e.target.value)}
+                      onChange={(e) => handleAssign(kit.id, e.target.value)}
                       sx={{ minWidth: 150 }}
                     >
                       <MenuItem disabled value="">
