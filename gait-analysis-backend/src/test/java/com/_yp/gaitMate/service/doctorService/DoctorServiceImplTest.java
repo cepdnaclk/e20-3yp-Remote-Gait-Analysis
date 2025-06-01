@@ -107,8 +107,8 @@ class DoctorServiceImplTest {
         void shouldCreateDoctor_andReturnResponse() {
             // Arrange
             when(doctorRepository.existsByName(request.getName())).thenReturn(false);
-            when(authUtil.loggedInUserId()).thenReturn(99L);
-            when(clinicRepository.findByUser_UserId(99L)).thenReturn(Optional.of(clinic));
+            //when(authUtil.loggedInUserId()).thenReturn(99L);
+            //when(clinicRepository.findByUser_UserId(99L)).thenReturn(Optional.of(clinic));
             when(authService.registerUser(any(SignupRequest.class))).thenReturn(doctor_user);
             when(doctorRepository.save(any(Doctor.class))).thenReturn(doctor);
             when(doctorMapper.toDoctorInfoResponse(any(Doctor.class))).thenReturn(doctorResponse);
@@ -123,7 +123,7 @@ class DoctorServiceImplTest {
 
             // Verify
             verify(doctorRepository).existsByName(request.getName());
-            verify(clinicRepository).findByUser_UserId(99L);
+            //verify(clinicRepository).findByUser_UserId(99L);
             verify(authService).registerUser(any(SignupRequest.class));
             verify(doctorRepository).save(any(Doctor.class));
             verify(doctorMapper).toDoctorInfoResponse(any(Doctor.class));
@@ -134,8 +134,9 @@ class DoctorServiceImplTest {
         void shouldThrow_whenClinicNotFound() {
             // Arrange
             when(doctorRepository.existsByName(request.getName())).thenReturn(false);
-            when(authUtil.loggedInUserId()).thenReturn(99L);
-            when(clinicRepository.findByUser_UserId(99L)).thenReturn(Optional.empty());
+            //when(authUtil.loggedInUserId()).thenReturn(99L);
+            //when(clinicRepository.findByUser_UserId(99L)).thenReturn(Optional.empty());
+            when(authUtil.getLoggedInClinic()).thenThrow(new ResourceNotFoundException("Clinic", "userId", 99L));
 
             // Act + Assert
             ResourceNotFoundException ex = assertThrows(ResourceNotFoundException.class,
@@ -144,7 +145,7 @@ class DoctorServiceImplTest {
             assertTrue(ex.getMessage().contains("Clinic not found with userId: 99"));
 
             // Verify
-            verify(clinicRepository).findByUser_UserId(99L);
+            //verify(clinicRepository).findByUser_UserId(99L);
             verifyNoInteractions(authService, doctorMapper);
             verify(doctorRepository, never()).save(any(Doctor.class));
         }
