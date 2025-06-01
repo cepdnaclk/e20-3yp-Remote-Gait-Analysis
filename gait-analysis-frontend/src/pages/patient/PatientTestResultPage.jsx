@@ -93,16 +93,57 @@ export default function PatientTestResultPage() {
       <Grid container spacing={3} >
         <Grid item xs={12} md={6}>
           <Paper sx={{ backgroundColor: "#ffffff", boxShadow: 4, p: 2, borderRadius: 2 }}>
-            <Typography variant="h6" color="#212121">🕒 Session Details</Typography>
-            <Typography>Start Time: {new Date(session.startTime).toLocaleString()}</Typography>
-            <Typography>End Time: {new Date(session.endTime).toLocaleString()}</Typography>
-            <Typography>Steps: {results.steps}</Typography>
-            <Typography>Cadence: {results.cadence} steps/min</Typography>
-            <Typography>Balance Score: {results.balanceScore}</Typography>
-            <Typography>Peak Impact: {results.peakImpact}</Typography>
-            <Typography>Swing Time: {results.avgSwingTime}s</Typography>
-            <Typography>Stance Time: {results.avgStanceTime}s</Typography>
-            <Typography>Duration: {results.durationSeconds}s</Typography>
+            <Typography variant="h6" color="#212121" fontWeight="bold" gutterBottom>
+              🕒 Session Details
+            </Typography>
+            <Grid container spacing={2}>
+              <Grid item xs={6}>
+                <Typography variant="body2" color="text.secondary">Start Time</Typography>
+                <Typography>{new Date(session.startTime).toLocaleString()}</Typography>
+              </Grid>
+
+              <Grid item xs={6}>
+                <Typography variant="body2" color="text.secondary">End Time</Typography>
+                <Typography>{new Date(session.endTime).toLocaleString()}</Typography>
+              </Grid>
+
+              <Grid item xs={6}>
+                <Typography variant="body2" color="text.secondary">Steps</Typography>
+                <Typography>{results.steps}</Typography>
+              </Grid>
+
+              <Grid item xs={6}>
+                <Typography variant="body2" color="text.secondary">Cadence</Typography>
+                <Typography>{results.cadence} steps/min</Typography>
+              </Grid>
+
+              <Grid item xs={6}>
+                <Typography variant="body2" color="text.secondary">Balance Score</Typography>
+                <Typography>{results.balanceScore}</Typography>
+              </Grid>
+
+              <Grid item xs={6}>
+                <Typography variant="body2" color="text.secondary">Peak Impact</Typography>
+                <Typography>{results.peakImpact}</Typography>
+              </Grid>
+
+              <Grid item xs={6}>
+                <Typography variant="body2" color="text.secondary">Swing Time</Typography>
+                <Typography>{results.avgSwingTime}s</Typography>
+              </Grid>
+
+              <Grid item xs={6}>
+                <Typography variant="body2" color="text.secondary">Stance Time</Typography>
+                <Typography>{results.avgStanceTime}s</Typography>
+              </Grid>
+
+              <Grid item xs={6}>
+                <Typography variant="body2" color="text.secondary">Duration</Typography>
+                <Typography>{results.durationSeconds}s</Typography>
+              </Grid>
+
+            </Grid>
+            
           </Paper>
         </Grid>
 
@@ -114,57 +155,98 @@ export default function PatientTestResultPage() {
 
         <Grid item xs={12} md={6}>
           <Paper sx={{ backgroundColor: "#ffffff", boxShadow: 4, p: 2, borderRadius: 2 }}>
-            <Typography variant="h6" color="#212121">🦶 Average Force Distribution</Typography>
-            <Typography>Heel: {avgForce.heel}</Typography>
-            <Typography>Midfoot: {avgForce.midfoot}</Typography>
-            <Typography>Toe: {avgForce.toe}</Typography>
-          </Paper>
-        </Grid>
-
-        <Grid item xs={12}>
-          <Paper sx={{ backgroundColor: "#ffffff", boxShadow: 4, p: 2, borderRadius: 2 }}>
-            <Typography variant="h6" color="#212121" gutterBottom>📈 Stride Time Chart</Typography>
-            {strideTimes.length > 0 ? (
-              <Line data={chartData} />
-            ) : (
-              <Typography>No stride time data available.</Typography>
-            )}
-          </Paper>
-        </Grid>
-
-        <Grid item xs={12}>
-          <Paper sx={{ backgroundColor: "#ffffff", boxShadow: 4, p: 2, borderRadius: 2 }}>
-            <Typography variant="h6" color="#212121">📄 Feedback</Typography>
-            <Typography fontStyle="italic" color="text.secondary">
-              {feedback?.createdAt && `Submitted on: ${new Date(feedback.createdAt).toLocaleString()}`}
+            <Typography variant="h6" color="#212121" fontWeight="bold" gutterBottom>
+              🦶 Average Force Distribution
             </Typography>
-            <Divider sx={{ my: 1 }} />
-            <Typography>{feedback?.notes || "No feedback provided."}</Typography>
+
+            <Grid container spacing={2}>
+              <Grid item xs={6}>
+                <Typography variant="body2" color="text.secondary">Heel</Typography>
+                <Typography>{avgForce.heel}</Typography>
+              </Grid>
+              <Grid item xs={6}>
+                <Typography variant="body2" color="text.secondary">Midfoot</Typography>
+                <Typography>{avgForce.midfoot}</Typography>
+              </Grid>
+              <Grid item xs={6}>
+                <Typography variant="body2" color="text.secondary">Toe</Typography>
+                <Typography>{avgForce.toe}</Typography>
+              </Grid>
+            </Grid>
           </Paper>
         </Grid>
 
+        <Grid container spacing={2} mt={1} marginLeft={1}>
+          {/* Stride Time Chart */}
+          <Grid item xs={12} md={6}>
+            <Paper sx={{ backgroundColor: "#ffffff", boxShadow: 4, p: 2, borderRadius: 2 }}>
+              <Typography variant="h6" color="#212121" fontWeight="bold" gutterBottom>📈 Stride Time Chart</Typography>
+              {strideTimes.length > 0 ? (
+                <Line data={chartData} />
+              ) : (
+                <Typography>No stride time data available.</Typography>
+              )}
+            </Paper>
+          </Grid>
+
+          {/* Force Over Time Chart Placeholder */}
+          <Grid item xs={12} md={6}>
+            <Paper sx={{ backgroundColor: "#ffffff", boxShadow: 4, p: 2, borderRadius: 2 }}>
+              <Typography variant="h6" color="#212121" fontWeight="bold" gutterBottom>💥 Force Over Time</Typography>
+              <Typography color="text.secondary">Coming soon or loading chart here</Typography>
+              {/* Replace this with <Line data={forceChartData} /> once available */}
+            </Paper>
+          </Grid>
+        </Grid>
+
         <Grid item xs={12}>
-          <Paper sx={{ backgroundColor: "#ffffff", boxShadow: 4, p: 2, borderRadius: 2 }}>
-            <Typography variant="h6" color="#212121">📂 Session Files</Typography>
-            <Box mt={1}>
+          <Paper sx={{ backgroundColor: "#ffffff", boxShadow: 4, p: 3, borderRadius: 2 }}>
+            <Typography variant="h6" color="#212121" fontWeight="bold" gutterBottom>
+              📄 Feedback
+            </Typography>
+
+            {feedback?.createdAt && (
+              <Typography variant="body2" color="text.secondary" gutterBottom>
+                <i>Submitted on:</i> {new Date(feedback.createdAt).toLocaleString()}
+              </Typography>
+            )}
+
+            <Divider sx={{ my: 2 }} />
+
+            <Typography variant="body1" sx={{ lineHeight: 1.8 }}>
+              {feedback?.notes || "No feedback provided."}
+            </Typography>
+          </Paper>
+        </Grid>
+
+
+        <Grid item xs={12}>
+          <Paper sx={{ backgroundColor: "#ffffff", boxShadow: 4, p: 3, borderRadius: 2 }}>
+            <Typography variant="h6" color="#212121" fontWeight="bold" gutterBottom>
+              📂 Session Files
+            </Typography>
+
+            <Box mt={2} display="flex" flexWrap="wrap" gap={2}>
               <Button
                 variant="outlined"
+                color="primary"
                 href={results.pressureResultsPath}
                 target="_blank"
-                sx={{ mr: 2 }}
               >
-                View Pressure Results
+                📊 View Pressure Results
               </Button>
               <Button
                 variant="outlined"
+                color="secondary"
                 href={rawSensorData?.path}
                 target="_blank"
               >
-                View Raw Sensor Data
+                📁 View Raw Sensor Data
               </Button>
             </Box>
           </Paper>
         </Grid>
+
       </Grid>
     </Box>
   );
