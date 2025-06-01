@@ -69,7 +69,7 @@ export default function App() {
           } />
           {/*Test session result page */}
           <Route path="/patient/test-session/:id" element={
-            <RoleBasedRoute allowedRoles={["ROLE_PATIENT"]}>
+            <RoleBasedRoute allowedRoles={["ROLE_PATIENT","ROLE_DOCTOR"]}>
               <PatientTestResultPage />
             </RoleBasedRoute>
           } />
