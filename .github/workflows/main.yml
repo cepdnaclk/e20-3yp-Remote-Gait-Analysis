@@ -19,6 +19,10 @@ jobs:
           distribution: 'temurin' # See 'Supported distributions' for available options
           java-version: '21'
 
+      - name: Make mvnw executable
+        working-directory: ./gait-analysis-backend
+        run: chmod +x ./mvnw
+
       - name: Unit Tests
         working-directory: ./gait-analysis-backend
         run: ./mvnw -B test --file pom.xml
