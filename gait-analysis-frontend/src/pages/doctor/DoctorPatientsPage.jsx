@@ -67,9 +67,16 @@ export default function DoctorPatientsPage({ patients, isLoading, error }) {
         />
       </Box>
 
-      <TableContainer component={Paper}>
-        <Table>
-          <TableHead>
+      <TableContainer 
+        component={Paper}
+        sx={{
+          boxShadow: 4,
+          borderRadius: 2,
+          overflow: "hidden",
+          border: "1px solid #e0e0e0",
+        }}>
+        <Table >
+          <TableHead sx={{ backgroundColor: "#f5f7fa"}}>
             <TableRow>
               <TableCell><strong>Name</strong></TableCell>
               <TableCell><strong>ID</strong></TableCell>
