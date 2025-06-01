@@ -132,12 +132,14 @@ public class TestSessionServiceImpl implements TestSessionService {
         TestSession session = testSessionRepository.findById(sessionId)
                 .orElseThrow(() -> new ApiException("Test session not found for ID: " + sessionId));
 
-        // Verify the user owns this session
-        if (!session.getPatient().getUser().getUserId().equals(userId)) {
-            throw new ApiException("Unauthorized access to this test session");
+        // Verify the user owns this session or user is the doctor of the session owned patient
+        if (session.getPatient().getUser().getUserId().equals(userId)
+        || session.getPatient().getDoctor().getUser().getUserId().equals(userId)) {
+            return testSessionMapper.toDetailsResponse(session);
         }
 
-        return testSessionMapper.toDetailsResponse(session);
+        throw new ApiException("Unauthorized access to this test session");
+
     }
 
     @Override

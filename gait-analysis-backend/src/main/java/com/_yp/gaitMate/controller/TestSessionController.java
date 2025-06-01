@@ -55,7 +55,7 @@ public class TestSessionController {
      * @param sessionId ID of the test session
      * @return Full session DTO
      */
-    @PreAuthorize("hasRole('PATIENT')")
+    @PreAuthorize("hasAnyRole('PATIENT', 'DOCTOR')")
     @GetMapping("/{id}")
     @Operation(
             summary = "Get session details by session-id"
