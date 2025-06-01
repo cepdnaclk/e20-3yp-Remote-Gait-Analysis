@@ -1,8 +1,8 @@
 spring:
   datasource:
-    url: {SPRING_DATASOURCE_URL}
-    username: {SPRING_DATASOURCE_USERNAME}
-    password: {SPRING_DATASOURCE_PASSWORD}
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
@@ -19,18 +19,18 @@ spring:
       mode: always
 
 jwt:
-  secret: {JWT_SECRET}
+  secret: ${JWT_SECRET}
   expiration:
     ms: 432000000
 
 
 mqtt:
   client:
-    endpoint: {MQTT_CLIENT_ENDPOINT}
-    id: {MQTT_CLIENT_ID}
+    endpoint: ${MQTT_CLIENT_ENDPOINT}
+    id: ${MQTT_CLIENT_ID}
   aws:
-    accessKey: {MQTT_AWS_ACCESS_KEY}
-    accessId: {MQTT_AWS_ACCESS_ID}
+    accessKey: ${MQTT_AWS_ACCESS_KEY}
+    accessId: ${MQTT_AWS_ACCESS_ID}
 
 cloud:
   aws:
