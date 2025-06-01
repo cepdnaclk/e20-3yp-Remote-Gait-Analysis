@@ -1,4 +1,3 @@
-// src/pages/doctor/DoctorPatientProfilePage.jsx
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
@@ -8,8 +7,13 @@ import {
   Grid,
   Button,
   CircularProgress,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  TextField,
+  DialogActions,
 } from "@mui/material";
-import { getDoctorPatients } from "../../services/doctorServices";
+import { getDoctorPatients, getPatientTestSession } from "../../services/doctorServices";
 
 export default function DoctorPatientProfilePage() {
   const { id } = useParams();
@@ -17,18 +21,43 @@ export default function DoctorPatientProfilePage() {
 
   const [patient, setPatient] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [reports, setReports] = useState([]);
+  const [selectedReport, setSelectedReport] = useState(null);
+  const [feedback, setFeedback] = useState("");
 
   useEffect(() => {
-    getDoctorPatients()
-      .then((res) => {
-        const selectedPatient = res.data.find((p) => p.id === parseInt(id));
-        setPatient(selectedPatient);
-      })
-      .catch((err) => {
-        console.error("Error fetching patient", err);
-      })
-      .finally(() => setLoading(false));
+    const loadPatientAndReports = async () => {
+      try {
+        const res = await getDoctorPatients();
+        const selected = res.data.find((p) => p.id === parseInt(id));
+        setPatient(selected);
+
+        if (selected) {
+          const reportRes = await getPatientTestSession(selected.id);
+          setReports(reportRes.data || []);
+        }
+      } catch (err) {
+        console.error("Error loading data:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadPatientAndReports();
   }, [id]);
+
+  const handleOpenReport = (report) => {
+    setSelectedReport(report);
+    setFeedback(report.feedback?.notes || "");
+  };
+
+  const handleCloseDialog = () => {
+    setSelectedReport(null);
+  };
+
+  const handleSaveFeedback = () => {
+    console.log("Updated feedback:", feedback);
+    handleCloseDialog();
+  };
 
   if (loading) {
     return (
@@ -62,6 +91,7 @@ export default function DoctorPatientProfilePage() {
 
       <Grid container spacing={3}>
         <Grid item xs={12} sm={6}>
+          <Box display="flex" flexDirection="column" gap={3} mb={3}>
           <Paper sx={{ p: 2 }}>
             <Typography variant="h6">Personal Details</Typography>
             <Typography><strong>Email:</strong> {patient.email}</Typography>
@@ -73,29 +103,87 @@ export default function DoctorPatientProfilePage() {
             <Typography><strong>Gender:</strong> {patient.gender}</Typography>
             <Typography><strong>Sensor Kit ID:</strong> {patient.sensorKitId}</Typography>
           </Paper>
-        </Grid>
-
-        <Grid item xs={12} sm={6}>
+        
           <Paper sx={{ p: 2 }}>
             <Typography variant="h6">History</Typography>
+            <Typography>Initial assessment: Stable gait with mild asymmetry.</Typography>
+            <Typography>Previous injuries: None reported.</Typography>
             <Typography>Recorded on: {new Date(patient.createdAt).toLocaleString()}</Typography>
           </Paper>
-        </Grid>
-
-        <Grid item xs={12} sm={6}>
+       
+          <Paper sx={{ p: 2 }}>
+            <Typography variant="h6">Treatment Plan</Typography>
+            <Typography>- Week 1-2: Balance and posture correction exercises</Typography>
+            <Typography>- Week 3-4: Strengthening lower limb muscles</Typography>
+            <Typography>- Week 5-6: Endurance and cadence drills</Typography>
+            <Typography>- Final week: Evaluation and readiness for discharge</Typography>
+          </Paper>
+          
           <Paper sx={{ p: 2 }}>
             <Typography variant="h6">Appointment History</Typography>
-            <Typography>No appointment records yet.</Typography>
+            <Typography>- 2024-04-05: Follow-up assessment</Typography>
+            <Typography>- 2024-04-19: Gait calibration session</Typography>
+            <Typography>- 2024-05-02: Cadence training evaluation</Typography>
           </Paper>
+        
+          </Box>
         </Grid>
 
-        <Grid item xs={12} sm={6}>
+        <Grid item xs={12} md={6}>
+          <Box display="flex" flexDirection="column" gap={3} alignItems="center" mb={3}>
           <Paper sx={{ p: 2 }}>
-            <Typography variant="h6">Report History</Typography>
-            <Typography>No reports available.</Typography>
+            <Typography variant="h6" mb={1}>Report History</Typography>
+            {reports.length === 0 ? (
+              <Typography>No reports available.</Typography>
+            ) : (
+              <Grid container spacing={2}>
+                {reports.map((report, idx) => (
+                  <Grid item xs={12} key={idx}>
+                    <Paper sx={{ p: 2, cursor: "pointer" }} onClick={() => handleOpenReport(report)}>
+                      <Typography variant="subtitle1"><strong>Session ID:</strong> {report.sessionId}</Typography>
+                      <Typography><strong>Date:</strong> {new Date(report.startTime).toLocaleDateString()}</Typography>
+                      <Typography><strong>Balance Score:</strong> {report.results?.balanceScore}</Typography>
+                      <Typography variant="body2" noWrap>
+                        <strong>Feedback:</strong> {report.feedback?.notes.slice(0, 60)}...
+                      </Typography>
+                    </Paper>
+                  </Grid>
+                ))}
+              </Grid>
+            )}
           </Paper>
+          </Box>
         </Grid>
       </Grid>
+
+      <Dialog open={!!selectedReport} onClose={handleCloseDialog} maxWidth="sm" fullWidth>
+        <DialogTitle>Report Details</DialogTitle>
+        <DialogContent>
+          {selectedReport && (
+            <>
+              <Typography><strong>Session ID:</strong> {selectedReport.sessionId}</Typography>
+              <Typography><strong>Date:</strong> {new Date(selectedReport.startTime).toLocaleString()}</Typography>
+              <Typography><strong>Status:</strong> {selectedReport.status}</Typography>
+              <Typography><strong>Steps:</strong> {selectedReport.results?.steps}</Typography>
+              <Typography><strong>Cadence:</strong> {selectedReport.results?.cadence}</Typography>
+              <Typography><strong>Balance Score:</strong> {selectedReport.results?.balanceScore}</Typography>
+              <TextField
+                fullWidth
+                multiline
+                rows={4}
+                margin="normal"
+                label="Doctor Feedback"
+                value={feedback}
+                onChange={(e) => setFeedback(e.target.value)}
+              />
+            </>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseDialog} color="secondary">Cancel</Button>
+          <Button onClick={handleSaveFeedback} variant="contained" color="primary">Save Feedback</Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 }

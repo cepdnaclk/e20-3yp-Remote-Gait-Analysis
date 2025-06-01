@@ -103,15 +103,7 @@ export default function DoctorPatientsPage({ patients, isLoading, error }) {
                     >
                       Realtime Gait
                     </Button>
-                    <IconButton
-                      color="error"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleRemovePatient(patient.id);
-                      }}
-                    >
-                      <DeleteIcon />
-                    </IconButton>
+                    
                   </TableCell>
                 </TableRow>
               ))
