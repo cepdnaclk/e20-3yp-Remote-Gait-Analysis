@@ -83,6 +83,7 @@ public class ProcessedTestResultsServiceImpl implements ProcessedTestResultsServ
         String username = session.getPatient().getUser().getUsername();
 
         ResultsNotificationMessage message = ResultsNotificationMessage.builder()
+                .sessionId(dto.getSessionId())
                 .type(WebSocketMessageType.RESULTS_READY)
                 .status(isSuccessful)
                 .timestamp(LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli())

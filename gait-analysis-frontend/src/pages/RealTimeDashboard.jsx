@@ -3,13 +3,12 @@ import { useParams } from "react-router-dom"; // ✅ To get the patient ID
 import { useEffect, useState } from "react";
 import axios from "axios";
 
-
 // import HeatmapComponent from "../components/HeatmapComponent";
 import InsoleHeatmap from "../components/heatmap/InsoleHeatmap.jsx";
 import InsoleHeatmapPattern from "../components/heatmap/InsoleHeatmapPattern.jsx";
 import HeatmapWebSock2 from "../components/heatmap/HeatmapWebSock2.jsx";
 import WebSocketCheck from "../components/heatmap/WebSockCheck.jsx";
-import HeatmapWebSock3Force from "../components/heatmap/HeatmapWebSock3Force.jsx";
+// import HeatmapWebSock3Force from "../components/heatmap/HeatmapWebSock3Force.jsx";
 
 // import HeatmapComponent from "../components/HeatmapComponent";
 import RealTimeGraph from "../components/RealTimeGraph";
@@ -20,7 +19,7 @@ import HeatmapWebSock3ForceOptimized from "../components/heatmap/HeatmapWebSock3
 
 export default function RealTimeDashboard() {
   const { id } = useParams(); // ✅ Get the patient ID from the URL
-  
+
   const [patient, setPatient] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);

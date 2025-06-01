@@ -17,6 +17,7 @@ public class NotificationService {
     private static final String TOPIC_CALIBRATION = "/topic/status/calibration";
     private static final String TOPIC_ORIENTATION = "/topic/status/orientation";
     private static final String TOPIC_SENSOR_DATA = "/topic/data/sensor";
+    private static final String TOPIC_RESULTS_READY = "/topic/status/results";
 
     public void sendDeviceAliveToUser(String username, DeviceAliveWebSocketMessage message) {
         try {
@@ -57,7 +58,7 @@ public class NotificationService {
     public void sendNotificationToUser(String username, ResultsNotificationMessage message) {
         try {
             log.info("📡 Sending SENSOR_DATA to [{}]: {}", username, message);
-            messagingTemplate.convertAndSendToUser(username, TOPIC_SENSOR_DATA, message);
+            messagingTemplate.convertAndSendToUser(username, TOPIC_RESULTS_READY, message);
         } catch (Exception e) {
             log.error("❌ Failed to send SENSOR_DATA to [{}]: {}", username, e.getMessage());
         }
