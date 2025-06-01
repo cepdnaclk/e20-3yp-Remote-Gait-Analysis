@@ -27,7 +27,7 @@ import HistoryIcon from "@mui/icons-material/History";
 
 import { useNavigate } from "react-router-dom";
 import { getPatientProfile, getMyTestSessions } from "../../services/patientServices";
-
+import { useMemo } from "react";
 
 export default function PatientDashboard() {
   const navigate = useNavigate();
@@ -62,7 +62,16 @@ export default function PatientDashboard() {
     { text: "Test Sessions", icon: <AssessmentIcon /> },
   ];
 
+  // Latest session
+  const latestSession = useMemo(() => {
+    return [...testSessions]
+      .filter((s) => s.status === "COMPLETED")
+      .sort((a, b) => new Date(b.startTime) - new Date(a.startTime))[0];
+  }, [testSessions]);
+
   const renderContent = () => {
+
+  
     switch (selectedSection) {
 
       case "Profile":
@@ -132,6 +141,7 @@ export default function PatientDashboard() {
                 {testSessions.map((session) => (
                   <Grid item xs={12} key={session.sessionId}>
                     <Card
+                    id = {`session-${session.sessionId}`}
                       variant="outlined"
                       sx={{
                         p: 2,
@@ -176,7 +186,28 @@ export default function PatientDashboard() {
                   <DescriptionIcon fontSize="large" />
                   <Typography variant="h6">Latest Report</Typography>
                   <Typography variant="body1">Reviewed on 2025-02-20</Typography>
-                  <Button variant="outlined" sx={{ mt: 2 }}>
+                  <Button
+                    variant="outlined"
+                    sx={{ mt: 2 }}
+                    onClick={() => {
+                      if (latestSession) {
+                        setSelectedSection("Test Sessions"); // 1. Show the right section
+                        setTimeout(() => {
+                          const el = document.getElementById(`session-${latestSession.sessionId}`);
+                          if (el) {
+                            el.scrollIntoView({ behavior: "smooth" });
+                            el.style.transition = "background-color 0.5s";
+                            el.style.backgroundColor = "#fff9c4";
+                            setTimeout(() => {
+                              el.style.backgroundColor = "";
+                            }, 1200);
+                          } else {
+                            console.warn("Element not found:", `session-${latestSession.sessionId}`);
+                          }
+                        }, 300); // 2. Wait for section to render
+                      }
+                    }}
+                  >
                     View Full Report
                   </Button>
                 </CardContent>
