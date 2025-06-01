@@ -94,13 +94,19 @@ import {
           Add Clinic
         </Button>
   
-        <TableContainer component={Paper}>
+        <TableContainer component={Paper}
+          sx={{
+            boxShadow: 4,
+            borderRadius: 2,
+            overflow: 'hidden',
+            border: '1px solid #e0e0e0',
+          }}>
           <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell>Clinic Name</TableCell>
-                <TableCell>Phone</TableCell>
-                <TableCell>Email</TableCell>
+            <TableHead sx={{ backgroundColor: "#f5f7fa" }}>
+              <TableRow >
+                <TableCell sx = {{fontWeight:"bold"}} >Clinic Name</TableCell>
+                <TableCell sx = {{fontWeight:"bold"}}>Phone</TableCell>
+                <TableCell sx = {{fontWeight:"bold"}}>Email</TableCell>
                 {/*<TableCell>Username</TableCell> */}
               </TableRow>
             </TableHead>

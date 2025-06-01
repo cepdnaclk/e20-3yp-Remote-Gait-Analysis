@@ -6,6 +6,7 @@ import {
     TableRow,
     TableCell,
     TableBody,
+    TableContainer,
     Paper,
     CircularProgress,
     Snackbar,
@@ -47,38 +48,47 @@ import {
           Patients
         </Typography>
   
-        <Paper>
+        <TableContainer
+          component={Paper}
+          sx={{
+            boxShadow: 4,
+            borderRadius: 2,
+            overflow: "hidden",
+            border: "1px solid #e0e0e0",
+          }}
+        >
           <Table size="small">
-            <TableHead>
+            <TableHead sx={{ backgroundColor: "#f5f7fa" }}>
               <TableRow>
-                <TableCell>Name</TableCell>
-                <TableCell>Age</TableCell>
-                <TableCell>Gender</TableCell>
-                <TableCell>Doctor</TableCell>
-                <TableCell>Sensor Kit</TableCell>
+                <TableCell sx={{ py: 2, px: 3, fontWeight: "bold" }}>Name</TableCell>
+                <TableCell sx={{ py: 2, px: 3, fontWeight: "bold" }}>Age</TableCell>
+                <TableCell sx={{ py: 2, px: 3, fontWeight: "bold" }}>Gender</TableCell>
+                <TableCell sx={{ py: 2, px: 3, fontWeight: "bold" }}>Doctor</TableCell>
+                <TableCell sx={{ py: 2, px: 3, fontWeight: "bold" }}>Sensor Kit</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {patients.length > 0 ? (
                 patients.map((p) => (
                   <TableRow key={p.id}>
-                    <TableCell>{p.name}</TableCell>
-                    <TableCell>{p.age}</TableCell>
-                    <TableCell>{p.gender}</TableCell>
-                    <TableCell>{p.doctor?.name || "Not assigned"}</TableCell>
-                    <TableCell>{p.sensorKit?.serialNo || "Not assigned"}</TableCell>
+                    <TableCell sx={{ py: 2, px: 3 }}>{p.name}</TableCell>
+                    <TableCell sx={{ py: 2, px: 3 }}>{p.age}</TableCell>
+                    <TableCell sx={{ py: 2, px: 3 }}>{p.gender}</TableCell>
+                    <TableCell sx={{ py: 2, px: 3 }}>{p.doctor?.name || "Not assigned"}</TableCell>
+                    <TableCell sx={{ py: 2, px: 3 }}>{p.sensorKit?.serialNo || "Not assigned"}</TableCell>
                   </TableRow>
                 ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={5} align="center">
+                  <TableCell colSpan={5} align="center" sx={{ py: 3 }}>
                     No patients registered.
                   </TableCell>
                 </TableRow>
               )}
             </TableBody>
           </Table>
-        </Paper>
+        </TableContainer>
+
   
         <Snackbar open={snackbar.open} autoHideDuration={4000} onClose={handleCloseSnackbar}>
           <Alert severity={snackbar.severity} onClose={handleCloseSnackbar} sx={{ width: "100%" }}>

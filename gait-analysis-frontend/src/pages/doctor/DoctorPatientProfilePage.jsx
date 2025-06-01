@@ -14,6 +14,13 @@ import {
   DialogActions,
 } from "@mui/material";
 import { getDoctorPatients, getPatientTestSession } from "../../services/doctorServices";
+import PersonIcon from "@mui/icons-material/Person";
+import HistoryEduIcon from "@mui/icons-material/HistoryEdu";
+import MedicalServicesIcon from "@mui/icons-material/MedicalServices";
+import ArticleIcon from "@mui/icons-material/Article";
+import EventNoteIcon from "@mui/icons-material/EventNote";
+import Divider from '@mui/material/Divider';
+
 
 export default function DoctorPatientProfilePage() {
   const { id } = useParams();
@@ -77,7 +84,7 @@ export default function DoctorPatientProfilePage() {
   }
 
   return (
-    <Box p={3}>
+    <Box p={4} sx={{ background: "#E0F7FA", height: "1800px" }}>
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
         <Typography variant="h4">Patient Profile: {patient.name}</Typography>
         <Button
@@ -92,8 +99,18 @@ export default function DoctorPatientProfilePage() {
       <Grid container spacing={3}>
         <Grid item xs={12} sm={6}>
           <Box display="flex" flexDirection="column" gap={3} mb={3}>
-          <Paper sx={{ p: 2 }}>
-            <Typography variant="h6">Personal Details</Typography>
+          <Paper elevation={3}
+              sx={{
+                p: 3,
+                borderRadius: 3,
+                backgroundColor: "#ffffff",
+                //background: "#E0F7FA",
+                boxShadow: "0px 2px 8px rgba(0,0,0,0.25)",
+              }}>
+            <Typography variant="h6" fontWeight="bold" gutterBottom>
+              👤 Personal Details
+            </Typography>
+            <Divider sx={{ mb: 2 }} />
             <Typography><strong>Email:</strong> {patient.email}</Typography>
             <Typography><strong>Phone:</strong> {patient.phoneNumber}</Typography>
             <Typography><strong>NIC:</strong> {patient.nic}</Typography>
@@ -104,23 +121,53 @@ export default function DoctorPatientProfilePage() {
             <Typography><strong>Sensor Kit ID:</strong> {patient.sensorKitId}</Typography>
           </Paper>
         
-          <Paper sx={{ p: 2 }}>
-            <Typography variant="h6">History</Typography>
+          <Paper elevation={3}
+                sx={{
+                  p: 3,
+                  borderRadius: 3,
+                  //background: "#E0F7FA",
+                   backgroundColor: "#ffffff",
+                  boxShadow: "0px 2px 8px rgba(0,0,0,0.25)",
+                }}>
+            <Typography variant="h6" fontWeight="bold" gutterBottom>
+            📋 History
+            </Typography>
+            <Divider sx={{ mb: 2 }} />
             <Typography>Initial assessment: Stable gait with mild asymmetry.</Typography>
             <Typography>Previous injuries: None reported.</Typography>
             <Typography>Recorded on: {new Date(patient.createdAt).toLocaleString()}</Typography>
           </Paper>
        
-          <Paper sx={{ p: 2 }}>
-            <Typography variant="h6">Treatment Plan</Typography>
+          <Paper elevation={3}
+              sx={{
+                p: 3,
+                borderRadius: 3,
+                 backgroundColor: "#ffffff",
+                //background: "#E0F7FA",
+                boxShadow: "0px 2px 8px rgba(0,0,0,0.25)",
+              }}>
+            <Typography variant="h6" fontWeight="bold" gutterBottom>
+            💊 Treatment Plan
+            </Typography>
+            <Divider sx={{ mb: 2 }} />
             <Typography>- Week 1-2: Balance and posture correction exercises</Typography>
             <Typography>- Week 3-4: Strengthening lower limb muscles</Typography>
             <Typography>- Week 5-6: Endurance and cadence drills</Typography>
             <Typography>- Final week: Evaluation and readiness for discharge</Typography>
           </Paper>
 
-          <Paper sx={{ p: 2 }}>
-            <Typography variant="h6">Appointment History</Typography>
+          <Paper elevation={3}
+              sx={{
+                p: 3,
+                borderRadius: 3,
+                  backgroundColor: "#ffffff", 
+                //background: "#E0F7FA",
+                boxShadow: "0px 2px 8px rgba(0,0,0,0.25)",
+              }}>
+            <Typography variant="h6" fontWeight="bold" gutterBottom>
+            📅 Appointment History
+            </Typography>
+            <Divider sx={{ mb: 2 }} />
             <Typography>- 2024-04-05: Follow-up assessment</Typography>
             <Typography>- 2024-04-19: Gait calibration session</Typography>
             <Typography>- 2024-05-02: Cadence training evaluation</Typography>
@@ -131,15 +178,35 @@ export default function DoctorPatientProfilePage() {
 
         <Grid item xs={12} md={6}>
           <Box display="flex" flexDirection="column" gap={3} alignItems="center" mb={3}>
-          <Paper sx={{ p: 2 }}>
-            <Typography variant="h6" mb={1}>Report History</Typography>
+          <Paper elevation={3}
+              sx={{
+                p: 3,
+                borderRadius: 3,
+                 backgroundColor: "#ffffff",
+                //background: "#E0F7FA",
+                boxShadow: "0px 2px 8px rgba(0,0,0,0.25)",
+              }}>
+            <Typography variant="h6" mb={1} fontWeight="bold">
+            📝 Report History
+            </Typography>
+            <Divider sx={{ mb: 2 }} />
             {reports.length === 0 ? (
               <Typography>No reports available.</Typography>
             ) : (
               <Grid container spacing={2}>
                 {reports.map((report, idx) => (
                   <Grid item xs={12} key={idx}>
-                    <Paper sx={{ p: 2, cursor: "pointer" }} onClick={() => navigate(`/patient/test-session/${report.sessionId}`)}>
+                    <Paper variant = "outlined"sx={{ 
+                            p: 2, 
+                            cursor: "pointer",
+                            borderLeft: "5px solid #3f51b5",
+                            transition: "all 0.3s ease",
+                            "&:hover": {
+                              backgroundColor: "#f0f8ff",
+                              boxShadow: 3
+                            },
+                         }} 
+                         onClick={() => navigate(`/patient/test-session/${report.sessionId}`)}>
                       <Typography variant="subtitle1"><strong>Session ID:</strong> {report.sessionId}</Typography>
                       <Typography><strong>Date:</strong> {new Date(report.startTime).toLocaleDateString()}</Typography>
                       <Typography><strong>Balance Score:</strong> {report.results?.balanceScore}</Typography>
@@ -157,8 +224,8 @@ export default function DoctorPatientProfilePage() {
       </Grid>
 
       <Dialog open={!!selectedReport} onClose={handleCloseDialog} maxWidth="sm" fullWidth>
-        <DialogTitle>Report Details</DialogTitle>
-        <DialogContent>
+        <DialogTitle fontWeight="bold">📝 Report Details</DialogTitle>
+        <DialogContent dividers>
           {selectedReport && (
             <>
               <Typography><strong>Session ID:</strong> {selectedReport.sessionId}</Typography>
