@@ -118,7 +118,7 @@ export default function DoctorPatientProfilePage() {
             <Typography>- Week 5-6: Endurance and cadence drills</Typography>
             <Typography>- Final week: Evaluation and readiness for discharge</Typography>
           </Paper>
-          
+
           <Paper sx={{ p: 2 }}>
             <Typography variant="h6">Appointment History</Typography>
             <Typography>- 2024-04-05: Follow-up assessment</Typography>
@@ -139,7 +139,7 @@ export default function DoctorPatientProfilePage() {
               <Grid container spacing={2}>
                 {reports.map((report, idx) => (
                   <Grid item xs={12} key={idx}>
-                    <Paper sx={{ p: 2, cursor: "pointer" }} onClick={() => handleOpenReport(report)}>
+                    <Paper sx={{ p: 2, cursor: "pointer" }} onClick={() => navigate(`/patient/test-session/${report.sessionId}`)}>
                       <Typography variant="subtitle1"><strong>Session ID:</strong> {report.sessionId}</Typography>
                       <Typography><strong>Date:</strong> {new Date(report.startTime).toLocaleDateString()}</Typography>
                       <Typography><strong>Balance Score:</strong> {report.results?.balanceScore}</Typography>

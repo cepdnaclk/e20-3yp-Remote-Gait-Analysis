@@ -3,7 +3,9 @@ import axiosInstance from './axiosInstance.js';
 export const getClinics = () => axiosInstance.get('/api/clinics');
 export const addClinic = (data) => axiosInstance.post('/api/clinics', data);
 
-export const getSensorKits = () => axiosInstance.get('/api/sensor-kits?status=IN_STOCK');
+export const getSensorKits = () => axiosInstance.get('/api/sensor-kits');
+export const getInStockSensorKits = () => axiosInstance.get('/api/sensor-kits?status=IN_STOCK');
+
 export const getSensorKitsByClinic = (clinicId) =>
   axiosInstance.get(`/api/sensor-kits?clinic_id=${clinicId}`);
 export const addSensorKit = (data) => axiosInstance.post('/api/sensor-kits', data);
