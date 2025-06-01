@@ -20,7 +20,7 @@ jobs:
           java-version: '21'
 
       - name: Unit Tests
-        run: ./mvn -B test --file gait-analysis-backend/pom.xml
+        run: mvn -B test --file gait-analysis-backend/pom.xml
 
       - name: Build the application
         run: |
