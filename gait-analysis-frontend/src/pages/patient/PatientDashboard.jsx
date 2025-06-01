@@ -22,6 +22,8 @@ import PersonIcon from "@mui/icons-material/Person";
 import DescriptionIcon from "@mui/icons-material/Description";
 import AssessmentIcon from "@mui/icons-material/Assessment";
 import LogoutIcon from "@mui/icons-material/Logout";
+import HistoryIcon from "@mui/icons-material/History";
+
 
 import { useNavigate } from "react-router-dom";
 import { getPatientProfile, getMyTestSessions } from "../../services/patientServices";
@@ -63,28 +65,34 @@ export default function PatientDashboard() {
   const renderContent = () => {
     switch (selectedSection) {
 
-      // case PROFILE
       case "Profile":
-        return (
-          <Card sx={{ p: 3, boxShadow: 3, borderRadius: 2, backgroundColor: "#ffffff" }}>
-            <CardContent>
-              <Typography variant="h5" fontWeight="bold" gutterBottom>
-                Profile Summary
-              </Typography>
-              <Typography>Name: {patient.name}</Typography>
-              <Typography>Email: {patient.email}</Typography>
-              <Typography>Phone: {patient.phoneNumber}</Typography>
-              <Typography>Age: {patient.age}</Typography>
-              <Typography>Height: {patient.height} cm</Typography>
-              <Typography>Weight: {patient.weight} kg</Typography>
-              <Typography>Gender: {patient.gender}</Typography>
-              <Typography>
-                Assigned Doctor: {patient.doctorName || "Not Assigned"}
-              </Typography>
-              
-            </CardContent>
-          </Card>
-        );
+  return (
+    <Card sx={{ p: 4, boxShadow: 4, borderRadius: 2, background: "#E0F7FA" }}>
+      <CardContent>
+        <Typography variant="h5" fontWeight="bold" marginTop={0} gutterBottom>
+          🧍 Profile Summary
+        </Typography>
+
+        <Grid container spacing={2} mt={1}>
+          <Grid item xs={12} sm={6}>
+            <Typography variant="body1" mb={1} fontSize={18}><strong>Name:</strong> {patient.name}</Typography>
+            <Typography variant="body1" mb={1} fontSize={18}><strong>Email:</strong> {patient.email}</Typography>
+            <Typography variant="body1" mb={1} fontSize={18}><strong>Phone:</strong> {patient.phoneNumber}</Typography>
+            <Typography variant="body1" mb={1} fontSize={18}><strong>Gender:</strong> {patient.gender}</Typography>
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <Typography variant="body1" mb={1} fontSize={18}><strong>Age:</strong> {patient.age}</Typography>
+            <Typography variant="body1" mb={1} fontSize={18}><strong>Height:</strong> {patient.height} cm</Typography>
+            <Typography variant="body1" mb={1} fontSize={18}><strong>Weight:</strong> {patient.weight} kg</Typography>
+            <Typography variant="body1" mb={1} fontSize={18}>
+              <strong>Assigned Doctor:</strong> {patient.doctorName || "Not Assigned"}
+            </Typography>
+          </Grid>
+        </Grid>
+      </CardContent>
+    </Card>
+  );
+
 
         // case TEST SESSIONS
         case "Test Sessions":
@@ -111,9 +119,10 @@ export default function PatientDashboard() {
 
       {/* Right: Test Session History */}
       <Grid item xs={12} sm={6} >
-        <Card sx={{ p: 3, boxShadow: 4 }} bgcolor="#F2F4F7">
+        <Card sx={{ p: 3, boxShadow: 4, background: "#E0F7FA" }} bgcolor="#F2F4F7">
           <CardContent>
-            <Typography variant="h5" fontWeight="bold"  gutterBottom>
+            <Typography variant="h5" fontWeight="bold"  gutterBottom sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+              <HistoryIcon fontSize="medium" />
               Test Session History
             </Typography>
             {testSessions.length === 0 ? (
@@ -162,7 +171,7 @@ export default function PatientDashboard() {
         return (
           <Grid container spacing={3} mt={1}>
             <Grid item xs={12} sm={6} md={6}>
-              <Card sx={{ p: 2, textAlign: "center", background: "#E0F7FA", boxShadow: 6 }}>
+              <Card sx={{ p: 2, textAlign: "center", height: "100%", background: "#E0F7FA", boxShadow: 6, display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
                 <CardContent>
                   <DescriptionIcon fontSize="large" />
                   <Typography variant="h6">Latest Report</Typography>
@@ -173,8 +182,10 @@ export default function PatientDashboard() {
                 </CardContent>
               </Card>
             </Grid>
+
+
             <Grid item xs={12} sm={6} md={6}>
-              <Card sx={{ p: 2, textAlign: "center", background: "#FFF3E0", boxShadow: 6 }}>
+              <Card sx={{ p: 2, textAlign: "center", background: "#FFF3E0", boxShadow: 6, height: "100%", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
                 <CardContent>
                   <DashboardIcon fontSize="large" />
                   <Typography variant="h6">Next Appointment</Typography>
@@ -270,9 +281,11 @@ export default function PatientDashboard() {
             borderRadius: 2,
             p: 3,
             boxShadow: 5,
+            height: "400px",
+            
           }}
         >
-          <Typography variant="h4" gutterBottom>
+          <Typography variant="h4" fontWeight="bold" gutterBottom>
             Patient Dashboard
           </Typography>
           <Typography variant="h6" color="text.secondary">
