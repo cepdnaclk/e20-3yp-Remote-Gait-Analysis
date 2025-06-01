@@ -25,6 +25,11 @@ jobs:
 
       - name: Unit Tests
         working-directory: ./gait-analysis-backend
+        env:
+          MQTT_CLIENT_ENDPOINT: ${{ secrets.MQTT_CLIENT_ENDPOINT }}
+          MQTT_CLIENT_ID: ${{ secrets.MQTT_CLIENT_ID }}
+          MQTT_AWS_ACCESS_KEY: ${{ secrets.MQTT_AWS_ACCESS_KEY }}
+          MQTT_AWS_ACCESS_ID: ${{ secrets.MQTT_AWS_ACCESS_ID }}
         run: ./mvnw -B test --file pom.xml
 
       - name: Build the application
