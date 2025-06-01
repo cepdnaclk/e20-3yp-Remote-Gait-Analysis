@@ -20,9 +20,11 @@ jobs:
           java-version: '21'
 
       - name: Unit Tests
-        run: mvn -B test --file gait-analysis-backend/pom.xml
+        working-directory: ./gait-analysis-backend
+        run: ./mvnw -B test --file pom.xml
 
       - name: Build the application
+        working-directory: ./gait-analysis-backend
         run: |
-          mvn clean
-          mvn -B package --file gait-analysis-backend/pom.xml
+          ./mvnw clean
+          ./mvnw -B package --file pom.xml
