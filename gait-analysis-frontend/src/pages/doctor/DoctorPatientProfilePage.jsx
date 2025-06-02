@@ -84,9 +84,12 @@ export default function DoctorPatientProfilePage() {
   }
 
   return (
-    <Box p={4} sx={{ background: "#E0F7FA", height: "1800px" }}>
+    <Box p={4} sx ={{
+        background: "linear-gradient(to bottom, rgb(28, 32, 57), rgb(6, 40, 97))",
+        minheight: "100vh"}}
+        >
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
-        <Typography variant="h4">Patient Profile: {patient.name}</Typography>
+        <Typography variant="h4" color='white'>Patient Profile: {patient.name}</Typography>
         <Button
           variant="contained"
           color="primary"
