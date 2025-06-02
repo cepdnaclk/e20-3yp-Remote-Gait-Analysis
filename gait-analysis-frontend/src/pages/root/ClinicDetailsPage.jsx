@@ -108,18 +108,24 @@ import {
     if (!clinic) return <Typography p={4}>Loading clinic details...</Typography>;
   
     return (
-      <Box p={4}>
+      <Box p={4} sx ={{
+        background: "linear-gradient(to bottom, rgb(28, 32, 57), rgb(6, 40, 97))",
+        minheight: "100vh"}}
+        >
         {/* Clinic Profile Card */}
         <Paper elevation={3} sx={{ p: 3, mb: 4 }}>
           <Typography variant="h5" gutterBottom>{clinic.name}</Typography>
           <Divider sx={{ mb: 2 }} />
           <Grid container spacing={2}>
             <Grid item xs={12} sm={6}>
-              <Typography><strong>Email:</strong> {clinic.email}</Typography>
-              <Typography><strong>Phone:</strong> {clinic.phoneNumber}</Typography>
+              <Typography variant="body2" color="text.secondary">Email : </Typography>
+              <Typography>{clinic.email}</Typography>
             </Grid>
             <Grid item xs={12} sm={6}>
-              <Typography><strong>Username:</strong> {clinic.username}</Typography>
+              <Typography variant="body2" color="text.secondary">Phone :</Typography>
+              <Typography>{clinic.phoneNumber}</Typography>
+            </Grid>
+            <Grid item xs={12} sm={6}>
               <Button color="error" variant="outlined" sx={{ mt: 2 }} onClick={() => setConfirmDelete(true)}>
                 Delete Clinic
               </Button>

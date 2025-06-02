@@ -53,7 +53,7 @@ export default function PatientTestResultPage() {
 
   if (loading) {
     return (
-      <Box display="flex" justifyContent="center" alignItems="center" height="100vh">
+      <Box display="flex" justifyContent="center" alignItems="center" minheight="100vh">
         <CircularProgress />
         <Typography ml={2}>Loading test session...</Typography>
       </Box>
@@ -82,11 +82,14 @@ export default function PatientTestResultPage() {
   };
 
   return (
-    <Box sx={{ backgroundColor: "#F2F4F7", minHeight: "100vh", p: 3 }}>
-      <Typography variant="h4" fontWeight="bold" color="#3f51b5" gutterBottom>
+    <Box p={4} sx ={{
+        background: "linear-gradient(to bottom, rgb(28, 32, 57), rgb(6, 40, 97))",
+        minheight: "100vh"}}
+        >
+      <Typography variant="h4" fontWeight="bold" color="#3f51b0" gutterBottom>
         Test Session #{session.sessionId}
       </Typography>
-      <Typography variant="subtitle1" gutterBottom color="text.secondary">
+      <Typography variant="subtitle1" gutterBottom color="white">
         Status: {session.status} | Duration: {results.durationSeconds}s
       </Typography>
 
