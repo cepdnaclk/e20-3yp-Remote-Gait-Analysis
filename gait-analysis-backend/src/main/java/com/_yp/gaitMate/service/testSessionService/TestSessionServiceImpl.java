@@ -246,9 +246,9 @@ public class TestSessionServiceImpl implements TestSessionService {
 
         long diffInSeconds = Math.abs(java.time.Duration.between(now, parsed).getSeconds());
 
-        if (diffInSeconds > 5) {
-            throw new ApiException("Timestamp must be within ±5 seconds of server time");
-        }
+//        if (diffInSeconds > 5) {
+//            throw new ApiException("Timestamp must be within ±5 seconds of server time");
+//        }
 
         return parsed;
     }

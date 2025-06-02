@@ -1,16 +1,21 @@
 # ============================================================================
-# EXACT API app/processor/gait_processor.py 
-# Returns ONLY the exact keys your backend API expects
+# FINAL COMPLETE app/processor/gait_processor.py - With PDF Report Integration
 # ============================================================================
 
 import numpy as np
+import os
+import time
 from app.algorithms.preprocessing import preprocess_sensor_dataframe
 from app.algorithms.gait_detection import detect_ic_to
 from app.algorithms.stride_estimation import count_steps_from_events, calculate_cadence, compute_valid_stride_times
 from app.processor.production_analyzer import ProductionGaitAnalyzer
+from app.visualization.gait_plots import generate_session_plots
+from app.reports.pdf_generator import generate_pdf_report
+from app.services.s3_service import create_s3_service
 
 class GaitProcessor:
-    def __init__(self):
+    def __init__(self, enable_plots: bool = True, enable_pdf_report: bool = True, 
+                 s3_bucket: str = "gait-analysis-reports"):
         # Initialize with your tested calibration factors
         self.analyzer = ProductionGaitAnalyzer(calibration_factors={
             'ZUPT Method': 1.201,      # From your 17% error session
@@ -18,10 +23,14 @@ class GaitProcessor:
             'Pendulum Model': 2.561,   # Consistent across sessions
             'Hybrid': 1.495           # Average performance
         }, verbose=False)  # Set to False to reduce console output
+        
+        self.enable_plots = enable_plots
+        self.enable_pdf_report = enable_pdf_report
+        self.s3_service = create_s3_service(s3_bucket)
     
     def compute(self, session_id, raw_data):
         """
-        EXACT same function signature and return format as your dummy implementation
+        Enhanced compute function with integrated plotting and PDF report generation
         
         Args:
             session_id: Session identifier  

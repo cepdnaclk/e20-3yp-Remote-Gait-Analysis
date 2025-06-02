@@ -65,4 +65,12 @@ public class ProcessedTestResults {
     @Convert(converter = com._yp.gaitMate.util.DoubleListToStringConverter.class)
     @Column(name = "stride_times", columnDefinition = "TEXT")
     private List<Double> strideTimes;
+
+
+    @Convert(converter = com._yp.gaitMate.util.DoubleListToStringConverter.class)
+    @Column(name = "stride_lengths", columnDefinition = "TEXT")
+    private List<Double> strideLengths;
+
+    @Column(nullable = true)
+    private Double strideLength;
 }
