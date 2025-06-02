@@ -161,6 +161,8 @@ public class PatientController {
         return ResponseEntity.ok(response);
     }
 
+
+
     // TODO:
     @DeleteMapping("patients/{id}")
     @PreAuthorize("hasRole('CLINIC')")

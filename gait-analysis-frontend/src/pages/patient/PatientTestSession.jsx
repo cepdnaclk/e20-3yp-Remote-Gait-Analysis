@@ -1,5 +1,14 @@
 import React, { useEffect, useState } from "react";
-import { Box, Container, Card, CardContent, Typography } from "@mui/material";
+import {
+  Box,
+  Container,
+  Card,
+  CardContent,
+  Typography,
+  Snackbar,
+  Alert,
+  Button,
+} from "@mui/material";
 import StepperHeader from "../../components/StepperHeader";
 import StepCalibration from "../../components/StepCalibration";
 import StepWearDevice from "../../components/StepWearDevice";
@@ -11,6 +20,7 @@ import {
 } from "../../services/websocketService";
 import sendCommand from "../../utils/sendCommand";
 import formatTime from "../../utils/formatTime";
+import { useNavigate } from "react-router-dom";
 
 const PatientTestSession = () => {
   const token = localStorage.getItem("token");
@@ -22,6 +32,12 @@ const PatientTestSession = () => {
   const [sensorData, setSensorData] = useState(null);
   const [sessionId, setSessionId] = useState(null);
   const [calibrationRequested, setCalibrationRequested] = useState(false);
+
+  const navigate = useNavigate();
+
+  // Toast notification state
+  const [showResultsNotification, setShowResultsNotification] = useState(false);
+  const [resultsSessionId, setResultsSessionId] = useState(null);
 
   const {
     activeStep,
@@ -73,6 +89,11 @@ const PatientTestSession = () => {
       onResultsReady: (data) => {
         console.log("📊 Results ready:", data);
         setResults(data);
+        // Show toast notification
+        if (data.sessionId) {
+          setResultsSessionId(data.sessionId);
+          setShowResultsNotification(true);
+        }
       },
     });
 
@@ -94,6 +115,17 @@ const PatientTestSession = () => {
       setTimeout(() => setActiveStep(2), 1000);
     }
   }, [orientationCaptured]);
+
+  // Handle showing results
+  const handleShowResults = () => {
+    setShowResultsNotification(false);
+    navigate(`/patient/test-session/${resultsSessionId}`);
+  };
+
+  // Handle closing notification
+  const handleCloseNotification = () => {
+    setShowResultsNotification(false);
+  };
 
   return (
     <Box
@@ -171,8 +203,8 @@ const PatientTestSession = () => {
           />
         )}
 
-        {/* {activeStep === 2 && ( */}
-        {true && (
+        {/* {true && ( */}
+        {activeStep === 2 && (
           <StepStartTest
             deviceStatus={deviceStatus}
             isRecording={isRecording}
@@ -188,6 +220,49 @@ const PatientTestSession = () => {
           />
         )}
       </Container>
+      {/* Results Ready Toast Notification */}
+      <Snackbar
+        open={showResultsNotification}
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+        sx={{ mt: 8 }}
+      >
+        <Alert
+          severity={results?.status ? "success" : "error"}
+          action={
+            results?.status ? (
+              <>
+                <Button
+                  color="inherit"
+                  size="small"
+                  onClick={handleShowResults}
+                  sx={{ mr: 1 }}
+                >
+                  Show Results
+                </Button>
+                <Button
+                  color="inherit"
+                  size="small"
+                  onClick={handleCloseNotification}
+                >
+                  ✕
+                </Button>
+              </>
+            ) : (
+              <Button
+                color="inherit"
+                size="small"
+                onClick={handleCloseNotification}
+              >
+                ✕
+              </Button>
+            )
+          }
+        >
+          {results?.status
+            ? "🎉 Test results are ready! Click 'Show Results' to view your gait analysis."
+            : "❌ Test processing failed. Please try running the test again."}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 };
