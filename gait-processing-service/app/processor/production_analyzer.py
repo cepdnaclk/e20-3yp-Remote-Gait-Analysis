@@ -21,7 +21,7 @@ class ProductionGaitAnalyzer:
     Production-ready gait analyzer that automatically selects the best method
     """
     
-    def __init__(self, calibration_factors: Optional[Dict[str, float]] = None, verbose: bool = False):
+    def __init__(self, calibration_factors: Optional[Dict[str, float]] = None, verbose: bool = True):
         """
         Initialize the production gait analyzer
         

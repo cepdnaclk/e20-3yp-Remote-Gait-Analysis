@@ -19,3 +19,7 @@ class GaitProcessor:
             "pressureResultsPath": "s3://bucket/heatmaps/session_1.png",
             "strideTimes": [1.02, 1.04, 1.01]
         }
+
+
+
+{"sensorId":601,"startTime":"2025-06-02T18:59:48.316","endTime":"2025-06-02T19:00:09.685","sessionId":2,"patientInfo":{"id":501,"name":"Patient 1","email":"patient1@example.com","phoneNumber":"0781111100","age":22,"height":165,"weight":60,"gender":"MALE","createdAt":"2025-06-03T02:07:26.136531","doctorId":401,"doctorName":"Dr. Alice","sensorKitId":601,"nic":"12345611"}}
