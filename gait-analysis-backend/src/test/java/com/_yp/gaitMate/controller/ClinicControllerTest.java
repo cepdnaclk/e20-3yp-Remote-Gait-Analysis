@@ -5,6 +5,7 @@ import com._yp.gaitMate.controller.config.IntegrationTestSupport;
 import com._yp.gaitMate.dto.ApiResponse;
 import com._yp.gaitMate.dto.clinic.ClinicInfoResponse;
 import com._yp.gaitMate.dto.clinic.CreateClinicRequest;
+import com._yp.gaitMate.mqtt.core.MqttClientProvider;
 import com._yp.gaitMate.repository.ClinicRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +14,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.jdbc.Sql;
 
 import java.util.Arrays;

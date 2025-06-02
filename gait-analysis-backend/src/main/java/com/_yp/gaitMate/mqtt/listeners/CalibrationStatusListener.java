@@ -22,8 +22,11 @@ import org.springframework.stereotype.Component;
  *   "type": "cal_status",
  *   "device_id": 34,
  *   "status": true,
- *   .
- *   .
+ *   "timestamp": 1321044433,
+ *   "sys": 3,
+ *   "gyro": 3,
+ *   "accel": 3,
+ *   "mag": 3
  * }
  * </pre>
  *

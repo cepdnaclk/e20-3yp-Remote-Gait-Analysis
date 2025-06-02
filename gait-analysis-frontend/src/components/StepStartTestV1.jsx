@@ -29,7 +29,6 @@ import HeatmapWebSock2 from "./heatmap/HeatmapWebSock2";
 
 import RealTimeGraphV2 from "./realtime-graphs/RealTimeGraph-v2.jsx";
 import FootOrientationGraphV2 from "./realtime-graphs/FootOrientationGraph-v2.jsx";
-import SceneV2 from "./footModel/SceneV2.jsx";
 
 const StepStartTest = ({
   isRecording,
@@ -144,7 +143,7 @@ const StepStartTest = ({
           </Grid>
         </Grid>
 
-        <Grid container spacing={4} sx={{ mb: 4 }}>
+        <Grid container spacing={4}>
           <Grid item xs={12} md={6} mt={4}>
             <Paper
               elevation={0}
@@ -276,23 +275,20 @@ const StepStartTest = ({
             )}
           </Grid>
 
-          {/* Tabbed Interface */}
-          <Grid item xs={12} md={6} sx={{ mt: 4 }}>
+          <Grid item xs={12} md={6} mt={4}>
+            <HeatmapWebSock3Force sensorData={sensorData} />
+          </Grid>
+          {/* Graphs */}
+          <Grid item xs={12} sm={5} md={5} sx={{ height: "400px" }}>
             <Paper
-              elevation={0}
               sx={{
                 padding: 2,
-                minHeight: "450px",
+                height: "400px",
                 display: "flex",
                 flexDirection: "column",
-                borderRadius: 4,
-                background:
-                  "linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.9) 100%)",
-                backdropFilter: "blur(20px)",
-                border: "1px solid rgba(255, 255, 255, 0.2)",
               }}
             >
-              <Typography variant="h6">Real-time Data</Typography>
+              <Typography variant="h6">Graphs</Typography>
               <Box
                 sx={{
                   display: "flex",
@@ -302,58 +298,27 @@ const StepStartTest = ({
                 }}
               >
                 <Button
-                  variant={activeTab === "heatmap" ? "contained" : "outlined"}
-                  onClick={() => setActiveTab("heatmap")}
-                  color="primary"
-                >
-                  Heatmap
-                </Button>
-                <Button
-                  variant={activeTab === "angles" ? "contained" : "outlined"}
-                  onClick={() => setActiveTab("angles")}
+                  variant={activeGraph === "angles" ? "contained" : "outlined"}
+                  onClick={() => setActiveGraph("angles")}
                   color="primary"
                 >
                   Angles
                 </Button>
                 <Button
-                  variant={activeTab === "pressure" ? "contained" : "outlined"}
-                  onClick={() => setActiveTab("pressure")}
+                  variant={
+                    activeGraph === "pressure" ? "contained" : "outlined"
+                  }
+                  onClick={() => setActiveGraph("pressure")}
                   color="secondary"
                 >
                   Pressure
                 </Button>
-                <Button
-                  variant={activeTab === "3d" ? "contained" : "outlined"}
-                  onClick={() => setActiveTab("3d")}
-                  color="info"
-                >
-                  3D Model
-                </Button>
               </Box>
-              <Box sx={{ flexGrow: 1, minHeight: "350px", overflow: "hidden" }}>
-                {activeTab === "heatmap" && (
-                  <HeatmapWebSock3Force sensorData={sensorData} />
-                )}
-                {activeTab === "angles" && (
-                  <Box sx={{ width: "100%", height: "400px" }}>
-                    <FootOrientationGraphV2 sensorData={sensorData} />
-                  </Box>
-                )}
-                {activeTab === "pressure" && (
-                  <Box sx={{ width: "100%", height: "400px" }}>
-                    <RealTimeGraphV2 sensorData={sensorData} />
-                  </Box>
-                )}
-                {activeTab === "3d" && (
-                  <Box
-                    sx={{
-                      width: "100%",
-                      height: "350px",
-                      backgroundColor: "rgba(1, 1, 1, 0.81)",
-                    }}
-                  >
-                    <SceneV2 sensorData={sensorData} />
-                  </Box>
+              <Box sx={{ flexGrow: 1, minHeight: "300px", height: "300px" }}>
+                {activeGraph === "angles" ? (
+                  <FootOrientationGraphV2 sensorData={sensorData} />
+                ) : (
+                  <RealTimeGraphV2 sensorData={sensorData} />
                 )}
               </Box>
             </Paper>
