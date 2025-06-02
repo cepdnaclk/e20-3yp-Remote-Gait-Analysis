@@ -108,18 +108,24 @@ import {
     if (!clinic) return <Typography p={4}>Loading clinic details...</Typography>;
   
     return (
-      <Box p={4}>
+      <Box p={4} sx ={{
+        background:  "linear-gradient(1deg, #e3e7ed 0%, #aab6d3 100%)",
+        minheight: "100vh"}}
+        >
         {/* Clinic Profile Card */}
-        <Paper elevation={3} sx={{ p: 3, mb: 4 }}>
-          <Typography variant="h5" gutterBottom>{clinic.name}</Typography>
+        <Paper elevation={3}  sx={{ p: 3, mb: 4, borderRadius: 4, boxShadow: 5 }}>
+          <Typography variant="h5" gutterBottom fontWeight="bold">{clinic.name}</Typography>
           <Divider sx={{ mb: 2 }} />
           <Grid container spacing={2}>
             <Grid item xs={12} sm={6}>
-              <Typography><strong>Email:</strong> {clinic.email}</Typography>
-              <Typography><strong>Phone:</strong> {clinic.phoneNumber}</Typography>
+              <Typography variant="body2" color="text.secondary">Email : </Typography>
+              <Typography>{clinic.email}</Typography>
             </Grid>
             <Grid item xs={12} sm={6}>
-              <Typography><strong>Username:</strong> {clinic.username}</Typography>
+              <Typography variant="body2" color="text.secondary">Phone :</Typography>
+              <Typography>{clinic.phoneNumber}</Typography>
+            </Grid>
+            <Grid item xs={12} sm={6}>
               <Button color="error" variant="outlined" sx={{ mt: 2 }} onClick={() => setConfirmDelete(true)}>
                 Delete Clinic
               </Button>
@@ -128,8 +134,8 @@ import {
         </Paper>
   
         {/* Assigned Sensor Kits */}
-        <Paper elevation={3} sx={{ p: 3, mb: 4 }}>
-          <Typography variant="h6" gutterBottom>Sensor Kits Assigned to This Clinic</Typography>
+        <Paper elevation={3} sx={{ p: 3, mb: 4 , borderRadius: 4, boxShadow: 5 }}>
+          <Typography variant="h6" fontWeight="bold" gutterBottom>Sensor Kits Assigned to This Clinic</Typography>
           <Table size="small">
             <TableHead>
               <TableRow>
@@ -172,8 +178,8 @@ import {
         </Paper>
   
         {/* Assign New Kits */}
-        <Paper elevation={3} sx={{ p: 3 }}>
-          <Typography variant="h6" gutterBottom>Assign New Sensor Kits to This Clinic</Typography>
+        <Paper elevation={3} sx={{ p: 3 , borderRadius: 4, boxShadow: 5 }}>
+          <Typography variant="h6" fontWeight="bold" gutterBottom>Assign New Sensor Kits to This Clinic</Typography>
           <FormControl fullWidth sx={{ mt: 2 }}>
             <InputLabel>Select Kits</InputLabel>
             <Select

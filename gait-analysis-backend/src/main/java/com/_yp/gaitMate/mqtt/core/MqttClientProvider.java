@@ -7,6 +7,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.util.UUID;
+
 @Service
 @Slf4j
 public class MqttClientProvider {
@@ -27,6 +29,10 @@ public class MqttClientProvider {
 
     public synchronized AWSIotMqttClient getClient() throws AWSIotException {
         if (client == null) {
+            String randomSuffix = UUID.randomUUID().toString().substring(0, 8);
+
+            clientId = "springBootApp-" + randomSuffix;
+
             log.info("Initializing AWS IoT MQTT Client");
             client = new AWSIotMqttClient(clientEndpoint, clientId, awsAccessKeyId, awsSecretAccessKey);
         }

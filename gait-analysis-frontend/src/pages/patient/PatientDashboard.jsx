@@ -22,10 +22,12 @@ import PersonIcon from "@mui/icons-material/Person";
 import DescriptionIcon from "@mui/icons-material/Description";
 import AssessmentIcon from "@mui/icons-material/Assessment";
 import LogoutIcon from "@mui/icons-material/Logout";
+import HistoryIcon from "@mui/icons-material/History";
+
 
 import { useNavigate } from "react-router-dom";
 import { getPatientProfile, getMyTestSessions } from "../../services/patientServices";
-
+import { useMemo } from "react";
 
 export default function PatientDashboard() {
   const navigate = useNavigate();
@@ -60,35 +62,54 @@ export default function PatientDashboard() {
     { text: "Test Sessions", icon: <AssessmentIcon /> },
   ];
 
+  // Latest session
+  const latestSession = useMemo(() => {
+    return [...testSessions]
+      .filter((s) => s.status === "COMPLETED")
+      .sort((a, b) => new Date(b.startTime) - new Date(a.startTime))[0];
+  }, [testSessions]);
+
   const renderContent = () => {
+
+  
     switch (selectedSection) {
+
       case "Profile":
-        return (
-          <Card sx={{ p: 3, boxShadow: 3 }}>
-            <CardContent>
-              <Typography variant="h5" fontWeight="bold" gutterBottom>
-                Profile Summary
-              </Typography>
-              <Typography>Name: {patient.name}</Typography>
-              <Typography>Email: {patient.email}</Typography>
-              <Typography>Phone: {patient.phoneNumber}</Typography>
-              <Typography>Age: {patient.age}</Typography>
-              <Typography>Height: {patient.height} cm</Typography>
-              <Typography>Weight: {patient.weight} kg</Typography>
-              <Typography>Gender: {patient.gender}</Typography>
-              <Typography>
-                Assigned Doctor: {patient.doctorName || "Not Assigned"}
-              </Typography>
-              
-            </CardContent>
-          </Card>
-        );
+  return (
+    <Card sx={{ p: 3, boxShadow: 4, borderRadius: 2, background: "#E0F7FA" }}>
+      <CardContent>
+        <Typography variant="h5" fontWeight="bold" marginTop={0} gutterBottom>
+          🧍 Profile Summary
+        </Typography>
+
+        <Grid container spacing={2} mt={1}>
+          <Grid item xs={12} sm={6}>
+            <Typography variant="body1" mb={1} fontSize={18}><strong>Name:</strong> {patient.name}</Typography>
+            <Typography variant="body1" mb={1} fontSize={18}><strong>Email:</strong> {patient.email}</Typography>
+            <Typography variant="body1" mb={1} fontSize={18}><strong>Phone:</strong> {patient.phoneNumber}</Typography>
+            <Typography variant="body1" mb={1} fontSize={18}><strong>Gender:</strong> {patient.gender}</Typography>
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <Typography variant="body1" mb={1} fontSize={18}><strong>Age:</strong> {patient.age}</Typography>
+            <Typography variant="body1" mb={1} fontSize={18}><strong>Height:</strong> {patient.height} cm</Typography>
+            <Typography variant="body1" mb={1} fontSize={18}><strong>Weight:</strong> {patient.weight} kg</Typography>
+            <Typography variant="body1" mb={1} fontSize={18}>
+              <strong>Assigned Doctor:</strong> {patient.doctorName || "Not Assigned"}
+            </Typography>
+          </Grid>
+        </Grid>
+      </CardContent>
+    </Card>
+  );
+
+
+        // case TEST SESSIONS
         case "Test Sessions":
   return (
     <Grid container spacing={3}>
       {/* Left: Go to Test Session */}
       <Grid item xs={12} sm={6}>
-        <Card sx={{ p: 3, backgroundColor: "#7986cb", color: "white" }}>
+        <Card sx={{ p: 5, backgroundColor: "#7986cb", color: "white", boxShadow: 3 }}>
           <AssessmentIcon fontSize="large" />
           <Typography variant="h6" gutterBottom>Run New Session</Typography>
           <Typography variant="body1">
@@ -105,69 +126,67 @@ export default function PatientDashboard() {
         </Card>
       </Grid>
 
-      {/* Right: Test Session History */}
-      <Grid item xs={12} sm={6}>
-        <Card sx={{ p: 3, boxShadow: 3 }}>
-          <CardContent>
-            <Typography variant="h5" fontWeight="bold" gutterBottom>
-              Test Session History
-            </Typography>
-            {testSessions.length === 0 ? (
-              <Typography>No sessions found.</Typography>
-            ) : (
-              <Grid container spacing={2}>
-                {testSessions.map((session) => (
-                  <Grid item xs={12} key={session.sessionId}>
-                    <Card
-                      variant="outlined"
-                      sx={{
-                        p: 2,
-                        cursor: "pointer",
-                        "&:hover": { backgroundColor: "#f9f9f9" },
-                      }}
-                      onClick={() => navigate(`/patient/test-session/${session.sessionId}`)}
-                    >
-                      <Typography variant="subtitle1" fontWeight="bold">
-                        Session #{session.sessionId}
-                      </Typography>
-                      <Typography variant="body2">
-                        🕒 {new Date(session.startTime).toLocaleString()}
-                      </Typography>
-                      <Typography variant="body2">
-                        👣 Steps: {session.results?.steps ?? "N/A"} | ⚖️ Balance: {session.results?.balanceScore ?? "N/A"}
-                      </Typography>
-                      <Typography variant="body2">
-                        🗒️ Feedback: {session.feedback?.notes?.substring(0, 100) || "No feedback yet..."}
-                      </Typography>
-                    </Card>
-                  </Grid>
-                ))}
-              </Grid>
-            )}
-          </CardContent>
-        </Card>
-      </Grid>
+      
     </Grid>
   );
 
-        
+      {/* DASHBOARD SECTION */}  
       default:
         return (
           <Grid container spacing={3} mt={1}>
             <Grid item xs={12} sm={6} md={6}>
-              <Card sx={{ p: 2, textAlign: "center", background: "#E0F7FA", boxShadow: 6 }}>
+              <Card sx={{ p: 2, textAlign: "center", height: "100%", background: "#E0F7FA", boxShadow: 6, display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
                 <CardContent>
                   <DescriptionIcon fontSize="large" />
                   <Typography variant="h6">Latest Report</Typography>
-                  <Typography variant="body1">Reviewed on 2025-02-20</Typography>
-                  <Button variant="outlined" sx={{ mt: 2 }}>
+                  <Typography variant="body1">
+                    Reviewed on{" "}
+                    {latestSession
+                      ? new Date(latestSession.endTime).toLocaleDateString()
+                      : "N/A"}
+                  </Typography>
+
+                  <Button
+                    variant="outlined"
+                    sx={{ mt: 2 }}
+                    onClick={() => {
+                      if (latestSession) {
+                        
+                          const el = document.getElementById(`session-${latestSession.sessionId}`);
+                          if (el) {
+
+                            // Smooth scroll into view
+                            el.scrollIntoView({ behavior: "smooth" });
+
+                            // Highlight the element
+                            el.style.transition = "background-color 0.5s";
+                            el.style.backgroundColor = "#fff9c4";
+
+                            // Delay to remove highlight
+                            setTimeout(() => {
+                              el.style.backgroundColor = "";
+                            }, 1200);
+
+                            // Trigger click to navigate
+                            setTimeout(() => {
+                              el.click();
+                            }, 600); // Delay to allow scroll/animation first
+                          } else {
+                            console.warn("Element not found:", `session-${latestSession.sessionId}`);
+                          }
+                         
+                      }
+                    }}
+                  >
                     View Full Report
                   </Button>
                 </CardContent>
               </Card>
             </Grid>
+
+
             <Grid item xs={12} sm={6} md={6}>
-              <Card sx={{ p: 2, textAlign: "center", background: "#FFF3E0", boxShadow: 6 }}>
+              <Card sx={{ p: 2, textAlign: "center", background: "#FFF3E0", boxShadow: 6, height: "100%", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
                 <CardContent>
                   <DashboardIcon fontSize="large" />
                   <Typography variant="h6">Next Appointment</Typography>
@@ -177,6 +196,54 @@ export default function PatientDashboard() {
                   <Typography variant="body2" color="text.secondary">
                     with {patient.doctor?.name || "N/A"}
                   </Typography>
+                </CardContent>
+              </Card>
+            </Grid>
+
+            {/* Right: Test Session History */}
+            <Grid item xs={12} sm={12} marginTop={8} >
+              <Card sx={{ p: 3, boxShadow: 4, background: "#E0F7FA" }} bgcolor="#F2F4F7">
+                <CardContent>
+                  <Typography variant="h5" fontWeight="bold"  gutterBottom sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                    <HistoryIcon fontSize="medium" />
+                    Test Session History
+                  </Typography>
+                  {testSessions.length === 0 ? (
+                    <Typography>No sessions found.</Typography>
+                  ) : (
+                    <Grid container spacing={2}>
+                      {testSessions.map((session) => (
+                        <Grid item xs={12} key={session.sessionId}>
+                          <Card
+                          id = {`session-${session.sessionId}`}
+                            variant="outlined"
+                            sx={{
+                              p: 2,
+                              cursor: "pointer",
+                              "&:hover": { backgroundColor: "#F2F4F7" },
+                              borderLeft: session.status === "FAILED" ? "5px solid red" : "5px solid #3f51b5",
+                              backgroundColor: session.status === "FAILED" ? "#fff0f0" : "inherit",
+                            }}
+                            onClick={() => {
+                              if (session.status !== "FAILED") navigate(`/patient/test-session/${session.sessionId}`)}}
+                          >
+                            <Typography variant="subtitle1" fontWeight="bold">
+                              Session #{session.sessionId}
+                            </Typography>
+                            <Typography variant="body2">
+                              🕒 {new Date(session.startTime).toLocaleString()}
+                            </Typography>
+                            <Typography variant="body2">
+                              👣 Steps: {session.results?.steps ?? "N/A"} | ⚖️ Balance: {session.results?.balanceScore ?? "N/A"}
+                            </Typography>
+                            <Typography variant="body2">
+                              🗒️ Feedback: {session.feedback?.notes?.substring(0, 100) || "No feedback yet..."}
+                            </Typography>
+                          </Card>
+                        </Grid>
+                      ))}
+                    </Grid>
+                  )}
                 </CardContent>
               </Card>
             </Grid>
@@ -256,16 +323,29 @@ export default function PatientDashboard() {
       </Drawer>
 
       {/* Main Content */}
-      <Box sx={{ flexGrow: 1, p: 3 }}>
-        <Typography variant="h4" gutterBottom>
-          Patient Dashboard
-        </Typography>
-        <Typography variant="h6" color="text.secondary">
-          Welcome {patient.name}, manage your sessions and view insights below.
-        </Typography>
+      <Box sx={{ flexGrow: 1, p: 2 }}>
+        <Box
+          sx={{
+            backgroundColor: "#ffffff",
+            borderRadius: 2,
+            p: 3,
+            boxShadow: 5,
+            height: "400px",
+            
+          }}
+        >
+          <Typography variant="h4" fontWeight="bold" gutterBottom>
+            Patient Dashboard
+          </Typography>
+          <Typography variant="h6" color="text.secondary">
+            Welcome {patient.name}, manage your sessions and view insights below.
+          </Typography>
 
-        <Box mt={3}>{renderContent()}</Box>
+          <Box mt={3}>{renderContent()}</Box>
+        </Box>
       </Box>
+
+      
     </Box>
   );
 }

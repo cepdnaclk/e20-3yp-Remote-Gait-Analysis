@@ -55,14 +55,17 @@ export default function ManageSensorKitsPage() {
   };
 
   const handleAssign = async (kitId, clinicId) => {
-    try {
-      await assignSensorKits(clinicId, [kitId]);
-      setSnackbar({ open: true, message: 'Sensor kit assigned', severity: 'success' });
-      fetchData();
-    } catch (err) {
-      setSnackbar({ open: true, message: 'Assignment failed', severity: 'error' });
-    }
-  };
+  try {
+    console.log("Assigning kit", kitId, "to clinic", clinicId);
+    await assignSensorKits(clinicId, [kitId]);
+    setSnackbar({ open: true, message: 'Sensor kit assigned', severity: 'success' });
+    fetchData();
+  } catch (err) {
+    console.error("Assignment error:", err.response?.data || err.message);
+    setSnackbar({ open: true, message: 'Assignment failed', severity: 'error' });
+  }
+};
+
 
   const handleAddKit = async () => {
     try {
@@ -101,15 +104,21 @@ export default function ManageSensorKitsPage() {
         Add New Sensor Kit
       </Button>
 
-      <TableContainer component={Paper}>
+      <TableContainer component={Paper}
+        sx={{
+          boxShadow: 4,
+          borderRadius: 2,
+          overflow: 'hidden',
+          border: '1px solid #e0e0e0',
+        }}>
         <Table>
-          <TableHead>
+          <TableHead sx={{ backgroundColor: "#f5f7fa" }}>
             <TableRow>
-              <TableCell>Serial No</TableCell>
-              <TableCell>Firmware</TableCell>
-              <TableCell>Status</TableCell>
-              <TableCell>Assigned Clinic</TableCell>
-              <TableCell>Assign</TableCell>
+              <TableCell sx = {{fontWeight:"bold"}}>Serial No</TableCell>
+              <TableCell sx = {{fontWeight:"bold"}}>Firmware</TableCell>
+              <TableCell sx = {{fontWeight:"bold"}}>Status</TableCell>
+              <TableCell sx = {{fontWeight:"bold"}}>Assigned Clinic</TableCell>
+              <TableCell sx = {{fontWeight:"bold"}}>Assign</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -126,7 +135,7 @@ export default function ManageSensorKitsPage() {
                     <Select
                       displayEmpty
                       value=""
-                      onChange={(e) => handleAssign(kit.serialNo, e.target.value)}
+                      onChange={(e) => handleAssign(kit.id, e.target.value)}
                       sx={{ minWidth: 150 }}
                     >
                       <MenuItem disabled value="">

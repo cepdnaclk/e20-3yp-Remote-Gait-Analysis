@@ -12,6 +12,7 @@ import lombok.*;
 @Builder
 @ToString
 public class ResultsNotificationMessage {
+    private Long sessionId;
     private WebSocketMessageType type;      // results ready// sensorKit ID (same as device ID)
     private Boolean status;   // true/false for status updates
     private Long timestamp;
