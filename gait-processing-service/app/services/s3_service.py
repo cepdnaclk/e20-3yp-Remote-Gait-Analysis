@@ -283,7 +283,117 @@ class S3Service:
         # Ultimate fallback
         return f"s3://{self.bucket_name}/placeholder/session_{session_id}.{file_type}"
     
-    def get_bucket_info(self) -> Dict[str, Any]:
+    def generate_presigned_url(self, s3_key: str, expiration: int = 604800) -> str:
+        """
+        Generate a presigned URL for secure file access
+        
+        Args:
+            s3_key: S3 object key (e.g., "reports/session_123.pdf")
+            expiration: URL expiration time in seconds (default: 24 hours)
+            
+        Returns:
+            Presigned URL or empty string if failed
+        """
+        if not self.is_available():
+            return ""
+        
+        try:
+            presigned_url = self.s3_client.generate_presigned_url(
+                'get_object',
+                Params={'Bucket': self.bucket_name, 'Key': s3_key},
+                ExpiresIn=expiration
+            )
+            print(f"🔗 Generated presigned URL valid for {expiration/3600:.1f} hours")
+            return presigned_url
+            
+        except Exception as e:
+            print(f"❌ Error generating presigned URL: {e}")
+            return ""
+    
+    def upload_pdf_report_with_presigned_url(self, local_file_path: str, session_id: str) -> str:
+        """
+        Upload PDF and return presigned URL instead of public URL
+        
+        Args:
+            local_file_path: Path to the local PDF file
+            session_id: Session identifier
+            
+        Returns:
+            Presigned URL of the uploaded PDF or empty string if failed
+        """
+        if not self.is_available():
+            print("❌ S3 service not available for PDF upload")
+            return ""
+        
+        try:
+            # Generate S3 key with timestamp
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            s3_key = f"reports/gait_analysis_session_{session_id}_{timestamp}.pdf"
+            
+            # Upload file (PRIVATE - no public access needed)
+            self.s3_client.upload_file(
+                local_file_path,
+                self.bucket_name,
+                s3_key,
+                ExtraArgs={
+                    'ContentType': 'application/pdf',
+                    'ContentDisposition': f'attachment; filename="gait_report_{session_id}.pdf"',
+                    'Metadata': {
+                        'session_id': str(session_id),
+                        'generated_at': datetime.now().isoformat(),
+                        'report_type': 'gait_analysis',
+                        'file_type': 'pdf_report'
+                    }
+                }
+            )
+            
+            # Generate presigned URL (valid for 24 hours)
+            presigned_url = self.generate_presigned_url(s3_key, expiration=86400)
+            
+            if presigned_url:
+                print(f"📤 PDF uploaded with presigned URL: {s3_key}")
+                return presigned_url
+            else:
+                print("⚠️ Failed to generate presigned URL")
+                return ""
+                
+        except Exception as e:
+            print(f"❌ PDF upload failed: {e}")
+            return ""
+    
+    def get_presigned_url_for_existing_report(self, session_id: str) -> str:
+        """
+        Get presigned URL for the most recent report of a session
+        
+        Args:
+            session_id: Session identifier
+            
+        Returns:
+            Presigned URL or empty string if not found
+        """
+        if not self.is_available():
+            return ""
+        
+        try:
+            # List objects with session prefix
+            response = self.s3_client.list_objects_v2(
+                Bucket=self.bucket_name,
+                Prefix=f"reports/gait_analysis_session_{session_id}_"
+            )
+            
+            if 'Contents' in response and response['Contents']:
+                # Get the most recent file
+                latest_object = max(response['Contents'], key=lambda x: x['LastModified'])
+                s3_key = latest_object['Key']
+                
+                # Generate presigned URL
+                return self.generate_presigned_url(s3_key, expiration=86400)
+            
+            return ""
+            
+        except Exception as e:
+            print(f"❌ Error retrieving presigned URL: {e}")
+            return ""
         """
         Get information about the S3 bucket
         
@@ -649,6 +759,6 @@ def create_s3_service_from_env() -> S3Service:
         Configured S3Service instance
     """
     bucket_name = os.environ.get('GAIT_REPORTS_BUCKET', 'gait-analysis-reports')
-    region = os.environ.get('AWS_DEFAULT_REGION', 'us-east-1')
+    region = os.environ.get('AWS_DEFAULT_REGION', 'eu-north-1')
     
     return S3Service(bucket_name=bucket_name, region=region)

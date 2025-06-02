@@ -112,8 +112,8 @@ class GaitProcessor:
                         if pdf_local_path:
                             print(f"📄 PDF generated locally: {pdf_local_path}")
                             
-                            # Upload to S3 using S3 service
-                            pdf_report_url = self.s3_service.upload_pdf_report(
+                            # Upload to S3 using S3 service with presigned URL
+                            pdf_report_url = self.s3_service.upload_pdf_report_with_presigned_url(
                                 pdf_local_path, str(session_id)
                             )
                             
@@ -237,8 +237,8 @@ class GaitProcessor:
         """
         Get fallback PDF URL - either existing report or placeholder
         """
-        # Try to get existing report first
-        existing_url = self.s3_service.get_latest_report_url(str(session_id))
+        # Try to get existing report with presigned URL
+        existing_url = self.s3_service.get_presigned_url_for_existing_report(str(session_id))
         if existing_url:
             print(f"📄 Using existing PDF report: {existing_url}")
             return existing_url
@@ -361,8 +361,8 @@ class GaitProcessor:
             if pdf_local_path:
                 print(f"📄 PDF regenerated locally: {pdf_local_path}")
                 
-                # Upload to S3
-                pdf_report_url = self.s3_service.upload_pdf_report(
+                # Upload to S3 with presigned URL
+                pdf_report_url = self.s3_service.upload_pdf_report_with_presigned_url(
                     pdf_local_path, str(session_id)
                 )
                 

@@ -56,7 +56,8 @@ public class ProcessedTestResults {
     @Column(nullable = false)
     private Double avgStanceTime;
 
-    @Column(nullable = false)
+    // ✅ CHANGE THIS: Use columnDefinition = "TEXT" instead of @Lob
+    @Column(nullable = false, columnDefinition = "TEXT")
     private String pressureResultsPath;
 
     /**
