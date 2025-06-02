@@ -81,7 +81,7 @@ class GaitAnalysisPDFReport:
         )
     
     def generate_report(self, session_id: str, analysis_result: Dict, 
-                       plot_files: Dict[str, str], df_processed=None) -> str:
+                       plot_files: Dict[str, str], df_processed=None, patient_info: Dict = None) -> str:
         """
         Generate complete PDF report (returns local file path)
         
@@ -90,6 +90,7 @@ class GaitAnalysisPDFReport:
             analysis_result: Results from gait analysis
             plot_files: Dictionary mapping plot names to file paths
             df_processed: Processed dataframe for additional metrics
+            patient_info: Patient information from SQS message
             
         Returns:
             Local path to the generated PDF file
@@ -113,11 +114,11 @@ class GaitAnalysisPDFReport:
             story = []
             
             # 1. Title Page
-            story.extend(self._create_title_page(session_id, analysis_result))
+            story.extend(self._create_title_page(session_id, analysis_result, patient_info))
             story.append(PageBreak())
             
             # 2. Executive Summary
-            story.extend(self._create_executive_summary(analysis_result, df_processed))
+            story.extend(self._create_executive_summary(analysis_result, df_processed, patient_info))
             story.append(PageBreak())
             
             # 3. Detailed Analysis with Plots
@@ -142,18 +143,50 @@ class GaitAnalysisPDFReport:
             print(f"❌ Error generating PDF report: {e}")
             return ""
     
-    def _create_title_page(self, session_id: str, analysis_result: Dict) -> List:
+    def _create_title_page(self, session_id: str, analysis_result: Dict, patient_info: Dict = None) -> List:
         """Create title page content"""
         story = []
         
         # Main title
-        story.append(Spacer(1, 2*inch))
+        story.append(Spacer(1, 1.5*inch))
         story.append(Paragraph("GAIT ANALYSIS REPORT", self.title_style))
-        story.append(Spacer(1, 0.5*inch))
+        story.append(Spacer(1, 0.3*inch))
+        
+        # Patient information section
+        if patient_info:
+            story.append(Paragraph("Patient Information", self.subheader_style))
+            
+            patient_data = [
+                ["Field", "Value"],
+                ["Patient Name", patient_info.get('name', 'N/A')],
+                ["Patient ID", str(patient_info.get('id', 'N/A'))],
+                ["Age", f"{patient_info.get('age', 'N/A')} years"],
+                ["Gender", patient_info.get('gender', 'N/A')],
+                ["Height", f"{patient_info.get('height', 'N/A')} cm"],
+                ["Weight", f"{patient_info.get('weight', 'N/A')} kg"],
+                ["Doctor", patient_info.get('doctorName', 'N/A')],
+                ["Contact", patient_info.get('phoneNumber', 'N/A')]
+            ]
+            
+            patient_table = Table(patient_data, colWidths=[2*inch, 3*inch])
+            patient_table.setStyle(TableStyle([
+                ('BACKGROUND', (0, 0), (-1, 0), colors.lightblue),
+                ('TEXTCOLOR', (0, 0), (-1, 0), colors.black),
+                ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+                ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+                ('FONTSIZE', (0, 0), (-1, 0), 11),
+                ('BOTTOMPADDING', (0, 0), (-1, 0), 8),
+                ('BACKGROUND', (0, 1), (-1, -1), colors.white),
+                ('GRID', (0, 0), (-1, -1), 1, colors.black),
+                ('VALIGN', (0, 0), (-1, -1), 'MIDDLE')
+            ]))
+            
+            story.append(patient_table)
+            story.append(Spacer(1, 0.3*inch))
         
         # Session info
         story.append(Paragraph(f"Session ID: {session_id}", self.subheader_style))
-        story.append(Spacer(1, 0.3*inch))
+        story.append(Spacer(1, 0.2*inch))
         
         # Key metrics table
         key_metrics = [
@@ -179,7 +212,7 @@ class GaitAnalysisPDFReport:
         ]))
         
         story.append(metrics_table)
-        story.append(Spacer(1, 1*inch))
+        story.append(Spacer(1, 0.5*inch))
         
         # Generation info
         timestamp = datetime.now().strftime("%B %d, %Y at %I:%M %p")
@@ -188,11 +221,21 @@ class GaitAnalysisPDFReport:
         
         return story
     
-    def _create_executive_summary(self, analysis_result: Dict, df_processed=None) -> List:
+    def _create_executive_summary(self, analysis_result: Dict, df_processed=None, patient_info: Dict = None) -> List:
         """Create executive summary section"""
         story = []
         
         story.append(Paragraph("EXECUTIVE SUMMARY", self.header_style))
+        
+        # Patient context (if available)
+        if patient_info:
+            patient_context = f"""
+            This gait analysis was performed for {patient_info.get('name', 'the patient')}, 
+            a {patient_info.get('age', 'N/A')}-year-old {patient_info.get('gender', '').lower()} patient 
+            under the care of {patient_info.get('doctorName', 'the attending physician')}.
+            """
+            story.append(Paragraph(patient_context, self.normal_style))
+            story.append(Spacer(1, 10))
         
         # Performance overview
         distance = analysis_result.get('distance_meters', 0)
@@ -405,7 +448,7 @@ class GaitAnalysisPDFReport:
 # ============================================================================
 
 def generate_pdf_report(session_id: str, analysis_result: Dict, plot_files: Dict[str, str], 
-                       df_processed=None) -> str:
+                       df_processed=None, patient_info: Dict = None) -> str:
     """
     Convenience function to generate PDF report
     
@@ -414,6 +457,7 @@ def generate_pdf_report(session_id: str, analysis_result: Dict, plot_files: Dict
         analysis_result: Results from gait analysis
         plot_files: Dictionary of plot file paths
         df_processed: Processed dataframe
+        patient_info: Patient information from SQS message
         
     Returns:
         Local path to the generated PDF file
@@ -421,7 +465,7 @@ def generate_pdf_report(session_id: str, analysis_result: Dict, plot_files: Dict
     try:
         pdf_generator = GaitAnalysisPDFReport()
         pdf_path = pdf_generator.generate_report(
-            session_id, analysis_result, plot_files, df_processed
+            session_id, analysis_result, plot_files, df_processed, patient_info
         )
         return pdf_path
         

@@ -28,13 +28,14 @@ class GaitProcessor:
         self.enable_pdf_report = enable_pdf_report
         self.s3_service = create_s3_service(s3_bucket)
     
-    def compute(self, session_id, raw_data):
+    def compute(self, session_id, raw_data, patient_info: dict = None):
         """
         Enhanced compute function with integrated plotting and PDF report generation
         
         Args:
             session_id: Session identifier  
             raw_data: Raw sensor data from DynamoDB
+            patient_info: Patient information from SQS message (optional)
             
         Returns:
             Dictionary with EXACTLY the same keys as before - NO NEW FIELDS
@@ -105,7 +106,7 @@ class GaitProcessor:
                         
                         # Generate PDF file locally (TEMPORARY)
                         pdf_local_path = generate_pdf_report(
-                            str(session_id), analysis_result, plot_files, df_processed
+                            str(session_id), analysis_result, plot_files, df_processed, patient_info
                         )
                         
                         if pdf_local_path:
@@ -354,7 +355,7 @@ class GaitProcessor:
             
             # Generate PDF file locally (TEMPORARY)
             pdf_local_path = generate_pdf_report(
-                str(session_id), analysis_result, {}, df_processed
+                str(session_id), analysis_result, {}, df_processed, patient_info
             )
             
             if pdf_local_path:
