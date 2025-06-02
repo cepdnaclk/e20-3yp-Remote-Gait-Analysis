@@ -246,6 +246,15 @@ export default function PatientTestResultPage() {
               >
                 📁 View Raw Sensor Data
               </Button>
+
+              
+              <Button
+                variant="contained"
+                color="success"
+                onClick={() => handleDownload()}
+              >
+                ⬇️ Download Report
+              </Button>
             </Box>
           </Paper>
         </Grid>
