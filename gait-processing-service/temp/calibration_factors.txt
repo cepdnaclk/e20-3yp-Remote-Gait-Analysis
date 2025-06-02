@@ -1,0 +1,25 @@
+Total distance estimates:
+Pendulum Model: 8.59m
+ZUPT Method: 18.32m
+Step Detection: 25.99m
+Hybrid: 14.72m
+
+🎯 Calibration Analysis (Known distance: 22m)
+Known distance: 22m
+
+Calibration factors needed:
+Pendulum Model: Factor=2.561, Error=61.0%
+ZUPT Method: Factor=1.201, Error=16.7%
+Step Detection: Factor=0.847, Error=18.1%
+Hybrid: Factor=1.495, Error=33.1%
+
+📊 Corrected distances:
+Pendulum Model: 22.00m (factor: 2.561)
+ZUPT Method: 22.00m (factor: 1.201)
+Step Detection: 22.00m (factor: 0.847)
+Hybrid: 22.00m (factor: 1.495)
+
+
+-------------------------------------------------
+
+
