@@ -5,7 +5,6 @@ import Home from "./pages/Home";
 import DoctorDashboard from "./pages/doctor/DoctorDashboard";
 //import PatientProfile from "./pages/doctor/PatientProfile";
 import RealTimeDashboard from "./pages/RealTimeDashboard";
-import Signup from "./pages/Signup";
 import AboutUs from "./pages/AboutUs";
 import ClinicDetailsPage from './pages/root/ClinicDetailsPage'; 
 
@@ -15,7 +14,6 @@ import RootDashboard from "./pages/root/SystemAdminDashboard";
 import AddClinicAdmin from "./pages/root/AddClinicAdmin";
 import Unauthorized from "./pages/Unauthorized";
 import PatientDashboard from "./pages/patient/PatientDashboard";
-import TestResult from "./pages/patient/TestResult";
 import Feedback from "./pages/patient/Feedback";
 import ClinicDashboard from "./pages/clinic/ClinicAdminDashboard";
 import AddDoctor from "./pages/clinic/DoctorManagementPage";
@@ -27,6 +25,7 @@ import PatientTestResultPage from "./pages/patient/PatientTestResultPage";
 
 import DoctorPatientsPage from "./pages/doctor/DoctorPatientsPage";
 import DoctorPatientProfilePage from "./pages/doctor/DoctorPatientProfilePage";
+import ContactPage from "./pages/ContactPage";
 
 
 // Create a Query Client instance for managing API data fetching, caching, and state updates
@@ -45,8 +44,12 @@ export default function App() {
           <Route path="/" element={<Home/>} />
           {/* Login Page Route */}
           <Route path="/login" element={<Login />} />
-          {/* SignUp Page Route */}
-          <Route path="/Signup" element={<Signup />} />
+
+          {/* Contact Page Route */}
+          <Route path="/contact" element={<ContactPage />} />
+
+          {/* Doctor Patients Page Route */}
+          
           {/* About Us Page Route */}
           <Route path="/about" element={<AboutUs />} />
           {/* doctor Dashboard Page Route */}
@@ -69,7 +72,7 @@ export default function App() {
           } />
           {/*Test session result page */}
           <Route path="/patient/test-session/:id" element={
-            <RoleBasedRoute allowedRoles={["ROLE_PATIENT"]}>
+            <RoleBasedRoute allowedRoles={["ROLE_PATIENT","ROLE_DOCTOR"]}>
               <PatientTestResultPage />
             </RoleBasedRoute>
           } />
@@ -130,12 +133,12 @@ export default function App() {
             </RoleBasedRoute>
           } />
 
-          {/* Test Result Page Route */}
+          {/* Test Result Page Route *
           <Route path="/patient/test/:id" element={
             <RoleBasedRoute allowedRoles={["ROLE_PATIENT"]}>
               <TestResult />
             </RoleBasedRoute>
-          } />
+          } /> /}
 
           {/* Feedback Page Route */}
           <Route path="/patient/feedback" element={

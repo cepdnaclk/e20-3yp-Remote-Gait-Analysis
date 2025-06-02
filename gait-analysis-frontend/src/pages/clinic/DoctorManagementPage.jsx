@@ -6,6 +6,7 @@ import {
     TableRow,
     TableCell,
     TableBody,
+    TableContainer,
     Paper,
     TextField,
     Button,
@@ -79,24 +80,33 @@ import {
           Add Doctor
         </Button>
   
-        <Paper>
+        <TableContainer
+          component={Paper}
+          sx={{
+            boxShadow: 4,
+            borderRadius: 2,
+            overflow: "hidden",
+            border: "1px solid #e0e0e0",
+          }}
+        >
           <Table size="small">
-            <TableHead>
+            <TableHead sx={{ backgroundColor: "#f5f7fa"}}    
+           >
               <TableRow>
-                <TableCell>Name</TableCell>
-                <TableCell>Email</TableCell>
-                <TableCell>Phone</TableCell>
-                <TableCell>Specialization</TableCell>
+                <TableCell sx={{ py: 2, px: 3, fontWeight: "bold" }}>Name</TableCell>
+                <TableCell sx={{ py: 2, px: 3, fontWeight: "bold" }}>Email</TableCell>
+                <TableCell sx={{ py: 2, px: 3, fontWeight: "bold" }}>Phone</TableCell>
+                <TableCell sx={{ py: 2, px: 3, fontWeight: "bold" }}>Specialization</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {doctors.length > 0 ? (
                 doctors.map((doc) => (
                   <TableRow key={doc.id}>
-                    <TableCell>{doc.name}</TableCell>
-                    <TableCell>{doc.email}</TableCell>
-                    <TableCell>{doc.phoneNumber}</TableCell>
-                    <TableCell>{doc.specialization}</TableCell>
+                    <TableCell sx={{ py: 2, px: 3 }}>{doc.name}</TableCell>
+                    <TableCell sx={{ py: 2, px: 3 }}>{doc.email}</TableCell>
+                    <TableCell sx={{ py: 2, px: 3 }}>{doc.phoneNumber}</TableCell>
+                    <TableCell sx={{ py: 2, px: 3 }}>{doc.specialization}</TableCell>
                   </TableRow>
                 ))
               ) : (
@@ -108,7 +118,7 @@ import {
               )}
             </TableBody>
           </Table>
-        </Paper>
+        </TableContainer>
   
         {/* Add Doctor Dialog */}
         <Dialog open={open} onClose={() => setOpen(false)}>

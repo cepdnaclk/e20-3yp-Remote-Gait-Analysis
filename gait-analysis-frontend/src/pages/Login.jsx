@@ -33,7 +33,7 @@ const Card = styled(MuiCard)(({ theme }) => ({
   margin: 'auto',
   boxShadow: 'hsla(220, 30%, 5%, 0.05) 0px 5px 15px 0px, hsla(220, 25%, 10%, 0.05) 0px 15px 35px -5px',
   [theme.breakpoints.up('sm')]: {
-    width: '350px',
+    width: '398px',
   },
 }));
 
@@ -105,27 +105,28 @@ const onSubmit = async (data) => {
       <CssBaseline enableColorScheme />
       <LoginContainer direction={'column'} justifyContent={'space-between'}>
       <Card variant="outlined">
-  {/* 🔰 Header with logo and title */}
-  <Box sx={{ textAlign: "center", mb: 2 }}>
-    <img
-      src={logo}  // ✅ Put your logo in /public/assets/
-      alt="RehabGait Logo"
-      style={{ height: 60, marginBottom: 8 }}
-    />
-    <Typography
-      variant="h5"
-      sx={{
-        fontWeight: "bold",
-        color: "#0D47A1",
-        fontSize: "1.75rem"
-      }}
-    >
-      RehabGait
-    </Typography>
+    {/* 🔰 Header with logo and title */}
+    <Box sx={{ textAlign: "center", mb: 2 , width: '100%'}}>
+      <img
+        src={logo}  // ✅ Put your logo in /public/assets/
+        alt="RehabGait Logo"
+        style={{ height: 60, marginBottom: 8 }}
+      />
+        <Typography
+          variant="h5"
+          sx={{
+            fontWeight: "bold",
+            color: "#0D47A1",
+            fontSize: "1.75rem"
+          }}
+        >
+          RehabGait
+        </Typography>
   </Box>
           <Box component="form" onSubmit={handleSubmit(onSubmit)} sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
             <FormControl>
-              <FormLabel htmlFor="username">Username</FormLabel>
+              
+              <FormLabel htmlFor="username">Username</FormLabel> 
               <TextField
                 autoFocus
                 required
@@ -141,7 +142,7 @@ const onSubmit = async (data) => {
               />
             </FormControl>
             <FormControl>
-              <FormLabel htmlFor="password">Password</FormLabel>
+              <FormLabel htmlFor="password" >Password</FormLabel>
               <TextField
                 required
                 fullWidth
@@ -159,14 +160,19 @@ const onSubmit = async (data) => {
             <Button type="submit"  fullWidth variant="contained">
               Log In
             </Button>
+
+            <Typography sx={{ textAlign: 'center', mt: 2 }}>
+              Don&apos;t have an account?{' '}
+              <Link href="/contact" underline="hover"  sx={{ color: '#0D47A1', fontWeight: 500 }}>
+                Contact us to get started
+              </Link>
+            </Typography>
+
           </Box>
           <Divider>
-            <Typography sx={{ color: 'text.secondary' }}> or </Typography>
+            
           </Divider>
-          <Typography sx={{ textAlign: 'center' }}>
-            Don't have an account?{' '}
-            <Link href="/Signup" variant="body2" sx={{ alignSelf: 'center' }}>Sign up</Link>
-          </Typography>
+          
         </Card>
 
         {/* Snackbar for feedback */}
