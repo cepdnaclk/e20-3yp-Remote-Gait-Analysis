@@ -147,3 +147,91 @@
 🚀 Results sent to backend for session 5
 ✅ Finished processing session 5
 ✅ Message processed and deleted.
+
+Distance 22m --------------- new test -------------
+
+⚙️ Processing session 1 from 2025-06-02 18:48:55.361000 to 2025-06-02 18:49:11.847000 for sensor 601
+step count - 15
+
+🔍 [DEBUG] Fetching data for Sensor ID: 601
+🕒 [DEBUG] Start Time: 2025-06-02 18:48:55.361000 -> 1748870335361
+🕒 [DEBUG] End Time: 2025-06-02 18:49:11.847000 -> 1748870351847
+📦 [DEBUG] Retrieved 165 items from DynamoDB.
+
+📦 Retrieved 165 data points from DynamoDB
+🧠 Running dummy gait processing logic...
+✅ Sent results to backend: 200
+🚀 Results sent to backend for session 1
+✅ Finished processing session 1
+
+⚙️ Processing session 2 from 2025-06-02 18:51:54.489000 to 2025-06-02 18:52:09.350000 for sensor 601
+step count - 14
+🔍 [DEBUG] Fetching data for Sensor ID: 601
+🕒 [DEBUG] Start Time: 2025-06-02 18:51:54.489000 -> 1748870514489
+🕒 [DEBUG] End Time: 2025-06-02 18:52:09.350000 -> 1748870529350
+📦 [DEBUG] Retrieved 149 items from DynamoDB.
+
+📦 Retrieved 149 data points from DynamoDB
+🧠 Running dummy gait processing logic...
+✅ Sent results to backend: 200
+🚀 Results sent to backend for session 2
+✅ Finished processing session 2
+✅ Message processed and deleted.
+
+⚙️ Processing session 3 from 2025-06-02 18:53:52.057000 to 2025-06-02 18:54:08.824000 for sensor 601
+step count - 15
+🔍 [DEBUG] Fetching data for Sensor ID: 601
+🕒 [DEBUG] Start Time: 2025-06-02 18:53:52.057000 -> 1748870632057
+🕒 [DEBUG] End Time: 2025-06-02 18:54:08.824000 -> 1748870648824
+📦 [DEBUG] Retrieved 168 items from DynamoDB.
+
+📦 Retrieved 168 data points from DynamoDB
+🧠 Running dummy gait processing logic...
+✅ Sent results to backend: 200
+🚀 Results sent to backend for session 3
+✅ Finished processing session 3
+✅ Message processed and deleted.
+
+⚙️ Processing session 4 from 2025-06-02 18:56:50.159000 to 2025-06-02 18:57:07.211000 for sensor 601
+steps 16
+
+🔍 [DEBUG] Fetching data for Sensor ID: 601
+🕒 [DEBUG] Start Time: 2025-06-02 18:56:50.159000 -> 1748870810159
+🕒 [DEBUG] End Time: 2025-06-02 18:57:07.211000 -> 1748870827211
+📦 [DEBUG] Retrieved 170 items from DynamoDB.
+
+📦 Retrieved 170 data points from DynamoDB
+🧠 Running dummy gait processing logic...
+✅ Sent results to backend: 200
+🚀 Results sent to backend for session 4
+✅ Finished processing session 4
+✅ Message processed and deleted.
+
+⚙️ Processing session 5 from 2025-06-02 18:59:48.316000 to 2025-06-02 19:00:09.685000 for sensor 601
+steps 17
+🔍 [DEBUG] Fetching data for Sensor ID: 601
+🕒 [DEBUG] Start Time: 2025-06-02 18:59:48.316000 -> 1748870988316
+🕒 [DEBUG] End Time: 2025-06-02 19:00:09.685000 -> 1748871009685
+📦 [DEBUG] Retrieved 202 items from DynamoDB.
+
+📦 Retrieved 202 data points from DynamoDB
+🧠 Running dummy gait processing logic...
+✅ Sent results to backend: 200
+🚀 Results sent to backend for session 5
+✅ Finished processing session 5
+✅ Message processed and deleted.
+
+⚙️ Processing session 6 from 2025-06-02 19:04:02.487000 to 2025-06-02 19:04:22.964000 for sensor 601
+18
+
+🔍 [DEBUG] Fetching data for Sensor ID: 601
+🕒 [DEBUG] Start Time: 2025-06-02 19:04:02.487000 -> 1748871242487
+🕒 [DEBUG] End Time: 2025-06-02 19:04:22.964000 -> 1748871262964
+📦 [DEBUG] Retrieved 192 items from DynamoDB.
+
+📦 Retrieved 192 data points from DynamoDB
+🧠 Running dummy gait processing logic...
+✅ Sent results to backend: 200
+🚀 Results sent to backend for session 6
+✅ Finished processing session 6
+✅ Message processed and deleted.

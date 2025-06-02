@@ -42,4 +42,6 @@ public class ProcessedTestResultsRequestDto {
     private String pressureResultsPath;
 
     private List<Double> strideTimes;
+
+
 }
