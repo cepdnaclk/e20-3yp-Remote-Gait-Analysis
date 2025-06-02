@@ -83,13 +83,13 @@ export default function PatientTestResultPage() {
 
   return (
     <Box p={4} sx ={{
-        background: "linear-gradient(to bottom, rgb(28, 32, 57), rgb(6, 40, 97))",
+        background: "linear-gradient(1deg, #e3e7ed 0%, #aab6d3 100%)",
         minheight: "100vh"}}
         >
-      <Typography variant="h4" fontWeight="bold" color="#3f51b0" gutterBottom>
+      <Typography variant="h4" fontWeight="bold" color="#212121" gutterBottom>
         Test Session #{session.sessionId}
       </Typography>
-      <Typography variant="subtitle1" gutterBottom color="white">
+      <Typography variant="subtitle1" gutterBottom color="black">
         Status: {session.status} | Duration: {results.durationSeconds}s
       </Typography>
 
