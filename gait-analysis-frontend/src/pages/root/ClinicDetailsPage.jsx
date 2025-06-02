@@ -109,12 +109,12 @@ import {
   
     return (
       <Box p={4} sx ={{
-        background: "linear-gradient(to bottom, rgb(28, 32, 57), rgb(6, 40, 97))",
+        background:  "linear-gradient(1deg, #e3e7ed 0%, #aab6d3 100%)",
         minheight: "100vh"}}
         >
         {/* Clinic Profile Card */}
-        <Paper elevation={3} sx={{ p: 3, mb: 4 }}>
-          <Typography variant="h5" gutterBottom>{clinic.name}</Typography>
+        <Paper elevation={3}  sx={{ p: 3, mb: 4, borderRadius: 4, boxShadow: 5 }}>
+          <Typography variant="h5" gutterBottom fontWeight="bold">{clinic.name}</Typography>
           <Divider sx={{ mb: 2 }} />
           <Grid container spacing={2}>
             <Grid item xs={12} sm={6}>
@@ -134,8 +134,8 @@ import {
         </Paper>
   
         {/* Assigned Sensor Kits */}
-        <Paper elevation={3} sx={{ p: 3, mb: 4 }}>
-          <Typography variant="h6" gutterBottom>Sensor Kits Assigned to This Clinic</Typography>
+        <Paper elevation={3} sx={{ p: 3, mb: 4 , borderRadius: 4, boxShadow: 5 }}>
+          <Typography variant="h6" fontWeight="bold" gutterBottom>Sensor Kits Assigned to This Clinic</Typography>
           <Table size="small">
             <TableHead>
               <TableRow>
@@ -178,8 +178,8 @@ import {
         </Paper>
   
         {/* Assign New Kits */}
-        <Paper elevation={3} sx={{ p: 3 }}>
-          <Typography variant="h6" gutterBottom>Assign New Sensor Kits to This Clinic</Typography>
+        <Paper elevation={3} sx={{ p: 3 , borderRadius: 4, boxShadow: 5 }}>
+          <Typography variant="h6" fontWeight="bold" gutterBottom>Assign New Sensor Kits to This Clinic</Typography>
           <FormControl fullWidth sx={{ mt: 2 }}>
             <InputLabel>Select Kits</InputLabel>
             <Select
