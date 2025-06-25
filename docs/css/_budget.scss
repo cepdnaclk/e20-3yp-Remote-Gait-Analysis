@@ -1,9 +1,0 @@
-@import "./variables";
-@import "./commonStyles";
-
-.section-budget {
-  min-height: 100vh;
-  @include column();
-  align-items: center;
-  gap: 6.4rem;
-}
