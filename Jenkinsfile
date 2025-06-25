@@ -1,28 +1,45 @@
 pipeline {
+    agent { label 'DevServer' }
 
-    agent none
-    
+    tools {
+        maven 'Maven 3.9.7' // Replace with your actual Maven tool name
+    }
+
+    environment {
+        BACKEND_DIR = 'gait-analysis-backend'
+        JAR_NAME = 'gait-backend.jar'
+    }
+
     stages {
-        
-        stage("Build") {
-            agent { label 'DevServer' }
+        stage('Checkout Code') {
             steps {
-                echo "This is Build stage running on DevServer"
+                checkout scm
             }
         }
 
-        stage("Test") {
-            agent { label 'DevServer' }
+        stage('Build Backend') {
             steps {
-                echo "This is Test stage running on DevServer"
+                dir("${env.BACKEND_DIR}") {
+                    sh 'mvn clean package -DskipTests'
+                }
             }
         }
 
-        stage("Deploy") {
-            agent { label 'ProdServer' }
+        stage('Archive JAR') {
             steps {
-                echo "This is Deploy stage running on prodserver"
+                dir("${env.BACKEND_DIR}") {
+                    archiveArtifacts artifacts: "target/${env.JAR_NAME}", fingerprint: true
+                }
             }
+        }
+    }
+
+    post {
+        success {
+            echo "✅ Spring Boot backend built and archived as ${env.JAR_NAME}!"
+        }
+        failure {
+            echo '❌ Backend build failed.'
         }
     }
 }
