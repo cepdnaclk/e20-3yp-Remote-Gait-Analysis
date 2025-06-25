@@ -1,5 +1,5 @@
 /* File: components/StepStartTest.jsx */
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import HeatmapWebSock3Force from "./heatmap/v2/HeatmapForceOptimized2";
 import {
   Box,
@@ -27,6 +27,10 @@ import sendCommand from "../utils/sendCommand";
 import axiosInstance from "../services/axiosInstance";
 import HeatmapWebSock2 from "./heatmap/HeatmapWebSock2";
 
+import RealTimeGraphV2 from "./realtime-graphs/RealTimeGraph-v2.jsx";
+import FootOrientationGraphV2 from "./realtime-graphs/FootOrientationGraph-v2.jsx";
+import SceneV2 from "./footModel/SceneV2.jsx";
+
 const StepStartTest = ({
   isRecording,
   recordingTime,
@@ -40,6 +44,8 @@ const StepStartTest = ({
   sessionId,
   sensorData,
 }) => {
+  const [activeTab, setActiveTab] = useState("heatmap");
+
   const handleStart = async () => {
     try {
       const timestamp = new Date().toISOString();
@@ -138,7 +144,7 @@ const StepStartTest = ({
           </Grid>
         </Grid>
 
-        <Grid container spacing={4}>
+        <Grid container spacing={4} sx={{ mb: 4 }}>
           <Grid item xs={12} md={6} mt={4}>
             <Paper
               elevation={0}
@@ -270,8 +276,87 @@ const StepStartTest = ({
             )}
           </Grid>
 
-          <Grid item xs={12} md={6} mt={4}>
-            <HeatmapWebSock3Force sensorData={sensorData} />
+          {/* Tabbed Interface */}
+          <Grid item xs={12} md={6} sx={{ mt: 4 }}>
+            <Paper
+              elevation={0}
+              sx={{
+                padding: 2,
+                minHeight: "450px",
+                display: "flex",
+                flexDirection: "column",
+                borderRadius: 4,
+                background:
+                  "linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.9) 100%)",
+                backdropFilter: "blur(20px)",
+                border: "1px solid rgba(255, 255, 255, 0.2)",
+              }}
+            >
+              <Typography variant="h6">Real-time Data</Typography>
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "center",
+                  gap: 1,
+                  mb: 2,
+                }}
+              >
+                <Button
+                  variant={activeTab === "heatmap" ? "contained" : "outlined"}
+                  onClick={() => setActiveTab("heatmap")}
+                  color="primary"
+                >
+                  Heatmap
+                </Button>
+                <Button
+                  variant={activeTab === "angles" ? "contained" : "outlined"}
+                  onClick={() => setActiveTab("angles")}
+                  color="primary"
+                >
+                  Angles
+                </Button>
+                <Button
+                  variant={activeTab === "pressure" ? "contained" : "outlined"}
+                  onClick={() => setActiveTab("pressure")}
+                  color="secondary"
+                >
+                  Pressure
+                </Button>
+                <Button
+                  variant={activeTab === "3d" ? "contained" : "outlined"}
+                  onClick={() => setActiveTab("3d")}
+                  color="info"
+                >
+                  3D Model
+                </Button>
+              </Box>
+              <Box sx={{ flexGrow: 1, minHeight: "350px", overflow: "hidden" }}>
+                {activeTab === "heatmap" && (
+                  <HeatmapWebSock3Force sensorData={sensorData} />
+                )}
+                {activeTab === "angles" && (
+                  <Box sx={{ width: "100%", height: "400px" }}>
+                    <FootOrientationGraphV2 sensorData={sensorData} />
+                  </Box>
+                )}
+                {activeTab === "pressure" && (
+                  <Box sx={{ width: "100%", height: "400px" }}>
+                    <RealTimeGraphV2 sensorData={sensorData} />
+                  </Box>
+                )}
+                {activeTab === "3d" && (
+                  <Box
+                    sx={{
+                      width: "100%",
+                      height: "350px",
+                      backgroundColor: "rgba(1, 1, 1, 0.81)",
+                    }}
+                  >
+                    <SceneV2 sensorData={sensorData} />
+                  </Box>
+                )}
+              </Box>
+            </Paper>
           </Grid>
         </Grid>
       </CardContent>

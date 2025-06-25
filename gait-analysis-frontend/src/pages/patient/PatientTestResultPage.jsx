@@ -8,6 +8,8 @@ import {
   Grid,
   Divider,
   Button,
+  Alert,
+  Snackbar,
 } from "@mui/material";
 import axios from "../../services/axiosInstance";
 import { Line } from "react-chartjs-2";
@@ -35,6 +37,8 @@ export default function PatientTestResultPage() {
   const { id } = useParams();
   const [session, setSession] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [downloading, setDownloading] = useState(false);
+  const [notification, setNotification] = useState({ open: false, message: "", severity: "info" });
 
   useEffect(() => {
     const fetchSession = async () => {
@@ -50,6 +54,140 @@ export default function PatientTestResultPage() {
 
     fetchSession();
   }, [id]);
+
+  const handleDownload = async () => {
+    if (!session?.results?.pressureResultsPath) {
+      setNotification({
+        open: true,
+        message: "No report available for download",
+        severity: "error"
+      });
+      return;
+    }
+
+    setDownloading(true);
+    
+    try {
+      let downloadUrl = session.results.pressureResultsPath;
+      
+      // Check if URL is expired (presigned URLs have expiration)
+      const testResponse = await fetch(downloadUrl, { method: 'HEAD' });
+      
+      if (!testResponse.ok && testResponse.status === 403) {
+        // URL might be expired, try to get a fresh one
+        try {
+          const refreshResponse = await axios.get(`/api/sessions/${session.sessionId}/report-url`);
+          if (refreshResponse.data.success) {
+            downloadUrl = refreshResponse.data.reportUrl;
+            setNotification({
+              open: true,
+              message: "Refreshed download link",
+              severity: "info"
+            });
+          }
+        } catch (refreshError) {
+          console.warn("Could not refresh URL:", refreshError);
+        }
+      }
+      
+      // Download the file
+      const response = await fetch(downloadUrl);
+      
+      if (!response.ok) {
+        throw new Error(`Failed to download: ${response.statusText}`);
+      }
+      
+      const blob = await response.blob();
+      
+      // Create download link
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      
+      // Generate filename with session info
+      const timestamp = new Date().toISOString().split('T')[0];
+      const filename = `Gait_Analysis_Report_Session_${session.sessionId}_${timestamp}.pdf`;
+      link.download = filename;
+      
+      // Trigger download
+      document.body.appendChild(link);
+      link.click();
+      
+      // Cleanup
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+      
+      setNotification({
+        open: true,
+        message: "Report downloaded successfully!",
+        severity: "success"
+      });
+      
+    } catch (error) {
+      console.error("Download failed:", error);
+      
+      // Fallback: Try to open in new tab
+      try {
+        window.open(session.results.pressureResultsPath, '_blank');
+        setNotification({
+          open: true,
+          message: "Report opened in new tab (download failed)",
+          severity: "warning"
+        });
+      } catch (fallbackError) {
+        setNotification({
+          open: true,
+          message: "Failed to download or open report. The link may have expired.",
+          severity: "error"
+        });
+      }
+    } finally {
+      setDownloading(false);
+    }
+  };
+
+  const handleViewReport = async () => {
+    if (!session?.results?.pressureResultsPath) {
+      setNotification({
+        open: true,
+        message: "No report available to view",
+        severity: "error"
+      });
+      return;
+    }
+
+    try {
+      let viewUrl = session.results.pressureResultsPath;
+      
+      // Check if URL is expired
+      const testResponse = await fetch(viewUrl, { method: 'HEAD' });
+      
+      if (!testResponse.ok && testResponse.status === 403) {
+        // Try to get fresh URL
+        try {
+          const refreshResponse = await axios.get(`/api/sessions/${session.sessionId}/report-url`);
+          if (refreshResponse.data.success) {
+            viewUrl = refreshResponse.data.reportUrl;
+          }
+        } catch (refreshError) {
+          console.warn("Could not refresh URL:", refreshError);
+        }
+      }
+      
+      window.open(viewUrl, '_blank');
+      
+    } catch (error) {
+      setNotification({
+        open: true,
+        message: "Failed to open report. The link may have expired.",
+        severity: "error"
+      });
+    }
+  };
+
+  const handleCloseNotification = () => {
+    setNotification({ ...notification, open: false });
+  };
 
   if (loading) {
     return (
@@ -82,7 +220,7 @@ export default function PatientTestResultPage() {
   };
 
   return (
-    <Box p={4} sx ={{
+    <Box p={4} sx={{
         background: "linear-gradient(1deg, #e3e7ed 0%, #aab6d3 100%)",
         minheight: "100vh"}}
         >
@@ -150,12 +288,6 @@ export default function PatientTestResultPage() {
           </Paper>
         </Grid>
 
-      
-
-
-      
-
-
         <Grid item xs={12} md={6}>
           <Paper sx={{ backgroundColor: "#ffffff", boxShadow: 4, p: 2, borderRadius: 2 }}>
             <Typography variant="h6" color="#212121" fontWeight="bold" gutterBottom>
@@ -222,7 +354,6 @@ export default function PatientTestResultPage() {
           </Paper>
         </Grid>
 
-
         <Grid item xs={12}>
           <Paper sx={{ backgroundColor: "#ffffff", boxShadow: 4, p: 3, borderRadius: 2 }}>
             <Typography variant="h6" color="#212121" fontWeight="bold" gutterBottom>
@@ -233,33 +364,63 @@ export default function PatientTestResultPage() {
               <Button
                 variant="outlined"
                 color="primary"
-                href={results.pressureResultsPath}
-                target="_blank"
+                onClick={handleViewReport}
+                disabled={!session?.results?.pressureResultsPath}
               >
-                📊 View Pressure Results
+                📊 View PDF Report
               </Button>
+              
               <Button
                 variant="outlined"
                 color="secondary"
                 href={rawSensorData?.path}
                 target="_blank"
+                disabled={!rawSensorData?.path}
               >
                 📁 View Raw Sensor Data
               </Button>
 
-              
               <Button
                 variant="contained"
                 color="success"
-                onClick={() => handleDownload()}
+                onClick={handleDownload}
+                disabled={downloading || !session?.results?.pressureResultsPath}
+                startIcon={downloading ? <CircularProgress size={16} /> : null}
               >
-                ⬇️ Download Report
+                {downloading ? 'Downloading...' : '⬇️ Download PDF Report'}
               </Button>
             </Box>
+
+            {/* Status indicator for report availability */}
+            {session?.results?.pressureResultsPath ? (
+              <Typography variant="caption" color="green" sx={{ mt: 1, display: 'block' }}>
+                ✅ PDF Report available
+              </Typography>
+            ) : (
+              <Typography variant="caption" color="orange" sx={{ mt: 1, display: 'block' }}>
+                ⏳ PDF Report not yet available
+              </Typography>
+            )}
           </Paper>
         </Grid>
 
       </Grid>
+
+      {/* Notification Snackbar */}
+      <Snackbar
+        open={notification.open}
+        autoHideDuration={6000}
+        onClose={handleCloseNotification}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+      >
+        <Alert 
+          onClose={handleCloseNotification} 
+          severity={notification.severity}
+          sx={{ width: '100%' }}
+        >
+          {notification.message}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 }

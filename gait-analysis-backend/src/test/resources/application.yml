@@ -30,12 +30,25 @@ jwt:
 
 mqtt:
   client:
-    endpoint: {MQTT_CLIENT_ENDPOINT}
-    id: {MQTT_CLIENT_ID}
+    endpoint: ${MQTT_CLIENT_ENDPOINT}
+    id: ${MQTT_CLIENT_ID}
   aws:
-    accessKey: {MQTT_AWS_ACCESS_KEY}
-    accessId: {MQTT_AWS_ACCESS_ID}
+    accessKey: ${MQTT_AWS_ACCESS_KEY}
+    accessId: ${MQTT_AWS_ACCESS_ID}
 
+cloud:
+  aws:
+    credentials:
+      access-key: ${MQTT_AWS_ACCESS_ID}
+      secret-key: ${MQTT_AWS_ACCESS_KEY}
+    region:
+      static: eu-north-1
+      auto: false
+
+
+app:
+  sqs:
+    queue-name: rehabgait-processing-request-dev
 
 microservices:
   data:

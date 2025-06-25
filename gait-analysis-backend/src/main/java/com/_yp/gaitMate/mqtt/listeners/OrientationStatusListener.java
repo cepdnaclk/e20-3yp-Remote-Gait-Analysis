@@ -21,7 +21,8 @@ import org.springframework.stereotype.Component;
  * {
  *   "type": "orientation_captured",
  *   "device_id": 34,
- *   "status": true
+ *   "status": true,
+ *   "timestamp": 1321044433
  * }
  * </pre>
  *

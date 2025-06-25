@@ -4,12 +4,14 @@ import com._yp.gaitMate.controller.config.IntegrationTestSupport;
 import com._yp.gaitMate.dto.ApiResponse;
 import com._yp.gaitMate.dto.doctor.CreateDoctorRequest;
 import com._yp.gaitMate.dto.doctor.DoctorInfoResponse;
+import com._yp.gaitMate.mqtt.core.MqttClientProvider;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.*;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.jdbc.Sql;
 
 import java.time.LocalDateTime;

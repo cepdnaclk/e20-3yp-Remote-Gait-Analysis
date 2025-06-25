@@ -1,6 +1,7 @@
 package com._yp.gaitMate.service.testSessionService;
 
 import com._yp.gaitMate.dto.ApiResponse;
+import com._yp.gaitMate.dto.patient.PatientInfoResponse;
 import com._yp.gaitMate.dto.testSession.*;
 import com._yp.gaitMate.exception.ApiException;
 import com._yp.gaitMate.mapper.TestSessionMapper;
@@ -108,12 +109,30 @@ public class TestSessionServiceImpl implements TestSessionService {
         SensorKit sensorKit = patient.getSensorKit();
         sendStopCommandToSensor(sensorKit);
 
-        // 9. Trigger asynchronous processing request
+        // 9. Create patient info response
+        PatientInfoResponse patientInfo = PatientInfoResponse.builder()
+                .id(patient.getId())
+                .name(patient.getName())
+                .email(patient.getEmail())
+                .phoneNumber(patient.getPhoneNumber())
+                .age(patient.getAge())
+                .height(patient.getHeight())
+                .weight(patient.getWeight())
+                .gender(patient.getGender().name())
+                .createdAt(patient.getCreatedAt() != null ? patient.getCreatedAt().toString() : null)
+                .doctorId(patient.getDoctor() != null ? patient.getDoctor().getId() : null)
+                .doctorName(patient.getDoctor() != null ? patient.getDoctor().getName() : null)
+                .sensorKitId(sensorKit != null ? sensorKit.getId() : null)
+                .nic(patient.getNic())
+                .build();
+
+// 10. Trigger asynchronous processing request
         ProcessingRequestDto processingRequest = ProcessingRequestDto.builder()
                 .sensorId(sensorKit.getId())
                 .startTime(session.getStartTime().toString())
                 .endTime(session.getEndTime().toString())
                 .sessionId(session.getId())
+                .patientInfo(patientInfo)  // <- ADD THIS LINE
                 .build();
 
 
@@ -246,9 +265,9 @@ public class TestSessionServiceImpl implements TestSessionService {
 
         long diffInSeconds = Math.abs(java.time.Duration.between(now, parsed).getSeconds());
 
-        if (diffInSeconds > 5) {
-            throw new ApiException("Timestamp must be within ±5 seconds of server time");
-        }
+//        if (diffInSeconds > 5) {
+//            throw new ApiException("Timestamp must be within ±5 seconds of server time");
+//        }
 
         return parsed;
     }

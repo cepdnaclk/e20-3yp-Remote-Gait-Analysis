@@ -1,5 +1,6 @@
 package com._yp.gaitMate.dto.testSession;
 
+import com._yp.gaitMate.dto.patient.PatientInfoResponse;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -23,5 +24,7 @@ public class ProcessingRequestDto {
     private String endTime;
 
     private Long sessionId;
+
+    private PatientInfoResponse patientInfo;
 }
 
