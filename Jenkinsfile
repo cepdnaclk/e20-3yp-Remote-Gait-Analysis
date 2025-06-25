@@ -1,31 +1,25 @@
-pipeline{
-    
-    agent any
-
-    stages{
-        agent{
-            DevServer
-        }
-        stage("build"){
-            steps{
-                echo "This is build"
+pipeline {
+    // No global agent here if stages have their own agents
+    stages {
+        stage("Build") {
+            agent { label 'DevServer' }
+            steps {
+                echo "This is Build stage running on DevServer"
             }
-            
         }
 
-        stage("Test"){
-            steps{
-                echo "This is Test man"
+        stage("Test") {
+            agent { label 'DevServer' }
+            steps {
+                echo "This is Test stage running on DevServer"
             }
-            
         }
 
-        stage("Deploy"){
-            steps{
-                echo "This is Deploy man"
+        stage("Deploy") {
+            agent { label 'ProdServer' }
+            steps {
+                echo "This is Deploy stage running on prodserver"
             }
-            
         }
     }
-
 }
