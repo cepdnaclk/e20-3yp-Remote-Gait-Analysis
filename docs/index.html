@@ -13,6 +13,173 @@
     />
     <link rel="stylesheet" href="css/style2.css" />
     <title>RehabGait - Gait Analysis System</title>
+    <style>
+      /* Additional styles for the new sections */
+      .section-prototype {
+        padding: 5rem 5%;
+        background-color: #f8f9fc;
+        text-align: center;
+      }
+
+      .section-prototype p {
+        max-width: 800px;
+        margin: 0 auto 2rem;
+        font-size: 1.1rem;
+      }
+
+      .prototype-video-container {
+        max-width: 900px;
+        margin: 0 auto 3rem;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        border-radius: 10px;
+        overflow: hidden;
+        position: relative;
+      }
+
+      .prototype-video {
+        width: 100%;
+        display: block;
+        border-radius: 10px;
+      }
+
+      .prototype-features {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 2rem;
+        max-width: 1000px;
+        margin: 0 auto;
+      }
+
+      .prototype-feature {
+        flex: 1;
+        min-width: 200px;
+        max-width: 300px;
+        padding: 1.5rem;
+        background-color: white;
+        border-radius: 10px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+      }
+
+      .prototype-feature:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+      }
+
+      .prototype-feature i {
+        color: #4e73df;
+        margin-bottom: 1rem;
+      }
+
+      .prototype-feature h3 {
+        color: #2e59d9;
+        margin-bottom: 0.5rem;
+      }
+
+      /* Report Section Styles */
+      .section-reports {
+        padding: 5rem 5%;
+        background-color: white;
+      }
+
+      .reports-container {
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+
+      .pdf-viewer-container {
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        padding: 2rem;
+        margin-top: 2rem;
+      }
+
+      .pdf-fallback {
+        text-align: center;
+        padding: 3rem;
+        background: #f8f9fc;
+        border-radius: 8px;
+        border: 2px dashed #e3e6f0;
+      }
+
+      .pdf-fallback h4 {
+        color: #4e73df;
+        margin-bottom: 1rem;
+      }
+
+      .download-section {
+        text-align: center;
+        margin-bottom: 2rem;
+      }
+
+      .download-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: linear-gradient(135deg, #4e73df, #2e59d9);
+        color: white;
+        text-decoration: none;
+        padding: 1rem 2rem;
+        border-radius: 8px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(78, 115, 223, 0.3);
+      }
+
+      .download-btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 6px 20px rgba(78, 115, 223, 0.4);
+      }
+
+      .report-stats {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+        margin-top: 2rem;
+      }
+
+      .stat-card {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 8px;
+        text-align: center;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+      }
+
+      .stat-number {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #4e73df;
+        display: block;
+      }
+
+      .stat-label {
+        font-size: 0.9rem;
+        color: #666;
+        margin-top: 0.5rem;
+      }
+
+      /* Responsive Design */
+      @media (max-width: 768px) {
+        .report-preview-container {
+          flex-direction: column;
+        }
+
+        .prototype-features {
+          flex-direction: column;
+        }
+
+        .prototype-feature {
+          min-width: 100%;
+        }
+
+        .report-stats {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
   </head>
   <body>
     <!-- HEADER -->
@@ -40,6 +207,8 @@
             <a class="main-nav-link" href="#system-design">System Design</a>
           </li>
           <li><a class="main-nav-link" href="#demo">Demo</a></li>
+          <li><a class="main-nav-link" href="#prototype">Prototype</a></li>
+          <li><a class="main-nav-link" href="#reports">Reports</a></li>
           <li><a class="main-nav-link" href="#budget">Budget</a></li>
           <li><a class="main-nav-link" href="#testing">Testing</a></li>
           <li><a class="main-nav-link" href="#team">Team</a></li>
@@ -77,7 +246,7 @@
         </div>
       </section>
 
-            <!-- PROJECT OVERVIEW VIDEO SECTION (New) -->
+      <!-- PROJECT OVERVIEW VIDEO SECTION -->
       <section id="project-overview" class="section-project-overview">
         <div class="section-header">
           <h1>PROJECT OVERVIEW</h1>
@@ -111,7 +280,7 @@
         </div>
       </section>
 
-      <!--- Why remote ? -->
+      <!-- WHY REMOTE SECTION -->
       <section id="why-remote" class="section-why-remote">
         <div class="section-header">
           <h1>WHY REMOTE GAIT ANALYSIS?</h1>
@@ -130,20 +299,6 @@
                 RehabGait's remote analysis technology directly addresses these challenges by:
               </p>
             </div>
-
-            <!-- <div class="why-remote-image">
-              <img src="./images/remote-healthcare.jpg" alt="Remote healthcare benefits illustration">
-              <div class="stat-overlay">
-                <div class="stat">
-                  <h3>75%</h3>
-                  <p>Reduction in treatment time</p>
-                </div>
-                <div class="stat">
-                  <h3>4×</h3>
-                  <p>More patients served</p>
-                </div>
-              </div>
-            </div> -->
             
             <div class="benefits-grid">
               <div class="benefit-card">
@@ -177,12 +332,8 @@
               <p>By implementing RehabGait in Sri Lankan hospitals, we could potentially reduce the national rehabilitation backlog by up to 75%, allowing thousands more patients to receive timely care and return to their daily lives faster.</p>
             </div>
           </div>
-          
-          
         </div>
       </section>
-      
-      
       
       <!-- ABOUT SECTION -->
       <section id="about" class="section-about">
@@ -257,7 +408,7 @@
         </div>
       </section>
 
-      <!-- DEMO VIDEO SECTION (NEW) -->
+      <!-- DEMO VIDEO SECTION -->
       <section id="demo" class="section-demo">
         <div class="section-header">
           <h1>PROOF OF CONCEPT DEMONSTRATION</h1>
@@ -267,7 +418,6 @@
           Watch our demonstration video to see the potential of RehabGait in remote and real-time gait analysis.
         </p>
         <div class="video-container">
-          <!-- Using the specified video from assets/video folder -->
           <video class="demo-video" controls poster="./images/video-thumbnail.jpg">
             <source src="./assets/videos/POC.mp4" type="video/mp4">
             Your browser does not support the video tag.
@@ -288,6 +438,122 @@
             <i class="ri-line-chart-line ri-2x"></i>
             <h3>Progress Tracking</h3>
             <p>Monitor improvements over the course of treatment</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- PROTOTYPE VIDEO SECTION (NEW) -->
+      <section id="prototype" class="section-prototype">
+        <div class="section-header">
+          <h1>PROTOTYPE DEMONSTRATION</h1>
+          <div class="underline"></div>
+        </div>
+        <p>
+          Experience our working prototype in action. This demonstration showcases the complete RehabGait system with real hardware implementation and live data processing.
+        </p>
+        <div class="prototype-video-container">
+          <video class="prototype-video" controls poster="./images/prototype-thumbnail.jpg">
+            <source src="./assets/videos/Prototype.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+          </video>
+        </div>
+        <div class="prototype-features">
+          <div class="prototype-feature">
+            <i class="ri-cpu-line ri-2x"></i>
+            <h3>Hardware Integration</h3>
+            <p>Complete sensor setup with real-time data collection from wearable devices</p>
+          </div>
+          <div class="prototype-feature">
+            <i class="ri-wifi-line ri-2x"></i>
+            <h3>Wireless Communication</h3>
+            <p>Seamless data transmission from sensors to processing unit</p>
+          </div>
+          <div class="prototype-feature">
+            <i class="ri-bar-chart-line ri-2x"></i>
+            <h3>Live Data Processing</h3>
+            <p>Real-time analysis and visualization of gait parameters</p>
+          </div>
+          <div class="prototype-feature">
+            <i class="ri-user-settings-line ri-2x"></i>
+            <h3>User Interface</h3>
+            <p>Intuitive dashboard for healthcare professionals</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- REPORTS SECTION (NEW) -->
+      <section id="reports" class="section-reports">
+        <div class="section-header">
+          <h1>PROJECT REPORT & DOCUMENTATION</h1>
+          <div class="underline"></div>
+        </div>
+        <div class="reports-container">
+          <p style="text-align: center; max-width: 800px; margin: 0 auto 2rem; font-size: 1.1rem;">
+            Access our comprehensive technical documentation with detailed analysis, methodology, and research findings. Please note that this report contains data and findings from a controlled test sessions, and all patient information included is dummy data for demonstration purposes
+          </p>
+          
+          <!-- Download Button -->
+          <div style="text-align: center; margin: 2rem 0;">
+            <a href="./assets/reports/gait_report_1.pdf" class="download-btn" download target="_blank">
+              <i class="ri-download-line"></i>
+              Download PDF Report
+            </a>
+            <p style="margin-top: 1rem; font-size: 0.9rem; color: #666;">
+              Complete technical documentation (PDF format)
+            </p>
+          </div>
+
+          <!-- Live PDF Viewer -->
+          <div class="pdf-viewer-container">
+            <h3 style="color: #4e73df; margin-bottom: 1.5rem; text-align: center;">
+              <i class="ri-file-pdf-line"></i> Live PDF Preview
+            </h3>
+            
+            <!-- PDF Embed with multiple fallback options -->
+            <div style="position: relative;">
+              <!-- Primary PDF embed using object tag -->
+              <object 
+                data="./assets/reports/gait_report_1.pdf" 
+                type="application/pdf" 
+                class="pdf-embed"
+                style="width: 100%; height: 800px; border-radius: 8px; box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);">
+                
+                <!-- Fallback: iframe for browsers that support it -->
+                <iframe 
+                  src="./assets/reports/gait_report_1.pdf" 
+                  style="width: 100%; height: 800px; border: none; border-radius: 8px;">
+                  
+                  <!-- Final fallback: download link -->
+                  <div class="pdf-fallback" style="text-align: center; padding: 3rem; background: #f8f9fc; border-radius: 8px; border: 2px dashed #e3e6f0;">
+                    <h4 style="color: #4e73df; margin-bottom: 1rem;">
+                      <i class="ri-alert-line"></i> PDF Preview Not Available
+                    </h4>
+                    <p style="color: #666; margin-bottom: 1.5rem;">
+                      Your browser doesn't support inline PDF viewing. Please download the report to view it.
+                    </p>
+                    <a href="./assets/reports/gait_report_1.pdf" class="download-btn" download target="_blank">
+                      <i class="ri-download-line"></i>
+                      Download PDF Report
+                    </a>
+                  </div>
+                </iframe>
+              </object>
+            </div>
+            
+            <!-- PDF Controls -->
+            <div style="text-align: center; margin-top: 1rem; padding: 1rem; background: #f8f9fc; border-radius: 8px;">
+              <p style="color: #666; font-size: 0.9rem; margin-bottom: 0.5rem;">
+                <i class="ri-information-line"></i> Tip: Use your browser's PDF controls to zoom, search, and navigate
+              </p>
+              <div style="display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap;">
+                <a href="./assets/reports/gait_report_1.pdf" target="_blank" style="color: #4e73df; text-decoration: none; font-size: 0.9rem;">
+                  <i class="ri-external-link-line"></i> Open in New Tab
+                </a>
+                <a href="./assets/reports/gait_report_1.pdf" download style="color: #4e73df; text-decoration: none; font-size: 0.9rem;">
+                  <i class="ri-download-line"></i> Download PDF
+                </a>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -471,6 +737,8 @@
             <li><a href="#home">Home</a></li>
             <li><a href="#about">About</a></li>
             <li><a href="#demo">Demo</a></li>
+            <li><a href="#prototype">Prototype</a></li>
+            <li><a href="#reports">Reports</a></li>
             <li><a href="#team">Team</a></li>
           </ul>
         </div>
@@ -485,6 +753,212 @@
       </div>
     </footer>
 
-    <script src="./javascript/script.js"></script>
+    <script>
+      // Enhanced JavaScript with slideshow functionality
+      
+      // Existing smooth scrolling animation
+      const allLinks = document.querySelectorAll(".main-nav-link");
+
+      allLinks.forEach(function (link) {
+        link.addEventListener("click", function (e) {
+          e.preventDefault();
+          const href = link.getAttribute("href");
+
+          allLinks.forEach((link_) => {
+            link_.classList.remove("active");
+
+            if (href === link_.getAttribute("href")) {
+              link_.classList.add("active");
+            }
+          });
+
+          // Scroll back to top
+          if (href === "#")
+            window.scrollTo({
+              top: 0,
+              behavior: "smooth",
+            });
+
+          // Scroll to other links
+          if (href !== "#" && href.startsWith("#")) {
+            const sectionEl = document.querySelector(href);
+            sectionEl.scrollIntoView({ behavior: "smooth" });
+          }
+        });
+      });
+
+      // Existing sticky navigation
+      const sectionHeroEl = document.querySelector(".section-hero");
+
+      const obs = new IntersectionObserver(
+        function (entries) {
+          const ent = entries[0];
+
+          if (ent.isIntersecting === false) {
+            document.body.classList.add("sticky");
+          }
+
+          if (ent.isIntersecting === true) {
+            document.body.classList.remove("sticky");
+          }
+        },
+        {
+          root: null,
+          threshold: 0,
+          rootMargin: "-80px",
+        }
+      );
+      obs.observe(sectionHeroEl);
+
+      // NEW: Tab switching functionality
+      function switchTab(tabName) {
+        // Hide all tab contents
+        document.querySelectorAll('.tab-content').forEach(content => {
+          content.classList.remove('active');
+        });
+        
+        // Remove active class from all tab buttons
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+          btn.classList.remove('active');
+        });
+        
+        // Show selected tab content
+        document.getElementById(tabName + '-tab').classList.add('active');
+        
+        // Add active class to clicked button
+        event.target.classList.add('active');
+        
+        // If switching to PDF viewer, check if PDF can be displayed
+        if (tabName === 'viewer') {
+          checkPDFSupport();
+        }
+      }
+
+      // Check if browser supports PDF viewing
+      function checkPDFSupport() {
+        const iframe = document.querySelector('.pdf-embed');
+        const fallback = document.querySelector('.pdf-fallback');
+        
+        iframe.onload = function() {
+          // PDF loaded successfully
+          fallback.style.display = 'none';
+        };
+        
+        iframe.onerror = function() {
+          // PDF failed to load, show fallback
+          iframe.style.display = 'none';
+          fallback.style.display = 'block';
+        };
+      }
+
+      // NEW: Slideshow functionality
+      let slideIndex = 1;
+
+      function changeSlide(n) {
+        showSlide(slideIndex += n);
+      }
+
+      function currentSlide(n) {
+        showSlide(slideIndex = n);
+      }
+
+      function showSlide(n) {
+        const slides = document.querySelectorAll('.slide');
+        const indicators = document.querySelectorAll('.indicator');
+        
+        if (n > slides.length) { slideIndex = 1; }
+        if (n < 1) { slideIndex = slides.length; }
+        
+        // Hide all slides
+        slides.forEach(slide => slide.classList.remove('active'));
+        indicators.forEach(indicator => indicator.classList.remove('active'));
+        
+        // Show current slide
+        if (slides[slideIndex - 1]) {
+          slides[slideIndex - 1].classList.add('active');
+        }
+        if (indicators[slideIndex - 1]) {
+          indicators[slideIndex - 1].classList.add('active');
+        }
+      }
+
+      // Auto-advance slideshow every 8 seconds
+      setInterval(() => {
+        changeSlide(1);
+      }, 8000);
+
+      // Mobile navigation toggle
+      const mobileNavToggle = document.querySelector('.mobile-nav-toggle');
+      const mainNav = document.querySelector('.main-nav');
+
+      if (mobileNavToggle) {
+        mobileNavToggle.addEventListener('click', function() {
+          mainNav.classList.toggle('active');
+          mobileNavToggle.classList.toggle('active');
+        });
+      }
+
+      // Close mobile nav when clicking on a link
+      const navLinks = document.querySelectorAll('.main-nav-link');
+      navLinks.forEach(link => {
+        link.addEventListener('click', () => {
+          mainNav.classList.remove('active');
+          mobileNavToggle.classList.remove('active');
+        });
+      });
+
+      // Smooth scroll behavior for all internal links
+      document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+          e.preventDefault();
+          const target = document.querySelector(this.getAttribute('href'));
+          if (target) {
+            target.scrollIntoView({
+              behavior: 'smooth',
+              block: 'start'
+            });
+          }
+        });
+      });
+
+      // Enhanced header scroll effect
+      let lastScrollTop = 0;
+      const header = document.querySelector('header');
+
+      window.addEventListener('scroll', () => {
+        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+        
+        if (scrollTop > 100) {
+          header.classList.add('scrolled');
+        } else {
+          header.classList.remove('scrolled');
+        }
+        
+        lastScrollTop = scrollTop;
+      });
+
+      // Intersection Observer for animations
+      const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+      };
+
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.style.opacity = '1';
+            entry.target.style.transform = 'translateY(0)';
+          }
+        });
+      }, observerOptions);
+
+      // Observe elements for animation
+      document.querySelectorAll('.feature, .highlight, .testing-card, .team-card, .benefit-card, .prototype-feature').forEach(el => {
+        el.style.opacity = '0';
+        el.style.transform = 'translateY(20px)';
+        el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+        observer.observe(el);
+      });
+    </script>
   </body>
 </html>
