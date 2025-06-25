@@ -48,10 +48,10 @@ app:
 
 
 
-microservices:
-  data:
-    processing:
-      url: http://localhost:8000/process-session
+#microservices:
+#  data:
+#    processing:
+#      url: http://localhost:8000/process-session
 
 
 
