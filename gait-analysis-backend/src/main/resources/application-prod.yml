@@ -1,0 +1,53 @@
+spring:
+  datasource:
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    defer-datasource-initialization: true  #This ensures the execution happens after Hibernate creates the tables
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+    database: postgresql
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+  sql:
+    init:
+      mode: always
+
+jwt:
+  secret: ${JWT_SECRET}
+  expiration:
+    ms: 432000000
+
+
+mqtt:
+  client:
+    endpoint: ${MQTT_CLIENT_ENDPOINT}
+    id: ${MQTT_CLIENT_ID}
+  aws:
+    accessKey: ${AWS_SECRET_KEY}
+    accessId: ${AWS_ACCESS_ID}
+
+cloud:
+  aws:
+    credentials:
+      access-key: ${AWS_ACCESS_ID}
+      secret-key: ${AWS_SECRET_KEY}
+    region:
+      static: eu-north-1
+      auto: false
+
+
+app:
+  sqs:
+    queue-name: ${SQS_QUEUE_NAME:rehabgait-processing-request-dev}
+
+logging:
+  level:
+    org.springframework.security: INFO
+
+

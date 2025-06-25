@@ -24,3 +24,4 @@ hardware-testing/
 mobile-app/
 POC/
 POC.code-workspace
+.env.prod
