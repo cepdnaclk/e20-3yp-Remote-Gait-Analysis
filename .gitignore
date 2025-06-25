@@ -15,4 +15,12 @@
 # Ignore Python virtual environment (if using one)
 **/.venv/
 
-
+# prod branch update (ci cd workflow)
+.github/
+.idea/
+data-processing-service/
+docs/
+hardware-testing/
+mobile-app/
+POC/
+POC.code-workspace
