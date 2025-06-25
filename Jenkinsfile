@@ -3,7 +3,9 @@ pipeline{
     agent any
 
     stages{
-
+        agent{
+            DevServer
+        }
         stage("build"){
             steps{
                 echo "This is build"
