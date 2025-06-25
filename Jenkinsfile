@@ -1,6 +1,7 @@
 pipeline {
     // No global agent here if stages have their own agents
     stages {
+        agent none
         stage("Build") {
             agent { label 'DevServer' }
             steps {
