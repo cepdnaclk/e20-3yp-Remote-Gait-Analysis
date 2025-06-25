@@ -71,7 +71,8 @@ pipeline {
             steps {
                 sshagent(['rehabgait-backend-deploy-key']) {
                     sh """
-                    ssh -o StrictHostKeyChecking=no ubuntu@${env.BACKEND_HOST} << EOF
+                        ssh -o StrictHostKeyChecking=no ubuntu@${env.BACKEND_HOST} << 'EOF'
+                        set -e
                         cd ${env.DEPLOY_DIR}
                         docker pull ${env.IMAGE_NAME}
                         docker stop ${env.CONTAINER_NAME} || true
@@ -80,7 +81,7 @@ pipeline {
                             --env-file .env.prod \\
                             -p 8080:8080 \\
                             ${env.IMAGE_NAME}
-                    EOF
+                        EOF
                     """
                 }
             }
