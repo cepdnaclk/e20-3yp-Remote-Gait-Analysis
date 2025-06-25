@@ -3,11 +3,13 @@ package com._yp.gaitMate.mqtt.core;
 import com.amazonaws.services.iot.client.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 /**
  * Publishes messages to AWS IoT Core using either blocking or non-blocking (async) mode.
  */
+@Profile("!test")
 @Component
 @RequiredArgsConstructor
 @Slf4j
