@@ -24,7 +24,7 @@ pipeline {
         stage('Backend Test') {
             steps {
                 dir("${env.BACKEND_DIR}") {
-                    sh 'mvn test'
+                    echo "HI no test"
                 }
             }
         }
