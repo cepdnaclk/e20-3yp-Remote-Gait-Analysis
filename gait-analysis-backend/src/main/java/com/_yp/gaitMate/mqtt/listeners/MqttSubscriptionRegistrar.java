@@ -16,7 +16,7 @@ import org.springframework.stereotype.Component;
  * to AWS IoT Core once the client is connected.
  * </p>
  */
-@Profile("!test")
+
 @Component
 @RequiredArgsConstructor
 @Slf4j

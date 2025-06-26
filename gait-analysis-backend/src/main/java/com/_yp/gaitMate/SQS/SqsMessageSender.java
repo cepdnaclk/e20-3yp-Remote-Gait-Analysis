@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.UUID;
 
-@Profile("!test")
+
 @Slf4j
 @Service
 @RequiredArgsConstructor

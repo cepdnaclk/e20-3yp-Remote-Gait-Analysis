@@ -45,7 +45,7 @@ import org.springframework.stereotype.Component;
 //    "device_id": 34,
 //    "status": true
 //}
-@Profile("!test")
+
 @Component
 @Slf4j
 public class CalibrationStatusListener extends AbstractTopicListener {

@@ -22,7 +22,7 @@ import java.time.format.DateTimeFormatter;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@ActiveProfiles("test")
+
 @SpringBootTest
 @Sql(scripts = "/test-data/doctor-test-data.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 @Sql(scripts = "/test-data/clean.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)

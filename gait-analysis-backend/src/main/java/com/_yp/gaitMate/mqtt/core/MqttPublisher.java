@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 /**
  * Publishes messages to AWS IoT Core using either blocking or non-blocking (async) mode.
  */
-@Profile("!test")
+
 @Component
 @RequiredArgsConstructor
 @Slf4j
