@@ -14,20 +14,31 @@ pipeline {
         DEPLOY_DIR = '/home/ubuntu/backend'
     }
 
-    stages {
-        stage('Checkout Code') {
-            steps {
-                checkout scm
+        stages {
+            stage('Checkout Code') {
+                steps {
+                    checkout scm
+                }
             }
-        }
 
         stage('Backend Test') {
             steps {
                 dir("${env.BACKEND_DIR}") {
-                    echo "HI no test"
+                    withCredentials([file(credentialsId: 'env-test-file', variable: 'ENV_TEST_FILE')]) {
+                        sh '''
+                            echo "📦 Loading test environment variables"
+                            set -a
+                            source "$ENV_TEST_FILE"
+                            set +a
+
+                            echo "🧪 Running backend tests..."
+                            mvn test
+                        '''
+                    }
                 }
             }
         }
+
 
         stage('Build Backend') {
             steps {
