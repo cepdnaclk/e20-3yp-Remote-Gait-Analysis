@@ -1,5 +1,5 @@
 import React from "react";
-import useWebSocket from "../../../../POC/gait-visualizer/src/hooks/useWebSocket";
+//import useWebSocket from "../../../../POC/gait-visualizer/src/hooks/useWebSocket";
 
 const HeatmapWebSock3Force = () => {
   // Configuration parameters - easy to modify
