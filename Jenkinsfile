@@ -24,20 +24,21 @@ pipeline {
         stage('Backend Test') {
             steps {
                 dir("${env.BACKEND_DIR}") {
-                    withCredentials([file(credentialsId: 'env-test-file', variable: 'ENV_TEST_FILE')]) {
-                        sh '''
-                            echo "📦 Loading test environment variables"
-                            set -a
-                            source "$ENV_TEST_FILE"
-                            set +a
-
-                            echo "🧪 Running backend tests..."
-                            mvn test
+                    withCredentials([
+                        file(credentialsId: 'env-test-file', variable: 'ENV_TEST_FILE')
+                    ]) {
+                        sh '''#!/bin/bash
+                        echo "📦 Loading test environment variables"
+                        set -a
+                        . "$ENV_TEST_FILE"
+                        set +a
+                        mvn test
                         '''
                     }
                 }
             }
         }
+
 
 
         stage('Build Backend') {
