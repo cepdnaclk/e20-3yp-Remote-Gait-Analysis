@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useMemo } from "react";
 import { Box, Typography, Paper, Grid } from "@mui/material";
 import { styled } from "@mui/material/styles";
 //import useWebSocket from "../../../../POC/gait-visualizer/src/hooks/useWebSocket";
-import useWebSocket from "../../hooks/useWebSocket";
+import useWebSocket from "../../hooks/useWebSocketOld";
 
 // Styled components
 const HeatmapContainer = styled(Box)(({ theme }) => ({
