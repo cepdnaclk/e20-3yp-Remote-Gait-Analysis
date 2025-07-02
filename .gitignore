@@ -25,3 +25,6 @@ mobile-app/
 POC/
 POC.code-workspace
 .env.prod
+gait-analysis-frontend/.env
+gait-analysis-frontend/.env.development
+gait-analysis-frontend/.env.production
