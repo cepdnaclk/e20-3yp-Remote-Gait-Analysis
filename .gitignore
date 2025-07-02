@@ -28,3 +28,4 @@ POC.code-workspace
 gait-analysis-frontend/.env
 gait-analysis-frontend/.env.development
 gait-analysis-frontend/.env.production
+nginx-config.txt
