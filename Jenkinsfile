@@ -99,6 +99,24 @@ pipeline {
                     }
                 }
             }
+             // 🔍 ADD DEBUG STAGE HERE
+            stage('Debug Frontend Structure') {
+                steps {
+                    dir("${env.FRONTEND_DIR}") {
+                        sh '''
+                            echo "📁 Checking frontend directory structure..."
+                            find . -name "*.js" -o -name "*.jsx" | grep -E "(websocket|service)" || echo "No websocket-related files found"
+                            echo "📂 Contents of src directory:"
+                            ls -la src/ || echo "src directory not found"
+                            echo "📂 Contents of src/services directory:"
+                            ls -la src/services/ || echo "src/services directory not found"
+                            echo "🔍 Looking for websocketService.js specifically:"
+                            find . -name "websocketService.js" -type f
+                        '''
+                    }
+                }
+            }
+
 
             stage('Build Frontend') {
                 steps {
