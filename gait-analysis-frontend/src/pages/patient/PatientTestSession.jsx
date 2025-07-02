@@ -17,7 +17,7 @@ import useGaitTestState from "../../hooks/useGaitTestState";
 import {
   connectWebSocket,
   disconnectWebSocket,
-} from '@services/websocketService';
+} from '@services/websocketService.js';
 import sendCommand from "../../utils/sendCommand";
 import formatTime from "../../utils/formatTime";
 import { useNavigate } from "react-router-dom";
