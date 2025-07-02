@@ -45,6 +45,8 @@ cloud:
 app:
   sqs:
     queue-name: rehabgait-processing-request-dev
+  cors:
+    allowed-origin: http://localhost:5173
 
 
 

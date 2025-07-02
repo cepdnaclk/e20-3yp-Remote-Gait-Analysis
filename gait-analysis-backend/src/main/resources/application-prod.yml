@@ -45,6 +45,9 @@ cloud:
 app:
   sqs:
     queue-name: ${SQS_QUEUE_NAME:rehabgait-processing-request-dev}
+  cors:
+    allowed-origin: https://rehabgait.com
+
 
 logging:
   level:
