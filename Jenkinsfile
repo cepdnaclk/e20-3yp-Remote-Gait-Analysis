@@ -108,7 +108,7 @@ pipeline {
                                 echo "🌐 Setting up frontend environment"
                                 cp $FRONTEND_ENV .env.production
                                 export NVM_DIR="$HOME/.nvm"
-                                [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+                                [ -s "$NVM_DIR/nvm.sh" ] && source "$NVM_DIR/nvm.sh"
 
                                 nvm use 20
                                 npm ci
