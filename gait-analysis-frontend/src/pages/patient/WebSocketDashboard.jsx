@@ -1,6 +1,8 @@
 import React, { useEffect } from 'react';
 //import { connectWebSocket, disconnectWebSocket } from './websocketService';
-import { connectWebSocket, disconnectWebSocket } from '../../services/websocketService';
+//import { connectWebSocket, disconnectWebSocket } from '../../services/websocketService';
+import { connectWebSocket, disconnectWebSocket } from '@services/websocketService';
+
 
 const WebSocketDashboard = () => {
   const authToken = localStorage.getItem('token');

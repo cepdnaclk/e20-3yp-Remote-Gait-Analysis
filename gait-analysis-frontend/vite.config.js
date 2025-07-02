@@ -5,5 +5,10 @@ export default defineConfig({
   plugins: [react()],
   define: {
     global: 'globalThis',
-  }
+  },
+  resolve: {
+    alias: {
+      '@services': path.resolve(__dirname, 'src/services'),
+    },
+  },
 })
