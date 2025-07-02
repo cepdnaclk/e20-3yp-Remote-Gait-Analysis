@@ -87,7 +87,7 @@ export default function Home() {
           </Typography>
           <Typography variant="h5" sx={{ mt: 2, mb: 3 }}>
 
-            Empowering physiotherapists with cutting-edge technology ! to monitor and improve patient mobility Anytime, Anywhere.!
+            Empowering physiotherapists with cutting-edge technology ! to monitor and improve patient mobility Anytime, Anywhere.!!
 
           </Typography>
           <Button
