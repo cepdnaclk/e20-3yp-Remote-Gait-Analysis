@@ -12,6 +12,10 @@ pipeline {
         CONTAINER_NAME = 'gait-backend'
         IMAGE_NAME = 'yohansenanayake/rehabgait-backend:latest'
         DEPLOY_DIR = '/home/ubuntu/backend'
+        FRONTEND_DIR = 'gait-analysis-frontend'
+        S3_BUCKET = 'www.rehabgait.com'
+        AWS_REGION = 'eu-north-1'
+
     }
 
     stages {
@@ -95,6 +99,43 @@ pipeline {
                     }
                 }
             }
+
+            stage('Build Frontend') {
+                steps {
+                    dir("${env.FRONTEND_DIR}") {
+                        withCredentials([file(credentialsId: 'env-prod-frontend', variable: 'FRONTEND_ENV')]) {
+                            sh '''
+                                echo "🌐 Setting up frontend environment"
+                                cp $FRONTEND_ENV .env.production
+                                npm ci
+                                npm run build
+                            '''
+                        }
+                    }
+                }
+            }
+
+            stage('Upload to S3') {
+                steps {
+                    dir("${env.FRONTEND_DIR}") {
+                        sh '''
+                            echo "📤 Syncing frontend build to S3 bucket: ${S3_BUCKET}"
+                            aws s3 sync dist/ s3://${S3_BUCKET}/ --delete --region ${AWS_REGION}
+                        '''
+                    }
+                }
+            }
+
+            stage('Invalidate CloudFront Cache') {
+                steps {
+                    sh '''
+                        echo "🚀 Invalidating CloudFront cache"
+                        aws cloudfront create-invalidation --distribution-id E2R68S9IUACL7H --paths "/*"
+                        aws cloudfront create-invalidation --distribution-id ERP7VK01EA1CA --paths "/*"
+                    '''
+                }
+            }
+
     }
 
     post {
