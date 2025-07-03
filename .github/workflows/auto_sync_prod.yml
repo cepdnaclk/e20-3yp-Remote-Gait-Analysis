@@ -38,8 +38,13 @@ jobs:
           gait-processing-service
 
         git add .
+        if git diff --cached --quiet; then
+          echo "✅ No changes to commit. Exiting gracefully."
+          exit 0
+        fi
         git commit -m "🔄 Auto-sync deploy folders from main"
         git push origin $BRANCH
+
 
         echo "branch=$BRANCH" >> $GITHUB_OUTPUT
 
