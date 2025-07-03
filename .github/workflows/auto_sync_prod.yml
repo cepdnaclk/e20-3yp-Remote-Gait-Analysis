@@ -28,8 +28,8 @@ jobs:
         git fetch origin prod
         git checkout -b $BRANCH origin/prod
 
-        # Remove everything from working directory
-        git rm -rf . || true
+        # ⚠️ Remove everything except .ci and .git
+        find . -mindepth 1 -maxdepth 1 ! -name '.git' ! -name '.ci' -exec rm -rf {} +
 
         # Restore only selected deploy folders from main
         git checkout main -- \
@@ -42,6 +42,7 @@ jobs:
         git push origin $BRANCH
 
         echo "branch=$BRANCH" >> $GITHUB_OUTPUT
+
 
     - name: 🔀 Open PR to prod
       uses: repo-sync/pull-request@v2
