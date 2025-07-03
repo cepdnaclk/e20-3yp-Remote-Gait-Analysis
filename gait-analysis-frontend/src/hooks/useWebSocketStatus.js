@@ -145,7 +145,8 @@ import { useEffect, useState, useRef } from 'react';
 import SockJS from 'sockjs-client';
 import Stomp from 'stompjs';
 
-const WEBSOCKET_URL = 'http://localhost:8080/ws';
+// const WEBSOCKET_URL = 'http://localhost:8080/ws';
+const WEBSOCKET_URL = `${import.meta.env.VITE_API_BASE_URL}/ws`;
 
 const useWebSocketStatus = (authToken) => {
   const [deviceAlive, setDeviceAlive] = useState(false);
