@@ -53,3 +53,23 @@ jobs:
         pr_body: |
           Automated PR to sync deployment folders (`gait-analysis-backend`, `frontend`, `processing-service`) from `main` to `prod`.
         github_token: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: 📧 Notify team about new sync PR
+      uses: dawidd6/action-send-mail@v3
+      with:
+        server_address: ${{ secrets.SMTP_SERVER }}
+        server_port: ${{ secrets.SMTP_PORT }}
+        username: ${{ secrets.SMTP_USERNAME }}
+        password: ${{ secrets.SMTP_PASSWORD }}
+        subject: "🔄 New PR: Sync Main → Prod"
+        from: "RehabGait CI <${{ secrets.FROM_EMAIL }}>"
+        to: |
+          yohansenanayake4321@gmail.com
+        body: |
+          A new pull request has been created to sync selected deployment folders from `main` to `prod`.
+
+          ➤ Branch: ${{ steps.sync-prod.outputs.branch }}
+          ➤ Repository: https://github.com/${{ github.repository }}
+          ➤ Pull Requests: https://github.com/${{ github.repository }}/pulls
+
+          🛡️ This is an automated message from the RehabGait CI system.
