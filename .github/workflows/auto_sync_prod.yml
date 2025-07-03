@@ -1,0 +1,54 @@
+name: Sync to Prod
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  sync-prod:
+    name: Sync Deploy Folders to Prod
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: ⬇️ Checkout main branch
+      uses: actions/checkout@v4
+      with:
+        ref: main
+        token: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: 📦 Copy deploy folders to temp branch
+      id: sync-prod
+      run: |
+        BRANCH=auto-sync-prod-$(date +%Y%m%d-%H%M%S)
+        git config user.name "github-actions"
+        git config user.email "github-actions@github.com"
+
+        # Create new branch from prod
+        git fetch origin prod
+        git checkout -b $BRANCH origin/prod
+
+        # Remove everything from working directory
+        git rm -rf . || true
+
+        # Restore only selected deploy folders from main
+        git checkout main -- \
+          gait-analysis-backend \
+          gait-analysis-frontend \
+          gait-processing-service
+
+        git add .
+        git commit -m "🔄 Auto-sync deploy folders from main"
+        git push origin $BRANCH
+
+        echo "branch=$BRANCH" >> $GITHUB_OUTPUT
+
+    - name: 🔀 Open PR to prod
+      uses: repo-sync/pull-request@v2
+      with:
+        source_branch: ${{ steps.sync-prod.outputs.branch }}
+        destination_branch: prod
+        pr_title: "🔄 Auto-sync deploy folders from main"
+        pr_body: |
+          Automated PR to sync deployment folders (`gait-analysis-backend`, `frontend`, `processing-service`) from `main` to `prod`.
+        github_token: ${{ secrets.GITHUB_TOKEN }}
