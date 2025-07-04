@@ -86,9 +86,9 @@ export default function Home() {
             Remote Gait Analysis System
           </Typography>
           <Typography variant="h5" sx={{ mt: 2, mb: 3 }}>
-
-            Empowering physiotherapists with cutting-edge technology to monitor and improve patient mobility Anytime, Anywhere. Heal Smart Heal fast.?
-
+            
+            Empowering physiotherapists with cutting-edge technology to monitor and improve patient mobility Anytime, Anywhere. Heal Smart Heal fast. Email test 2
+            
           </Typography>
           <Button
             variant="contained"
