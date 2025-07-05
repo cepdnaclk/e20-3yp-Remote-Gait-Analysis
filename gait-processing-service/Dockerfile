@@ -11,7 +11,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy app source code
 COPY app/ app/
 
-# Optionally copy entrypoint shell or .env if needed during build
+# Set the Python path to make 'app' importable
+ENV PYTHONPATH=/app
 
 # Entrypoint
 CMD ["python", "app/main.py"]
