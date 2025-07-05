@@ -5,3 +5,4 @@ temp_plots/
 __pycache__/
 *.pyc
 .env
+.env.prod
