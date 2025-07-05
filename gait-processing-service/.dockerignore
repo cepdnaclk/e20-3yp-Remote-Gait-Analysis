@@ -1,0 +1,7 @@
+venv/
+notebooks/
+temp/
+temp_plots/
+__pycache__/
+*.pyc
+.env

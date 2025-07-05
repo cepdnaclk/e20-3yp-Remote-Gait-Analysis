@@ -15,6 +15,11 @@ pipeline {
         FRONTEND_DIR = 'gait-analysis-frontend'
         S3_BUCKET = 'www.rehabgait.com'
         AWS_REGION = 'eu-north-1'
+        PROCESSING_DIR = 'gait-processing-service'
+        PROCESSING_IMAGE = 'yohansenanayake/rehabgait-processing:latest'
+        PROCESSING_HOST = '13.48.156.250' 
+        PROCESSING_CONTAINER = 'gait-processing'
+        PROCESSING_DEPLOY_DIR = '/home/ubuntu/processing'
 
     }
 
@@ -156,6 +161,49 @@ pipeline {
                     '''
                 }
             }
+
+            stage('Build & Push Gait Processing Image') {
+                steps {
+                    dir("${env.PROCESSING_DIR}") {
+                        script {
+                            sh "docker build -t ${env.PROCESSING_IMAGE} ."
+
+                            withCredentials([usernamePassword(
+                                credentialsId: 'dockerhub-credentials',
+                                usernameVariable: 'DOCKER_USER',
+                                passwordVariable: 'DOCKER_PASS'
+                            )]) {
+                                sh """
+                                    echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
+                                    docker push ${env.PROCESSING_IMAGE}
+                                    docker logout
+                                """
+                            }
+                        }
+                    }
+                }
+            }
+
+            stage('Deploy Gait Processing Service') {
+                steps {
+                    sshagent(['rehabgait-backend-deploy-key']) {
+                        sh """
+                            ssh -o StrictHostKeyChecking=no ubuntu@${env.PROCESSING_HOST} << EOF
+                            set -e
+                            cd ${env.PROCESSING_DEPLOY_DIR}
+                            docker pull ${env.PROCESSING_IMAGE}
+                            docker stop ${env.PROCESSING_CONTAINER} || true
+                            docker rm ${env.PROCESSING_CONTAINER} || true
+                            docker run -d --name ${env.PROCESSING_CONTAINER} \
+                                --env-file .env.prod \
+                                ${env.PROCESSING_IMAGE}
+                        """
+                    }
+                }
+            }
+
+
+
 
     }
 
