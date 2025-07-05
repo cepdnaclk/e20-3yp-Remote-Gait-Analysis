@@ -4,3 +4,4 @@ nginx-config.txt
 gait-analysis-frontend/.env.production
 gait-analysis-frontend/.env.development
 gait-analysis-frontend/.env
+mobile-app/
