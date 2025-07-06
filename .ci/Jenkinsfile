@@ -308,6 +308,6 @@ pipeline {
                 
                 echo "📧 Failure notification sent via SES template"
             }
-
+        }
     }
 }
