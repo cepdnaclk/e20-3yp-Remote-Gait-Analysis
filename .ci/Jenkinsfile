@@ -239,7 +239,7 @@ pipeline {
                 sh """
                     aws ses send-templated-email \
                         --source "RehabGait CI <alert@rehabgait.com>" \
-                        --destination "ToAddresses=yohansenanayake4321@gmail.com,e20037@eng.pdn.ac.lk,e20342@eng.pdn.ac.lk" \
+                        --destination "ToAddresses=yohansenanayake4321@gmail.com,e20037@eng.pdn.ac.lk,e20342@eng.pdn.ac.lk,e20365@eng.pdn.ac.lk" \
                         --template "RehabGaitDeploymentSuccess" \
                         --template-data '{
                             "job_name": "${env.JOB_NAME}",
@@ -292,7 +292,7 @@ pipeline {
                 sh """
                     aws ses send-templated-email \
                         --source "RehabGait CI <alert@rehabgait.com>" \
-                        --destination "ToAddresses=yohansenanayake4321@gmail.com,e20037@eng.pdn.ac.lk,e20342@eng.pdn.ac.lk" \
+                        --destination "ToAddresses=yohansenanayake4321@gmail.com,e20037@eng.pdn.ac.lk,e20342@eng.pdn.ac.lk,e20365@eng.pdn.ac.lk" \
                         --template "RehabGaitDeploymentFaliure" \
                         --template-data '{
                             "job_name": "${env.JOB_NAME}",
