@@ -1,0 +1,6 @@
+{
+  "TemplateName": "TestTemplate",
+  "Subject": "Test Email",
+  "HtmlPart": "<html><body><h1>Hello {{name}}</h1><p>This is a test email.</p></body></html>",
+  "TextPart": "Hello {{name}}\n\nThis is a test email."
+}
