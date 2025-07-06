@@ -1,0 +1,80 @@
+name: Sync to Prod
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  sync-prod:
+    name: Sync Deploy Folders to Prod
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: ⬇️ Checkout main branch
+      uses: actions/checkout@v4
+      with:
+        ref: main
+        token: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: 📦 Copy deploy folders to temp branch
+      id: sync-prod
+      run: |
+        BRANCH=auto-sync-prod-$(date +%Y%m%d-%H%M%S)
+        git config user.name "github-actions"
+        git config user.email "github-actions@github.com"
+
+        # Create new branch from prod
+        git fetch origin prod
+        git checkout -b $BRANCH origin/prod
+
+        # ⚠️ Remove everything except .ci and .git
+        find . -mindepth 1 -maxdepth 1 ! -name '.git' ! -name '.ci' -exec rm -rf {} +
+
+        # Restore only selected deploy folders from main
+        git checkout main -- \
+          gait-analysis-backend \
+          gait-analysis-frontend \
+          gait-processing-service
+
+        git add .
+        if git diff --cached --quiet; then
+          echo "✅ No changes to commit. Exiting gracefully."
+          exit 0
+        fi
+        git commit -m "🔄 Auto-sync deploy folders from main"
+        git push origin $BRANCH
+
+
+        echo "branch=$BRANCH" >> $GITHUB_OUTPUT
+
+
+    - name: 🔀 Open PR to prod
+      uses: repo-sync/pull-request@v2
+      with:
+        source_branch: ${{ steps.sync-prod.outputs.branch }}
+        destination_branch: prod
+        pr_title: "🔄 Auto-sync deploy folders from main"
+        pr_body: |
+          Automated PR to sync deployment folders (`gait-analysis-backend`, `frontend`, `processing-service`) from `main` to `prod`.
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: 📧 Notify team about new sync PR
+      uses: dawidd6/action-send-mail@v3
+      with:
+        server_address: ${{ secrets.SMTP_SERVER }}
+        server_port: ${{ secrets.SMTP_PORT }}
+        username: ${{ secrets.SMTP_USERNAME }}
+        password: ${{ secrets.SMTP_PASSWORD }}
+        subject: "🔄 New PR: Sync Main → Prod"
+        from: "RehabGait CI <${{ secrets.FROM_EMAIL }}>"
+        to: |
+          yohansenanayake4321@gmail.com
+        body: |
+          A new pull request has been created to sync selected deployment folders from `main` to `prod`.
+
+          ➤ Branch: ${{ steps.sync-prod.outputs.branch }}
+          ➤ Repository: https://github.com/${{ github.repository }}
+          ➤ Pull Requests: https://github.com/${{ github.repository }}/pulls
+
+          🛡️ This is an automated message from the RehabGait CI system.

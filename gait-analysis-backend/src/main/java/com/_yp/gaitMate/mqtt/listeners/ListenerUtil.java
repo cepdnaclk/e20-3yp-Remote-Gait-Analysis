@@ -4,6 +4,8 @@ import com._yp.gaitMate.websocket.message.*;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Profile;
+
 
 @Slf4j
 public class ListenerUtil {

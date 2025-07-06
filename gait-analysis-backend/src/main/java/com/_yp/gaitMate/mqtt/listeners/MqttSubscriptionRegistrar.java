@@ -6,6 +6,7 @@ import com.amazonaws.services.iot.client.AWSIotException;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 /**
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Component;
  * to AWS IoT Core once the client is connected.
  * </p>
  */
+
 @Component
 @RequiredArgsConstructor
 @Slf4j
