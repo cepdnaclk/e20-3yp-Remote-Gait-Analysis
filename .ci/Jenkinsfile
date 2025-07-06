@@ -238,7 +238,7 @@ pipeline {
                 // Send success email via SES
                 sh """
                     aws ses send-templated-email \
-                        --source "RehabGait CI <alert@rehabgait.com>" \
+                        --source "RehabGait CI-CD <alert@rehabgait.com>" \
                         --destination "ToAddresses=yohansenanayake4321@gmail.com,e20037@eng.pdn.ac.lk,e20342@eng.pdn.ac.lk,e20365@eng.pdn.ac.lk" \
                         --template "RehabGaitDeploymentSuccess" \
                         --template-data '{
@@ -291,7 +291,7 @@ pipeline {
                 // Send failure email via SES
                 sh """
                     aws ses send-templated-email \
-                        --source "RehabGait CI <alert@rehabgait.com>" \
+                        --source "RehabGait CI-CD <alert@rehabgait.com>" \
                         --destination "ToAddresses=yohansenanayake4321@gmail.com,e20037@eng.pdn.ac.lk,e20342@eng.pdn.ac.lk,e20365@eng.pdn.ac.lk" \
                         --template "RehabGaitDeploymentFaliure" \
                         --template-data '{
