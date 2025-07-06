@@ -212,28 +212,102 @@ pipeline {
             cleanWs()
         }
 
+        // success {
+        //     echo "✅ Build, test, image push, and deployment successful!"
+        //     emailext (
+        //                     to: 'yohansenanayake4321@gmail.com',
+        //                     subject: "SUCCESS: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]'",
+        //                     body: """<p>Good news! The job <b>${env.JOB_NAME}</b> build <b>${env.BUILD_NUMBER}</b> succeeded.</p>""",
+        //                     replyTo: 'noreply@rehabgait.com',
+        //                     from: 'alert@rehabgait.com'
+        //               )
+        // }
+
         success {
             echo "✅ Build, test, image push, and deployment successful!"
-            emailext (
-                            to: 'yohansenanayake4321@gmail.com',
-                            subject: "SUCCESS: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]'",
-                            body: """<p>Good news! The job <b>${env.JOB_NAME}</b> build <b>${env.BUILD_NUMBER}</b> succeeded.</p>""",
-                            replyTo: 'noreply@rehabgait.com',
-                            from: 'alert@rehabgait.com'
-                      )
+            script {
+                // Calculate build duration
+                def duration = currentBuild.durationString.replace(' and counting', '')
+                
+                // Get Sri Lanka time
+                def timestamp = sh(
+                    script: "TZ='Asia/Colombo' date '+%Y-%m-%d %I:%M:%S %p SLST'",
+                    returnStdout: true
+                ).trim()
+
+                // Send success email via SES
+                sh """
+                    aws ses send-templated-email \
+                        --source "RehabGait CI <alert@rehabgait.com>" \
+                        --destination "ToAddresses=yohansenanayake4321@gmail.com,e20037@eng.pdn.ac.lk,e20342@eng.pdn.ac.lk,e20365@eng.pdn.ac.lk" \
+                        --template "RehabGaitDeploymentSuccess" \
+                        --template-data '{
+                            "job_name": "${env.JOB_NAME}",
+                            "build_number": "${env.BUILD_NUMBER}",
+                            "duration": "${duration}",
+                            "timestamp": "${timestamp}",
+                            "jenkins_url": "${env.BUILD_URL}",
+                            "app_url": "https://www.rehabgait.com"
+                        }' \
+                        --region us-east-1
+                """
+                
+                echo "📧 Success notification sent via SES template"
+            }
         }
 
+
+        // failure {
+        //     echo "❌ Pipeline failed. Check logs and stages for more information."
+        //     emailext (
+        //                     to: 'yohansenanayake4321@gmail.com',
+        //                     subject: "FAILURE: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]'",
+        //                     body: """<p>Unfortunately, the job <b>${env.JOB_NAME}</b> build <b>${env.BUILD_NUMBER}</b> failed.</p>""",
+        //                     replyTo: 'noreply@rehabgait.com',
+        //                     from: 'alert@rehabgait.com'
+        //               )
+        // }
 
         failure {
             echo "❌ Pipeline failed. Check logs and stages for more information."
-            emailext (
-                            to: 'yohansenanayake4321@gmail.com',
-                            subject: "FAILURE: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]'",
-                            body: """<p>Unfortunately, the job <b>${env.JOB_NAME}</b> build <b>${env.BUILD_NUMBER}</b> failed.</p>""",
-                            replyTo: 'noreply@rehabgait.com',
-                            from: 'alert@rehabgait.com'
-                      )
-        }
+            script {
+                // Get the failed stage name
+                def failedStage = "Unknown"
+                try {
+                    def stages = currentBuild.rawBuild.getAllActions(org.jenkinsci.plugins.workflow.actions.LabelAction.class)
+                    if (stages) {
+                        failedStage = stages.last().getDisplayName()
+                    }
+                } catch (Exception e) {
+                    failedStage = "Build Process"
+                }
 
+                // Get Sri Lanka time
+                def timestamp = sh(
+                    script: "TZ='Asia/Colombo' date '+%Y-%m-%d %I:%M:%S %p SLST'",
+                    returnStdout: true
+                ).trim()
+
+                // Send failure email via SES
+                sh """
+                    aws ses send-templated-email \
+                        --source "RehabGait CI <alert@rehabgait.com>" \
+                        --destination "ToAddresses=yohansenanayake4321@gmail.com,e20037@eng.pdn.ac.lk,e20342@eng.pdn.ac.lk,e20365@eng.pdn.ac.lk" \
+                        --template "RehabGaitDeploymentFaliure" \
+                        --template-data '{
+                            "job_name": "${env.JOB_NAME}",
+                            "build_number": "${env.BUILD_NUMBER}",
+                            "failed_stage": "${failedStage}",
+                            "timestamp": "${timestamp}",
+                            "error_message": "Build failed during ${failedStage} stage. Check console output for details.",
+                            "jenkins_url": "${env.BUILD_URL}",
+                            "console_url": "${env.BUILD_URL}console"
+                        }' \
+                        --region us-east-1
+                """
+                
+                echo "📧 Failure notification sent via SES template"
+            }
+        }
     }
 }
