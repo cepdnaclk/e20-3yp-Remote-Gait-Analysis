@@ -62,6 +62,21 @@ export default function PatientDashboard() {
     { text: "Test Sessions", icon: <AssessmentIcon /> },
   ];
 
+  const ProfileField = ({ label, value }) => (
+    <Box mb={1}>
+      <Typography
+        variant="subtitle2"
+        sx={{ color: "text.secondary", fontSize: 14 }}
+      >
+        {label}
+      </Typography>
+      <Typography variant="body1" fontWeight="500" sx={{ fontSize: 16 }}>
+        {value}
+      </Typography>
+    </Box>
+  );
+  
+
   // Latest session
   const latestSession = useMemo(() => {
     return [...testSessions]
@@ -76,31 +91,122 @@ export default function PatientDashboard() {
 
       case "Profile":
   return (
-    <Card sx={{ p: 3, boxShadow: 4, borderRadius: 2, background: "#E0F7FA" }}>
-      <CardContent>
-        <Typography variant="h5" fontWeight="bold" marginTop={0} gutterBottom>
-          🧍 Profile Summary
+    <Card
+      sx={{
+        p: 4,
+        boxShadow: 5,
+        borderRadius: 4,
+        background: "linear-gradient(145deg, #ffffff, #f2f2f2)",
+        display: "flex",
+        flexDirection: { xs: "column", md: "row" },
+        alignItems: "center",
+        gap: 4,
+      }}
+    >
+      {/* Left: Avatar */}
+<Box
+  sx={{
+    width: 160,
+    height: 160,
+    borderRadius: "50%",
+    overflow: "hidden",
+    border: "4px solid #e0e0e0",
+    boxShadow: 3,
+    flexShrink: 0,
+    position: "relative",
+  }}
+>
+<img
+  src={
+    patient.photoUrl && patient.photoUrl.trim() !== ""
+      ? patient.photoUrl
+      : `https://ui-avatars.com/api/?name=${encodeURIComponent(
+          patient.name
+        )}&background=dee2e6&color=263238&rounded=true&size=160`
+  }
+  alt="Patient Avatar"
+  style={{ width: "100%", height: "100%", objectFit: "cover" }}
+/>
+
+
+  {/* Optional: Upload Button Overlay */}
+  <label htmlFor="upload-avatar">
+    <Box
+      sx={{
+        position: "absolute",
+        bottom: 0,
+        width: "100%",
+        textAlign: "center",
+        bgcolor: "rgba(0,0,0,0.5)",
+        color: "#fff",
+        fontSize: 12,
+        cursor: "pointer",
+        py: 0.5,
+      }}
+    >
+      Change
+    </Box>
+    <input
+      id="upload-avatar"
+      type="file"
+      accept="image/*"
+      style={{ display: "none" }}
+      onChange={(e) => {
+        const file = e.target.files[0];
+        if (file) {
+          // upload logic here (to Firebase / your server)
+          // then update patient.photoUrl state
+        }
+      }}
+    />
+  </label>
+</Box>
+
+
+      {/* Right: Info */}
+      <Box flex={1}>
+        <Typography variant="h5" fontWeight="bold" gutterBottom>
+          🧍 Patient Profile
         </Typography>
 
-        <Grid container spacing={2} mt={1}>
+        <Grid container spacing={3}>
           <Grid item xs={12} sm={6}>
-            <Typography variant="body1" mb={1} fontSize={18}><strong>Name:</strong> {patient.name}</Typography>
-            <Typography variant="body1" mb={1} fontSize={18}><strong>Email:</strong> {patient.email}</Typography>
-            <Typography variant="body1" mb={1} fontSize={18}><strong>Phone:</strong> {patient.phoneNumber}</Typography>
-            <Typography variant="body1" mb={1} fontSize={18}><strong>Gender:</strong> {patient.gender}</Typography>
+            <ProfileField label="Name" value={patient.name} />
+            <ProfileField label="Gender" value={patient.gender} />
+            <ProfileField label="Email" value={patient.email} />
           </Grid>
           <Grid item xs={12} sm={6}>
-            <Typography variant="body1" mb={1} fontSize={18}><strong>Age:</strong> {patient.age}</Typography>
-            <Typography variant="body1" mb={1} fontSize={18}><strong>Height:</strong> {patient.height} cm</Typography>
-            <Typography variant="body1" mb={1} fontSize={18}><strong>Weight:</strong> {patient.weight} kg</Typography>
-            <Typography variant="body1" mb={1} fontSize={18}>
-              <strong>Assigned Doctor:</strong> {patient.doctorName || "Not Assigned"}
-            </Typography>
+            <ProfileField label="Age" value={`${patient.age} yrs`} />
+            <ProfileField
+              label="Height / Weight"
+              value={`${patient.height} cm / ${patient.weight} kg`}
+            />
+            <ProfileField label="Phone" value={patient.phoneNumber} />
           </Grid>
         </Grid>
-      </CardContent>
+
+        {/* Doctor Info */}
+        <Box
+          mt={4}
+          p={2}
+          sx={{
+            background: "#e8f5e9",
+            borderRadius: 2,
+            borderLeft: "5px solid #66bb6a",
+          }}
+        >
+          <Typography variant="subtitle2" color="text.secondary">
+            Assigned Doctor
+          </Typography>
+          <Typography variant="h6" fontWeight="bold" color="#2e7d32">
+            {patient.doctorName || "Not Assigned"}
+          </Typography>
+        </Box>
+      </Box>
     </Card>
   );
+
+      
 
 
         // case TEST SESSIONS
