@@ -1,6 +1,7 @@
 package com._yp.gaitMate.service.testSessionService;
 
 import com._yp.gaitMate.dto.ApiResponse;
+import com._yp.gaitMate.dto.doctor.DoctorTestReportDto;
 import com._yp.gaitMate.dto.patient.PatientInfoResponse;
 import com._yp.gaitMate.dto.testSession.*;
 import com._yp.gaitMate.exception.ApiException;
@@ -19,6 +20,7 @@ import org.springframework.stereotype.Service;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -188,6 +190,18 @@ public class TestSessionServiceImpl implements TestSessionService {
         return testSessions.stream()
                 .map(testSessionMapper::toDetailsResponse)
                 .toList();
+    }
+
+    @Override
+    public List<DoctorTestReportDto> getReportsOfLoggedInDoctor() {
+
+        Long doctorID = authUtil.getLoggedInDoctor().getId();
+
+        List<TestSession> sessions = testSessionRepository.findAllWithResultsByDoctorId(doctorID);
+
+        return sessions.stream()
+                .map(testSessionMapper::toDoctorTestReportDto)
+                .collect(Collectors.toList());
     }
 
     // =====================================

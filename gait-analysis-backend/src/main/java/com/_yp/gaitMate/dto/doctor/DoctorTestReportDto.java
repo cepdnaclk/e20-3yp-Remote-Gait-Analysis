@@ -1,6 +1,5 @@
-package com._yp.gaitMate.dto.testSession;
+package com._yp.gaitMate.dto.doctor;
 
-import com._yp.gaitMate.model.TestSession.Status;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -11,17 +10,15 @@ import java.util.List;
 @Getter
 @Setter
 @Builder
-public class TestSessionDetailsResponse {
+public class DoctorTestReportDto {
     private Long sessionId;
     private Long patientId;
+    private String patientName;
 
     private LocalDateTime startTime;
     private LocalDateTime endTime;
-    private Status status;
 
     private ProcessedResults results;
-    private FeedbackDetails feedback;
-    private RawDataFile rawSensorData;
 
     @Getter
     @Setter
@@ -36,7 +33,7 @@ public class TestSessionDetailsResponse {
         private Double avgSwingTime;
         private Double avgStanceTime;
         private List<Double> strideTimes;
-        private String pressureResultsPath;  //s3 bucket pdf report url
+        private String pressureResultsPath;   //report URL
     }
 
     @Getter
@@ -48,18 +45,4 @@ public class TestSessionDetailsResponse {
         private Double midfoot;
     }
 
-    @Getter
-    @Setter
-    @Builder
-    public static class FeedbackDetails {
-        private String notes;
-        private LocalDateTime createdAt;
-    }
-
-    @Getter
-    @Setter
-    @Builder
-    public static class RawDataFile {
-        private String path;
-    }
 }

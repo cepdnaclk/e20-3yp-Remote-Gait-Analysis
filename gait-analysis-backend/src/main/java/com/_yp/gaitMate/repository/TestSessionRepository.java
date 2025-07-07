@@ -3,6 +3,8 @@ package com._yp.gaitMate.repository;
 import com._yp.gaitMate.model.Patient;
 import com._yp.gaitMate.model.TestSession;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -13,4 +15,16 @@ public interface TestSessionRepository extends JpaRepository<TestSession, Long> 
 
 
     List<TestSession> findAllByPatient(Patient patient);
+
+    @Query("""
+    SELECT s FROM TestSession s
+    JOIN FETCH s.patient p
+    LEFT JOIN FETCH s.results
+    LEFT JOIN FETCH s.feedback
+    WHERE p.doctor.id = :doctorId
+""")
+    List<TestSession> findAllWithResultsByDoctorId(@Param("doctorId") Long doctorId);
+
+
+
 }

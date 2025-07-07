@@ -1,6 +1,7 @@
 package com._yp.gaitMate.controller;
 
 import com._yp.gaitMate.dto.ApiResponse;
+import com._yp.gaitMate.dto.doctor.DoctorTestReportDto;
 import com._yp.gaitMate.dto.testSession.TestSessionActionDto;
 import com._yp.gaitMate.dto.testSession.StartTestSessionResponse;
 import com._yp.gaitMate.dto.testSession.TestSessionDetailsResponse;
@@ -87,6 +88,16 @@ public class TestSessionController {
         List<TestSessionDetailsResponse> response = testSessionService.getSessionsByIdOfPatientsOfLoggedInDoctor(id);
         return ResponseEntity.ok(response);
     }
+
+    @GetMapping("/doctors/me/reports")
+    @PreAuthorize("hasRole('DOCTOR')")
+    @Operation(summary = "Get all test reports of patients assigned to the logged-in doctor")
+    public ResponseEntity<List<DoctorTestReportDto>> getTestReportsOfLoggedInDoctor() {
+        List<DoctorTestReportDto> reports = testSessionService.getReportsOfLoggedInDoctor();
+        return ResponseEntity.ok(reports);
+    }
+
+
 
 
 
