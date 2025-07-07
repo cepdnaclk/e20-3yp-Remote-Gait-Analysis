@@ -196,7 +196,7 @@ export default function PatientDashboard() {
           }}
         >
           <Typography variant="subtitle2" color="text.secondary">
-            Assigned Doctor
+            Assigned Doctor For You
           </Typography>
           <Typography variant="h6" fontWeight="bold" color="#2e7d32">
             {patient.doctorName || "Not Assigned"}
