@@ -75,7 +75,7 @@ public class TestSessionMapper {
                         .avgSwingTime(result.getAvgSwingTime())
                         .avgStanceTime(result.getAvgStanceTime())
                         .strideTimes(result.getStrideTimes())
-                        .pressureResultsPath(result.getPressureResultsPath())
+                        .reportURL(result.getPressureResultsPath())
                         .build() : null)
                 .build();
     }

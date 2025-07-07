@@ -35,7 +35,7 @@ import { getDoctorPatients } from "../../services/doctorServices";
 import DoctorPatientsPage from "./DoctorPatientsPage";
 
 import Appointments from "../Appointments";
-import Reports from "../Reports";
+import Reports from "../../components/Reports"; // Updated import for your new Reports component
 import Messages from "../Messages";
 import Settings from "../Settings";
 
@@ -86,7 +86,7 @@ export default function DoctorDashboard() {
       case "Appointments":
         return <Appointments />;
       case "Reports":
-        return <Reports />;
+        return <Reports />; // Now using your new Reports component
       case "Messages":
         return <Messages />;
       case "Settings":
