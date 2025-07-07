@@ -33,7 +33,7 @@ public class DoctorTestReportDto {
         private Double avgSwingTime;
         private Double avgStanceTime;
         private List<Double> strideTimes;
-        private String pressureResultsPath;   //report URL
+        private String reportURL;   //report URL
     }
 
     @Getter
