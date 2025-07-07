@@ -45,36 +45,54 @@ jobs:
         git commit -m "🔄 Auto-sync deploy folders from main"
         git push origin $BRANCH
 
-
         echo "branch=$BRANCH" >> $GITHUB_OUTPUT
 
-
     - name: 🔀 Open PR to prod
+      id: create-pr
       uses: repo-sync/pull-request@v2
       with:
         source_branch: ${{ steps.sync-prod.outputs.branch }}
         destination_branch: prod
         pr_title: "🔄 Auto-sync deploy folders from main"
         pr_body: |
-          Automated PR to sync deployment folders (`gait-analysis-backend`, `frontend`, `processing-service`) from `main` to `prod`.
+          Automated PR to sync deployment folders (`gait-analysis-backend`, `gait-analysis-frontend`, `gait-processing-service`) from `main` to `prod`.
+          
+          ## Changes
+          - ✅ Backend services updated
+          - ✅ Frontend application updated  
+          - ✅ Processing service updated
+          
+          **Please review and merge to deploy to production.**
         github_token: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: 📧 Notify team about new sync PR
-      uses: dawidd6/action-send-mail@v3
+    - name: 🛠️ Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
       with:
-        server_address: ${{ secrets.SMTP_SERVER }}
-        server_port: ${{ secrets.SMTP_PORT }}
-        username: ${{ secrets.SMTP_USERNAME }}
-        password: ${{ secrets.SMTP_PASSWORD }}
-        subject: "🔄 New PR: Sync Main → Prod"
-        from: "RehabGait CI <${{ secrets.FROM_EMAIL }}>"
-        to: |
-          yohansenanayake4321@gmail.com
-        body: |
-          A new pull request has been created to sync selected deployment folders from `main` to `prod`.
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: us-east-1
 
-          ➤ Branch: ${{ steps.sync-prod.outputs.branch }}
-          ➤ Repository: https://github.com/${{ github.repository }}
-          ➤ Pull Requests: https://github.com/${{ github.repository }}/pulls
-
-          🛡️ This is an automated message from the RehabGait CI system.
+    - name: 📧 Send notification via SES template
+      run: |
+        echo "📧 Sending notification email using SES template..."
+        
+        # Prepare timestamp in Sri Lanka time (Asia/Colombo) - 12 hour format
+        TIMESTAMP=$(TZ='Asia/Colombo' date '+%Y-%m-%d %I:%M:%S %p SLST')
+        
+        # Send email using SES template
+        aws ses send-templated-email \
+          --source "RehabGait CI <${{ secrets.FROM_EMAIL }}>" \
+          --destination "ToAddresses=yohansenanayake4321@gmail.com,e20037@eng.pdn.ac.lk,e20342@eng.pdn.ac.lk" \
+          --template "RehabGaitSyncNotification" \
+          --template-data "{
+            \"branch_name\": \"${{ steps.sync-prod.outputs.branch }}\",
+            \"repo_name\": \"${{ github.repository }}\",
+            \"triggered_by\": \"${{ github.actor }}\",
+            \"timestamp\": \"$TIMESTAMP\",
+            \"pr_url\": \"https://github.com/${{ github.repository }}/pull/${{ steps.create-pr.outputs.pr_number }}\",
+            \"repo_url\": \"https://github.com/${{ github.repository }}\"
+          }" \
+          --region us-east-1
+        
+        echo "✅ Email notification sent successfully!"
+        echo "📬 Email sent to team members about PR #${{ steps.create-pr.outputs.pr_number }}"
