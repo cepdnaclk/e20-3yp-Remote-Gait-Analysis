@@ -9,6 +9,9 @@ import com._yp.gaitMate.service.testSessionService.TestSessionService;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -92,8 +95,12 @@ public class TestSessionController {
     @GetMapping("/doctors/me/reports")
     @PreAuthorize("hasRole('DOCTOR')")
     @Operation(summary = "Get all test reports of patients assigned to the logged-in doctor")
-    public ResponseEntity<List<DoctorTestReportDto>> getTestReportsOfLoggedInDoctor() {
-        List<DoctorTestReportDto> reports = testSessionService.getReportsOfLoggedInDoctor();
+    public ResponseEntity<Page<DoctorTestReportDto>> getTestReportsOfLoggedInDoctor(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<DoctorTestReportDto> reports = testSessionService.getReportsOfLoggedInDoctor(pageable);
         return ResponseEntity.ok(reports);
     }
 

@@ -5,6 +5,8 @@ import com._yp.gaitMate.dto.doctor.DoctorTestReportDto;
 import com._yp.gaitMate.dto.testSession.TestSessionActionDto;
 import com._yp.gaitMate.dto.testSession.StartTestSessionResponse;
 import com._yp.gaitMate.dto.testSession.TestSessionDetailsResponse;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -19,5 +21,5 @@ public interface TestSessionService {
 
     List<TestSessionDetailsResponse> getSessionsByIdOfPatientsOfLoggedInDoctor(Long id);
 
-    List<DoctorTestReportDto> getReportsOfLoggedInDoctor();
+    Page<DoctorTestReportDto> getReportsOfLoggedInDoctor(Pageable pageable);
 }

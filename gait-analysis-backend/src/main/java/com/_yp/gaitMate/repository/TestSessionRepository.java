@@ -2,6 +2,8 @@ package com._yp.gaitMate.repository;
 
 import com._yp.gaitMate.model.Patient;
 import com._yp.gaitMate.model.TestSession;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -16,14 +18,22 @@ public interface TestSessionRepository extends JpaRepository<TestSession, Long> 
 
     List<TestSession> findAllByPatient(Patient patient);
 
-    @Query("""
-    SELECT s FROM TestSession s
-    JOIN FETCH s.patient p
-    LEFT JOIN FETCH s.results
-    LEFT JOIN FETCH s.feedback
-    WHERE p.doctor.id = :doctorId
-""")
-    List<TestSession> findAllWithResultsByDoctorId(@Param("doctorId") Long doctorId);
+//    @Query("""
+//    SELECT s FROM TestSession s
+//    JOIN FETCH s.patient p
+//    LEFT JOIN FETCH s.results
+//    LEFT JOIN FETCH s.feedback
+//    WHERE p.doctor.id = :doctorId
+//        AND s.status = com._yp.gaitMate.model.TestSession.Status.COMPLETED
+//""")
+//    List<TestSession> findAllWithResultsByDoctorId(@Param("doctorId") Long doctorId);
+
+    Page<TestSession> findByPatient_Doctor_IdAndStatus(
+            Long doctorId,
+            TestSession.Status status,
+            Pageable pageable
+    );
+
 
 
 
