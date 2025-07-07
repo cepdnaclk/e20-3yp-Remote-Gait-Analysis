@@ -14,6 +14,11 @@ import {
   IconButton,
   CircularProgress,
   Button,
+  Avatar,
+  Chip,
+  Divider,
+  Paper,
+  Container,
 } from "@mui/material";
 
 import MenuIcon from "@mui/icons-material/Menu";
@@ -23,7 +28,10 @@ import DescriptionIcon from "@mui/icons-material/Description";
 import AssessmentIcon from "@mui/icons-material/Assessment";
 import LogoutIcon from "@mui/icons-material/Logout";
 import HistoryIcon from "@mui/icons-material/History";
-
+import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
+import TrendingUpIcon from "@mui/icons-material/TrendingUp";
+import PlayArrowIcon from "@mui/icons-material/PlayArrow";
+import LocalHospitalIcon from "@mui/icons-material/LocalHospital";
 
 import { useNavigate } from "react-router-dom";
 import { getPatientProfile, getMyTestSessions } from "../../services/patientServices";
@@ -51,7 +59,6 @@ export default function PatientDashboard() {
       } finally {
         setLoading(false);
       }
-    
     };
     fetchProfile();
   }, []);
@@ -63,19 +70,33 @@ export default function PatientDashboard() {
   ];
 
   const ProfileField = ({ label, value }) => (
-    <Box mb={1}>
+    <Box sx={{ mb: 2.5 }}>
       <Typography
-        variant="subtitle2"
-        sx={{ color: "text.secondary", fontSize: 14 }}
+        variant="caption"
+        sx={{ 
+          color: "text.secondary", 
+          fontSize: 12,
+          fontWeight: 600,
+          textTransform: "uppercase",
+          letterSpacing: 0.5,
+          mb: 0.5,
+          display: "block"
+        }}
       >
         {label}
       </Typography>
-      <Typography variant="body1" fontWeight="500" sx={{ fontSize: 16 }}>
+      <Typography 
+        variant="body1" 
+        sx={{ 
+          fontSize: 16,
+          fontWeight: 500,
+          color: "text.primary"
+        }}
+      >
         {value}
       </Typography>
     </Box>
   );
-  
 
   // Latest session
   const latestSession = useMemo(() => {
@@ -85,341 +106,597 @@ export default function PatientDashboard() {
   }, [testSessions]);
 
   const renderContent = () => {
-
-  
     switch (selectedSection) {
-
       case "Profile":
-  return (
-    <Card
-      sx={{
-        p: 4,
-        boxShadow: 5,
-        borderRadius: 4,
-        background: "linear-gradient(145deg, #ffffff, #f2f2f2)",
-        display: "flex",
-        flexDirection: { xs: "column", md: "row" },
-        alignItems: "center",
-        gap: 4,
-      }}
-    >
-      {/* Left: Avatar */}
-<Box
-  sx={{
-    width: 160,
-    height: 160,
-    borderRadius: "50%",
-    overflow: "hidden",
-    border: "4px solid #e0e0e0",
-    boxShadow: 3,
-    flexShrink: 0,
-    position: "relative",
-  }}
->
-<img
-  src={
-    patient.photoUrl && patient.photoUrl.trim() !== ""
-      ? patient.photoUrl
-      : `https://ui-avatars.com/api/?name=${encodeURIComponent(
-          patient.name
-        )}&background=dee2e6&color=263238&rounded=true&size=160`
-  }
-  alt="Patient Avatar"
-  style={{ width: "100%", height: "100%", objectFit: "cover" }}
-/>
-
-
-  {/* Optional: Upload Button Overlay */}
-  <label htmlFor="upload-avatar">
-    <Box
-      sx={{
-        position: "absolute",
-        bottom: 0,
-        width: "100%",
-        textAlign: "center",
-        bgcolor: "rgba(0,0,0,0.5)",
-        color: "#fff",
-        fontSize: 12,
-        cursor: "pointer",
-        py: 0.5,
-      }}
-    >
-      Change
-    </Box>
-    <input
-      id="upload-avatar"
-      type="file"
-      accept="image/*"
-      style={{ display: "none" }}
-      onChange={(e) => {
-        const file = e.target.files[0];
-        if (file) {
-          // upload logic here (to Firebase / your server)
-          // then update patient.photoUrl state
-        }
-      }}
-    />
-  </label>
-</Box>
-
-
-      {/* Right: Info */}
-      <Box flex={1}>
-        <Typography variant="h5" fontWeight="bold" gutterBottom>
-          🧍 Patient Profile
-        </Typography>
-
-        <Grid container spacing={3}>
-          <Grid item xs={12} sm={6}>
-            <ProfileField label="Name" value={patient.name} />
-            <ProfileField label="Gender" value={patient.gender} />
-            <ProfileField label="Email" value={patient.email} />
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            <ProfileField label="Age" value={`${patient.age} yrs`} />
-            <ProfileField
-              label="Height / Weight"
-              value={`${patient.height} cm / ${patient.weight} kg`}
-            />
-            <ProfileField label="Phone" value={patient.phoneNumber} />
-          </Grid>
-        </Grid>
-
-        {/* Doctor Info */}
-        <Box
-          mt={4}
-          p={2}
-          sx={{
-            background: "#e8f5e9",
-            borderRadius: 2,
-            borderLeft: "5px solid #66bb6a",
-          }}
-        >
-          <Typography variant="subtitle2" color="text.secondary">
-            Assigned Doctor
-          </Typography>
-          <Typography variant="h6" fontWeight="bold" color="#2e7d32">
-            {patient.doctorName || "Not Assigned"}
-          </Typography>
-        </Box>
-      </Box>
-    </Card>
-  );
-
-      
-
-
-        // case TEST SESSIONS
-        case "Test Sessions":
-  return (
-    <Grid container spacing={3}>
-      {/* Left: Go to Test Session */}
-      <Grid item xs={12} sm={6}>
-        <Card sx={{ p: 5, backgroundColor: "#7986cb", color: "white", boxShadow: 3 }}>
-          <AssessmentIcon fontSize="large" />
-          <Typography variant="h6" gutterBottom>Run New Session</Typography>
-          <Typography variant="body1">
-            Start a gait analysis session using your assigned sensor kit.
-          </Typography>
-          <Button
-            variant="contained"
-            color="secondary"
-            sx={{ mt: 2 }}
-            onClick={() => navigate("/patient/test-session")}
+        return (
+          <Card
+            sx={{
+              p: 4,
+              boxShadow: "0 8px 32px rgba(0,0,0,0.08)",
+              borderRadius: 3,
+              background: "linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)",
+              border: "1px solid rgba(226, 232, 240, 0.8)",
+            }}
           >
-            Go to Test Session
-          </Button>
-        </Card>
-      </Grid>
+            <Box sx={{ display: "flex", flexDirection: { xs: "column", md: "row" }, gap: 4 }}>
+              {/* Avatar Section */}
+              <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+                <Box
+                  sx={{
+                    position: "relative",
+                    mb: 2,
+                  }}
+                >
+                  <Avatar
+                    src={
+                      patient.photoUrl && patient.photoUrl.trim() !== ""
+                        ? patient.photoUrl
+                        : `https://ui-avatars.com/api/?name=${encodeURIComponent(
+                            patient.name
+                          )}&background=3b82f6&color=ffffff&rounded=true&size=160`
+                    }
+                    sx={{
+                      width: 120,
+                      height: 120,
+                      border: "4px solid #e2e8f0",
+                      boxShadow: "0 8px 24px rgba(0,0,0,0.12)",
+                    }}
+                  />
+                  <label htmlFor="upload-avatar">
+                    <Box
+                      sx={{
+                        position: "absolute",
+                        bottom: 0,
+                        right: 0,
+                        width: 36,
+                        height: 36,
+                        borderRadius: "50%",
+                        bgcolor: "primary.main",
+                        color: "white",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        cursor: "pointer",
+                        fontSize: 12,
+                        fontWeight: 600,
+                        boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+                        "&:hover": { bgcolor: "primary.dark" },
+                      }}
+                    >
+                      ✎
+                    </Box>
+                    <input
+                      id="upload-avatar"
+                      type="file"
+                      accept="image/*"
+                      style={{ display: "none" }}
+                      onChange={(e) => {
+                        const file = e.target.files[0];
+                        if (file) {
+                          // upload logic here
+                        }
+                      }}
+                    />
+                  </label>
+                </Box>
+                <Typography variant="h5" fontWeight="700" sx={{ mb: 1 }}>
+                  {patient.name}
+                </Typography>
+                <Chip 
+                  label="Patient" 
+                  size="small" 
+                  sx={{ 
+                    backgroundColor: "rgba(59, 130, 246, 0.1)",
+                    color: "primary.main",
+                    fontWeight: 600
+                  }} 
+                />
+              </Box>
 
-      
-    </Grid>
-  );
+              {/* Profile Information */}
+              <Box sx={{ flex: 1 }}>
+                <Typography variant="h6" fontWeight="700" sx={{ mb: 3, color: "text.primary" }}>
+                  Personal Information
+                </Typography>
 
-      {/* DASHBOARD SECTION */}  
+                <Grid container spacing={3}>
+                  <Grid item xs={12} sm={6}>
+                    <ProfileField label="Full Name" value={patient.name} />
+                    <ProfileField label="Gender" value={patient.gender} />
+                    <ProfileField label="Email Address" value={patient.email} />
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <ProfileField label="Age" value={`${patient.age} years`} />
+                    <ProfileField
+                      label="Physical Stats"
+                      value={`${patient.height} cm • ${patient.weight} kg`}
+                    />
+                    <ProfileField label="Phone Number" value={patient.phoneNumber} />
+                  </Grid>
+                </Grid>
+
+                <Divider sx={{ my: 3 }} />
+
+                {/* Doctor Information */}
+                <Box
+                  sx={{
+                    p: 3,
+                    backgroundColor: "rgba(34, 197, 94, 0.05)",
+                    borderRadius: 2,
+                    border: "1px solid rgba(34, 197, 94, 0.2)",
+                  }}
+                >
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: 1 }}>
+                    <LocalHospitalIcon sx={{ color: "success.main", fontSize: 20 }} />
+                    <Typography variant="subtitle2" color="text.secondary" fontWeight="600">
+                      Assigned Healthcare Provider
+                    </Typography>
+                  </Box>
+                  <Typography variant="h6" fontWeight="700" sx={{ color: "success.dark" }}>
+                    {patient.doctorName || "Not Assigned"}
+                  </Typography>
+                </Box>
+              </Box>
+            </Box>
+          </Card>
+        );
+
+      case "Test Sessions":
+        return (
+          <Grid container spacing={3}>
+            <Grid item xs={12} sm={6}>
+              <Card 
+                sx={{ 
+                  p: 4, 
+                  background: "linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)",
+                  color: "white", 
+                  boxShadow: "0 12px 32px rgba(59, 130, 246, 0.3)",
+                  borderRadius: 3,
+                  position: "relative",
+                  overflow: "hidden",
+                  "&::before": {
+                    content: '""',
+                    position: "absolute",
+                    top: 0,
+                    right: 0,
+                    width: "100px",
+                    height: "100px",
+                    background: "rgba(255,255,255,0.1)",
+                    borderRadius: "50%",
+                    transform: "translate(30px, -30px)",
+                  }
+                }}
+              >
+                <Box sx={{ position: "relative", zIndex: 1 }}>
+                  <PlayArrowIcon sx={{ fontSize: 48, mb: 2, opacity: 0.9 }} />
+                  <Typography variant="h5" fontWeight="700" gutterBottom>
+                    Start New Session
+                  </Typography>
+                  <Typography variant="body1" sx={{ mb: 3, opacity: 0.9 }}>
+                    Begin a comprehensive gait analysis using your assigned sensor kit.
+                  </Typography>
+                  <Button
+                    variant="contained"
+                    size="large"
+                    sx={{ 
+                      bgcolor: "rgba(255,255,255,0.2)",
+                      color: "white",
+                      fontWeight: 600,
+                      px: 3,
+                      py: 1.5,
+                      "&:hover": { bgcolor: "rgba(255,255,255,0.3)" },
+                      backdropFilter: "blur(10px)",
+                    }}
+                    onClick={() => navigate("/patient/test-session")}
+                  >
+                    Launch Session
+                  </Button>
+                </Box>
+              </Card>
+            </Grid>
+          </Grid>
+        );
+
       default:
         return (
-          <Grid container spacing={3} mt={1}>
-            <Grid item xs={12} sm={6} md={6}>
-              <Card sx={{ p: 2, textAlign: "center", height: "100%", background: "#E0F7FA", boxShadow: 6, display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
-                <CardContent>
-                  <DescriptionIcon fontSize="large" />
-                  <Typography variant="h6">Latest Report</Typography>
-                  <Typography variant="body1">
-                    Reviewed on{" "}
-                    {latestSession
-                      ? new Date(latestSession.endTime).toLocaleDateString()
-                      : "N/A"}
-                  </Typography>
-
-                  <Button
-                    variant="outlined"
-                    sx={{ mt: 2 }}
-                    onClick={() => {
-                      if (latestSession) {
-                        
+          <Container maxWidth="xl" sx={{ px: 0 }}>
+            <Grid container spacing={3}>
+              {/* Stats Cards */}
+              <Grid item xs={12} sm={6} md={6}>
+                <Card 
+                  sx={{ 
+                    p: 3, 
+                    height: "100%",
+                    background: "linear-gradient(135deg, #06b6d4 0%, #0891b2 100%)",
+                    color: "white",
+                    boxShadow: "0 12px 32px rgba(6, 182, 212, 0.3)",
+                    borderRadius: 3,
+                    position: "relative",
+                    overflow: "hidden",
+                    "&::before": {
+                      content: '""',
+                      position: "absolute",
+                      top: 0,
+                      right: 0,
+                      width: "80px",
+                      height: "80px",
+                      background: "rgba(255,255,255,0.1)",
+                      borderRadius: "50%",
+                      transform: "translate(20px, -20px)",
+                    }
+                  }}
+                >
+                  <Box sx={{ position: "relative", zIndex: 1 }}>
+                    <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", mb: 2 }}>
+                      <DescriptionIcon sx={{ fontSize: 32, opacity: 0.9 }} />
+                      <Chip 
+                        label="Latest" 
+                        size="small" 
+                        sx={{ 
+                          bgcolor: "rgba(255,255,255,0.2)",
+                          color: "white",
+                          fontWeight: 600
+                        }} 
+                      />
+                    </Box>
+                    <Typography variant="h6" fontWeight="700" gutterBottom>
+                      Latest Report
+                    </Typography>
+                    <Typography variant="body2" sx={{ opacity: 0.9, mb: 3 }}>
+                      Last reviewed on{" "}
+                      {latestSession
+                        ? new Date(latestSession.endTime).toLocaleDateString()
+                        : "No data available"}
+                    </Typography>
+                    <Button
+                      variant="contained"
+                      size="medium"
+                      sx={{
+                        bgcolor: "rgba(255,255,255,0.2)",
+                        color: "white",
+                        fontWeight: 600,
+                        "&:hover": { bgcolor: "rgba(255,255,255,0.3)" },
+                        backdropFilter: "blur(10px)",
+                      }}
+                      onClick={() => {
+                        if (latestSession) {
                           const el = document.getElementById(`session-${latestSession.sessionId}`);
                           if (el) {
-
-                            // Smooth scroll into view
                             el.scrollIntoView({ behavior: "smooth" });
-
-                            // Highlight the element
                             el.style.transition = "background-color 0.5s";
                             el.style.backgroundColor = "#fff9c4";
-
-                            // Delay to remove highlight
                             setTimeout(() => {
                               el.style.backgroundColor = "";
                             }, 1200);
-
-                            // Trigger click to navigate
                             setTimeout(() => {
                               el.click();
-                            }, 600); // Delay to allow scroll/animation first
+                            }, 600);
                           } else {
                             console.warn("Element not found:", `session-${latestSession.sessionId}`);
                           }
-                         
-                      }
-                    }}
-                  >
-                    View Full Report
-                  </Button>
-                </CardContent>
-              </Card>
-            </Grid>
+                        }
+                      }}
+                    >
+                      View Details
+                    </Button>
+                  </Box>
+                </Card>
+              </Grid>
 
+              <Grid item xs={12} sm={6} md={6}>
+                <Card 
+                  sx={{ 
+                    p: 3, 
+                    height: "100%",
+                    background: "linear-gradient(135deg, #f59e0b 0%, #d97706 100%)",
+                    color: "white",
+                    boxShadow: "0 12px 32px rgba(245, 158, 11, 0.3)",
+                    borderRadius: 3,
+                    position: "relative",
+                    overflow: "hidden",
+                    "&::before": {
+                      content: '""',
+                      position: "absolute",
+                      top: 0,
+                      right: 0,
+                      width: "80px",
+                      height: "80px",
+                      background: "rgba(255,255,255,0.1)",
+                      borderRadius: "50%",
+                      transform: "translate(20px, -20px)",
+                    }
+                  }}
+                >
+                  <Box sx={{ position: "relative", zIndex: 1 }}>
+                    <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", mb: 2 }}>
+                      <CalendarTodayIcon sx={{ fontSize: 32, opacity: 0.9 }} />
+                      <Chip 
+                        label="Upcoming" 
+                        size="small" 
+                        sx={{ 
+                          bgcolor: "rgba(255,255,255,0.2)",
+                          color: "white",
+                          fontWeight: 600
+                        }} 
+                      />
+                    </Box>
+                    <Typography variant="h6" fontWeight="700" gutterBottom>
+                      Next Appointment
+                    </Typography>
+                    <Typography variant="body2" sx={{ opacity: 0.9, mb: 1 }}>
+                      {patient.nextAppointment || "Not scheduled"}
+                    </Typography>
+                    <Typography variant="caption" sx={{ opacity: 0.8 }}>
+                      with {patient.doctor?.name || "Healthcare Provider"}
+                    </Typography>
+                  </Box>
+                </Card>
+              </Grid>
 
-            <Grid item xs={12} sm={6} md={6}>
-              <Card sx={{ p: 2, textAlign: "center", background: "#FFF3E0", boxShadow: 6, height: "100%", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
-                <CardContent>
-                  <DashboardIcon fontSize="large" />
-                  <Typography variant="h6">Next Appointment</Typography>
-                  <Typography variant="body1">
-                    {patient.nextAppointment || "Not Scheduled"}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    with {patient.doctor?.name || "N/A"}
-                  </Typography>
-                </CardContent>
-              </Card>
-            </Grid>
+              {/* Test Session History */}
+              <Grid item xs={12} sx={{ mt: 2 }}>
+                <Card 
+                  sx={{ 
+                    p: 4, 
+                    boxShadow: "0 8px 32px rgba(0,0,0,0.08)",
+                    borderRadius: 3,
+                    background: "linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)",
+                    border: "1px solid rgba(226, 232, 240, 0.8)",
+                    marginTop: 4,
+                  }}
+                >
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: 4 }}>
+                    <Box 
+                      sx={{
+                        p: 1.5,
+                        borderRadius: 2,
+                        background: "linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)",
+                        color: "white",
+                      }}
+                    >
+                      <HistoryIcon sx={{ fontSize: 24 }} />
+                    </Box>
+                    <Box>
+                      <Typography variant="h5" fontWeight="700" sx={{ color: "text.primary" }}>
+                        Session History
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        Track your progress over time
+                      </Typography>
+                    </Box>
+                  </Box>
 
-            {/* Right: Test Session History */}
-            <Grid item xs={12} sm={12} marginTop={8} >
-              <Card sx={{ p: 3, boxShadow: 4, background: "#E0F7FA" }} bgcolor="#F2F4F7">
-                <CardContent>
-                  <Typography variant="h5" fontWeight="bold"  gutterBottom sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                    <HistoryIcon fontSize="medium" />
-                    Test Session History
-                  </Typography>
                   {testSessions.length === 0 ? (
-                    <Typography>No sessions found.</Typography>
+                    <Paper 
+                      sx={{ 
+                        p: 4, 
+                        textAlign: "center",
+                        background: "rgba(148, 163, 184, 0.05)",
+                        border: "1px dashed rgba(148, 163, 184, 0.3)",
+                        borderRadius: 2,
+                      }}
+                    >
+                      <Typography variant="h6" color="text.secondary">
+                        No sessions found
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        Your test sessions will appear here once you start
+                      </Typography>
+                    </Paper>
                   ) : (
                     <Grid container spacing={2}>
                       {testSessions.map((session) => (
                         <Grid item xs={12} key={session.sessionId}>
                           <Card
-                          id = {`session-${session.sessionId}`}
-                            variant="outlined"
+                            id={`session-${session.sessionId}`}
                             sx={{
-                              p: 2,
+                              p: 3,
                               cursor: "pointer",
-                              "&:hover": { backgroundColor: "#F2F4F7" },
-                              borderLeft: session.status === "FAILED" ? "5px solid red" : "5px solid #3f51b5",
-                              backgroundColor: session.status === "FAILED" ? "#fff0f0" : "inherit",
+                              border: "1px solid rgba(226, 232, 240, 0.8)",
+                              borderRadius: 2,
+                              transition: "all 0.2s ease",
+                              borderLeft: session.status === "FAILED" 
+                                ? "4px solid #ef4444" 
+                                : "4px solid #3b82f6",
+                              backgroundColor: session.status === "FAILED" 
+                                ? "rgba(239, 68, 68, 0.05)" 
+                                : "white",
+                              "&:hover": { 
+                                transform: "translateY(-2px)",
+                                boxShadow: "0 12px 32px rgba(0,0,0,0.12)",
+                                borderColor: session.status === "FAILED" 
+                                  ? "#ef4444" 
+                                  : "#3b82f6",
+                              },
                             }}
                             onClick={() => {
-                              if (session.status !== "FAILED") navigate(`/patient/test-session/${session.sessionId}`)}}
+                              if (session.status !== "FAILED") 
+                                navigate(`/patient/test-session/${session.sessionId}`)
+                            }}
                           >
-                            <Typography variant="subtitle1" fontWeight="bold">
-                              Session #{session.sessionId}
-                            </Typography>
-                            <Typography variant="body2">
-                              🕒 {new Date(session.startTime).toLocaleString()}
-                            </Typography>
-                            <Typography variant="body2">
-                              👣 Steps: {session.results?.steps ?? "N/A"} | ⚖️ Balance: {session.results?.balanceScore ?? "N/A"}
-                            </Typography>
-                            <Typography variant="body2">
-                              🗒️ Feedback: {session.feedback?.notes?.substring(0, 100) || "No feedback yet..."}
+                            <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", mb: 2 }}>
+                              <Typography variant="h6" fontWeight="700" sx={{ color: "text.primary" }}>
+                                Session #{session.sessionId}
+                              </Typography>
+                              <Chip 
+                                label={session.status} 
+                                size="small" 
+                                sx={{ 
+                                  bgcolor: session.status === "FAILED" 
+                                    ? "rgba(239, 68, 68, 0.1)" 
+                                    : "rgba(34, 197, 94, 0.1)",
+                                  color: session.status === "FAILED" 
+                                    ? "#dc2626" 
+                                    : "#16a34a",
+                                  fontWeight: 600,
+                                  fontSize: 11,
+                                }} 
+                              />
+                            </Box>
+                            
+                            <Box sx={{ display: "flex", gap: 3, mb: 2 }}>
+                              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                                <Typography variant="body2" color="text.secondary">
+                                  📅 {new Date(session.startTime).toLocaleDateString()}
+                                </Typography>
+                              </Box>
+                              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                                <Typography variant="body2" color="text.secondary">
+                                  🕐 {new Date(session.startTime).toLocaleTimeString()}
+                                </Typography>
+                              </Box>
+                            </Box>
+
+                            <Box sx={{ display: "flex", gap: 4, mb: 2 }}>
+                              <Box>
+                                <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600 }}>
+                                  STEPS
+                                </Typography>
+                                <Typography variant="body1" fontWeight="600">
+                                  {session.results?.steps ?? "N/A"}
+                                </Typography>
+                              </Box>
+                              <Box>
+                                <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600 }}>
+                                  BALANCE SCORE
+                                </Typography>
+                                <Typography variant="body1" fontWeight="600">
+                                  {session.results?.balanceScore ?? "N/A"}
+                                </Typography>
+                              </Box>
+                            </Box>
+
+                            <Typography variant="body2" color="text.secondary" sx={{ 
+                              fontStyle: "italic",
+                              backgroundColor: "rgba(148, 163, 184, 0.05)",
+                              p: 1.5,
+                              borderRadius: 1,
+                              border: "1px solid rgba(148, 163, 184, 0.1)"
+                            }}>
+                              {session.feedback?.notes?.substring(0, 100) || "No feedback available yet..."}
                             </Typography>
                           </Card>
                         </Grid>
                       ))}
                     </Grid>
                   )}
-                </CardContent>
-              </Card>
+                </Card>
+              </Grid>
             </Grid>
-          </Grid>
+          </Container>
         );
     }
   };
 
   if (loading || !patient) {
     return (
-      <Box display="flex" justifyContent="center" alignItems="center" height="100vh">
-        <CircularProgress />
-        <Typography ml={2}>Loading patient dashboard...</Typography>
+      <Box 
+        display="flex" 
+        justifyContent="center" 
+        alignItems="center" 
+        height="100vh"
+        sx={{ bgcolor: "#f8fafc" }}
+      >
+        <Box sx={{ textAlign: "center" }}>
+          <CircularProgress size={48} thickness={4} />
+          <Typography variant="h6" sx={{ mt: 2, color: "text.secondary" }}>
+            Loading your dashboard...
+          </Typography>
+        </Box>
       </Box>
     );
   }
 
   return (
-    <Box sx={{ display: "flex", minHeight: "100vh", bgcolor: "#F2F4F7" }}>
-      {/* Sidebar */}
+    <Box sx={{ display: "flex", minHeight: "100vh", bgcolor: "#f8fafc" }}>
+      {/* Modern Sidebar */}
       <Drawer
         variant="permanent"
         sx={{
-          width: sidebarOpen ? 240 : 80,
+          width: sidebarOpen ? 280 : 80,
           flexShrink: 0,
           "& .MuiDrawer-paper": {
-            width: sidebarOpen ? 240 : 80,
-            transition: "width 0.3s",
+            width: sidebarOpen ? 280 : 80,
+            transition: "width 0.3s ease",
             boxSizing: "border-box",
-            background: "linear-gradient(to bottom, rgb(25, 45, 75), rgb(5, 25, 55))",
+            background: "linear-gradient(180deg, #1e293b 0%, #0f172a 100%)",
             color: "#fff",
+            border: "none",
+            boxShadow: "0 8px 32px rgba(0,0,0,0.12)",
           },
         }}
       >
-        <Box sx={{ padding: 2, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+        <Box sx={{ p: 3, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           {sidebarOpen && (
-            <Typography variant="h6" sx={{ fontWeight: "bold", color: "#fff" }}>
-              Patient Portal
-            </Typography>
+            <Box>
+              <Typography variant="h6" sx={{ fontWeight: 700, color: "#fff", mb: 0.5 }}>
+                Patient Portal
+              </Typography>
+              <Typography variant="caption" sx={{ color: "rgba(255,255,255,0.7)" }}>
+                Healthcare Dashboard
+              </Typography>
+            </Box>
           )}
-          <IconButton onClick={() => setSidebarOpen(!sidebarOpen)} sx={{ color: "#fff" }}>
+          <IconButton 
+            onClick={() => setSidebarOpen(!sidebarOpen)} 
+            sx={{ 
+              color: "#fff",
+              bgcolor: "rgba(255,255,255,0.1)",
+              "&:hover": { bgcolor: "rgba(255,255,255,0.2)" },
+            }}
+          >
             <MenuIcon />
           </IconButton>
         </Box>
 
-        <List>
+        <List sx={{ px: 2 }}>
           {menuItems.map((item) => (
-            <ListItem key={item.text} disablePadding>
+            <ListItem key={item.text} disablePadding sx={{ mb: 1 }}>
               <ListItemButton
                 selected={selectedSection === item.text}
                 onClick={() => setSelectedSection(item.text)}
                 sx={{
-                  "&.Mui-selected": { backgroundColor: "rgba(0,0,0,0.3)", color: "#fff" },
-                  "&:hover": { backgroundColor: "rgba(255,255,255,0.2)" },
+                  borderRadius: 2,
+                  py: 1.5,
+                  "&.Mui-selected": { 
+                    backgroundColor: "rgba(59, 130, 246, 0.2)",
+                    color: "#60a5fa",
+                    "& .MuiListItemIcon-root": { color: "#60a5fa" },
+                  },
+                  "&:hover": { 
+                    backgroundColor: "rgba(255,255,255,0.1)",
+                    transform: "translateX(4px)",
+                  },
+                  transition: "all 0.2s ease",
                 }}
               >
-                <ListItemIcon sx={{ color: "#fff" }}>{item.icon}</ListItemIcon>
+                <ListItemIcon sx={{ color: "#94a3b8", minWidth: 40 }}>
+                  {item.icon}
+                </ListItemIcon>
                 {sidebarOpen && <ListItemText primary={item.text} />}
               </ListItemButton>
             </ListItem>
           ))}
+          
+          <Divider sx={{ my: 2, borderColor: "rgba(255,255,255,0.1)" }} />
+          
           <ListItem disablePadding>
             <ListItemButton
               onClick={() => {
                 localStorage.removeItem("token");
                 navigate("/");
               }}
-              sx={{ "&:hover": { backgroundColor: "rgba(255, 0, 0, 0.2)" } }}
+              sx={{ 
+                borderRadius: 2,
+                py: 1.5,
+                "&:hover": { 
+                  backgroundColor: "rgba(239, 68, 68, 0.2)",
+                  transform: "translateX(4px)",
+                },
+                transition: "all 0.2s ease",
+              }}
             >
-              <ListItemIcon sx={{ color: "#fff" }}>
+              <ListItemIcon sx={{ color: "#f87171", minWidth: 40 }}>
                 <LogoutIcon />
               </ListItemIcon>
               {sidebarOpen && <ListItemText primary="Logout" />}
@@ -429,29 +706,46 @@ export default function PatientDashboard() {
       </Drawer>
 
       {/* Main Content */}
-      <Box sx={{ flexGrow: 1, p: 2 }}>
-        <Box
+      <Box sx={{ flexGrow: 1, p: 3 }}>
+        <Paper
+          elevation={0}
           sx={{
-            backgroundColor: "#ffffff",
-            borderRadius: 2,
-            p: 3,
-            boxShadow: 5,
-            height: "400px",
-            
+            borderRadius: 3,
+            p: 4,
+            background: "linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)",
+            border: "1px solid rgba(226, 232, 240, 0.8)",
+            minHeight: "calc(100vh - 48px)",
           }}
         >
-          <Typography variant="h4" fontWeight="bold" gutterBottom>
-            Patient Dashboard
-          </Typography>
-          <Typography variant="h6" color="text.secondary">
-            Welcome {patient.name}, manage your sessions and view insights below.
-          </Typography>
+          {/* Header */}
+          <Box sx={{ mb: 4 }}>
+            <Typography 
+              variant="h4" 
+              fontWeight="800" 
+              sx={{ 
+                color: "text.primary",
+                mb: 1,
+                background: "linear-gradient(135deg, #1e293b 0%, #3b82f6 100%)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+                backgroundClip: "text",
+              }}
+            >
+              Welcome back, {patient.name}
+            </Typography>
+            <Typography 
+              variant="h6" 
+              color="text.secondary" 
+              sx={{ fontWeight: 400 }}
+            >
+              Monitor your health journey and track your progress
+            </Typography>
+          </Box>
 
-          <Box mt={3}>{renderContent()}</Box>
-        </Box>
+          {/* Content */}
+          <Box>{renderContent()}</Box>
+        </Paper>
       </Box>
-
-      
     </Box>
   );
 }
