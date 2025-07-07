@@ -2,9 +2,11 @@ package com._yp.gaitMate.service.testSessionService;
 
 import com._yp.gaitMate.dto.ApiResponse;
 import com._yp.gaitMate.dto.doctor.DoctorTestReportDto;
+import com._yp.gaitMate.dto.page.PageResponseDto;
 import com._yp.gaitMate.dto.patient.PatientInfoResponse;
 import com._yp.gaitMate.dto.testSession.*;
 import com._yp.gaitMate.exception.ApiException;
+import com._yp.gaitMate.mapper.PageMapper;
 import com._yp.gaitMate.mapper.TestSessionMapper;
 import com._yp.gaitMate.model.*;
 import com._yp.gaitMate.mqtt.core.MqttPublisher;
@@ -38,6 +40,7 @@ public class TestSessionServiceImpl implements TestSessionService {
     private final MqttPublisher mqttPublisher;
     private final DataProcessingService dataProcessingService;
     private final TestSessionMapper testSessionMapper;
+    private final PageMapper pageMapper;
 
 
 
@@ -198,17 +201,15 @@ public class TestSessionServiceImpl implements TestSessionService {
     }
 
     @Override
-    public Page<DoctorTestReportDto> getReportsOfLoggedInDoctor(Pageable pageable) {
+    public PageResponseDto<DoctorTestReportDto> getReportsOfLoggedInDoctor(Pageable pageable) {
 
         Long doctorID = authUtil.getLoggedInDoctor().getId();
 
         Page<TestSession> sessions = testSessionRepository.findByPatient_Doctor_IdAndStatus(doctorID, TestSession.Status.COMPLETED, pageable);
 
+        Page<DoctorTestReportDto> dtoPage = sessions.map(testSessionMapper::toDoctorTestReportDto);
 
-        List<DoctorTestReportDto> doctorTestReportDtos = sessions.getContent().stream()
-                .map(testSessionMapper::toDoctorTestReportDto).toList();
-
-        return new PageImpl<>(doctorTestReportDtos , pageable , sessions.getTotalElements());
+        return pageMapper.toPageResponse(dtoPage);
     }
 
     // =====================================

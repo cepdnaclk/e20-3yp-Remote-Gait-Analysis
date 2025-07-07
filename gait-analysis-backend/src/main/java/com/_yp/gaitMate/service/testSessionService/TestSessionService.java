@@ -2,6 +2,7 @@ package com._yp.gaitMate.service.testSessionService;
 
 import com._yp.gaitMate.dto.ApiResponse;
 import com._yp.gaitMate.dto.doctor.DoctorTestReportDto;
+import com._yp.gaitMate.dto.page.PageResponseDto;
 import com._yp.gaitMate.dto.testSession.TestSessionActionDto;
 import com._yp.gaitMate.dto.testSession.StartTestSessionResponse;
 import com._yp.gaitMate.dto.testSession.TestSessionDetailsResponse;
@@ -21,5 +22,5 @@ public interface TestSessionService {
 
     List<TestSessionDetailsResponse> getSessionsByIdOfPatientsOfLoggedInDoctor(Long id);
 
-    Page<DoctorTestReportDto> getReportsOfLoggedInDoctor(Pageable pageable);
+    PageResponseDto<DoctorTestReportDto> getReportsOfLoggedInDoctor(Pageable pageable);
 }

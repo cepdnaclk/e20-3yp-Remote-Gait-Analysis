@@ -2,6 +2,7 @@ package com._yp.gaitMate.controller;
 
 import com._yp.gaitMate.dto.ApiResponse;
 import com._yp.gaitMate.dto.doctor.DoctorTestReportDto;
+import com._yp.gaitMate.dto.page.PageResponseDto;
 import com._yp.gaitMate.dto.testSession.TestSessionActionDto;
 import com._yp.gaitMate.dto.testSession.StartTestSessionResponse;
 import com._yp.gaitMate.dto.testSession.TestSessionDetailsResponse;
@@ -95,22 +96,14 @@ public class TestSessionController {
     @GetMapping("/doctors/me/reports")
     @PreAuthorize("hasRole('DOCTOR')")
     @Operation(summary = "Get all test reports of patients assigned to the logged-in doctor")
-    public ResponseEntity<Page<DoctorTestReportDto>> getTestReportsOfLoggedInDoctor(
+    public ResponseEntity<PageResponseDto<DoctorTestReportDto>> getTestReportsOfLoggedInDoctor(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
     ) {
         Pageable pageable = PageRequest.of(page, size);
-        Page<DoctorTestReportDto> reports = testSessionService.getReportsOfLoggedInDoctor(pageable);
+        PageResponseDto<DoctorTestReportDto> reports = testSessionService.getReportsOfLoggedInDoctor(pageable);
         return ResponseEntity.ok(reports);
     }
-
-
-
-
-
-
-
-
 
 
 }
