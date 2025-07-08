@@ -1,5 +1,6 @@
 package com._yp.gaitMate.mapper;
 
+import com._yp.gaitMate.dto.doctor.DoctorTestReportDto;
 import com._yp.gaitMate.dto.testSession.TestSessionDetailsResponse;
 import com._yp.gaitMate.model.Feedback;
 import com._yp.gaitMate.model.ProcessedTestResults;
@@ -50,4 +51,33 @@ public class TestSessionMapper {
 
                 .build();
     }
+
+    public DoctorTestReportDto toDoctorTestReportDto(TestSession session) {
+        ProcessedTestResults result = session.getResults();
+
+        return DoctorTestReportDto.builder()
+                .sessionId(session.getId())
+                .patientId(session.getPatient().getId())
+                .patientName(session.getPatient().getName())
+                .startTime(session.getStartTime())
+                .endTime(session.getEndTime())
+                .results(result != null ? DoctorTestReportDto.ProcessedResults.builder()
+                        .steps(result.getSteps())
+                        .cadence(result.getCadence())
+                        .avgForce(DoctorTestReportDto.AvgForce.builder()
+                                .heel(result.getAvgHeelForce())
+                                .midfoot(result.getAvgMidfootForce())
+                                .toe(result.getAvgToeForce())
+                                .build())
+                        .balanceScore(result.getBalanceScore())
+                        .peakImpact(result.getPeakImpact())
+                        .durationSeconds(result.getDurationSeconds())
+                        .avgSwingTime(result.getAvgSwingTime())
+                        .avgStanceTime(result.getAvgStanceTime())
+                        .strideTimes(result.getStrideTimes())
+                        .reportURL(result.getPressureResultsPath())
+                        .build() : null)
+                .build();
+    }
+
 }

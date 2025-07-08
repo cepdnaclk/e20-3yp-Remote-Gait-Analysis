@@ -1,9 +1,12 @@
 package com._yp.gaitMate.service.testSessionService;
 
 import com._yp.gaitMate.dto.ApiResponse;
+import com._yp.gaitMate.dto.doctor.DoctorTestReportDto;
+import com._yp.gaitMate.dto.page.PageResponseDto;
 import com._yp.gaitMate.dto.patient.PatientInfoResponse;
 import com._yp.gaitMate.dto.testSession.*;
 import com._yp.gaitMate.exception.ApiException;
+import com._yp.gaitMate.mapper.PageMapper;
 import com._yp.gaitMate.mapper.TestSessionMapper;
 import com._yp.gaitMate.model.*;
 import com._yp.gaitMate.mqtt.core.MqttPublisher;
@@ -12,13 +15,19 @@ import com._yp.gaitMate.repository.TestSessionRepository;
 import com._yp.gaitMate.security.utils.AuthUtil;
 import com.amazonaws.services.iot.client.AWSIotQos;
 import lombok.RequiredArgsConstructor;
+import org.aspectj.weaver.ast.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -31,6 +40,7 @@ public class TestSessionServiceImpl implements TestSessionService {
     private final MqttPublisher mqttPublisher;
     private final DataProcessingService dataProcessingService;
     private final TestSessionMapper testSessionMapper;
+    private final PageMapper pageMapper;
 
 
 
@@ -188,6 +198,18 @@ public class TestSessionServiceImpl implements TestSessionService {
         return testSessions.stream()
                 .map(testSessionMapper::toDetailsResponse)
                 .toList();
+    }
+
+    @Override
+    public PageResponseDto<DoctorTestReportDto> getReportsOfLoggedInDoctor(Pageable pageable) {
+
+        Long doctorID = authUtil.getLoggedInDoctor().getId();
+
+        Page<TestSession> sessions = testSessionRepository.findByPatient_Doctor_IdAndStatus(doctorID, TestSession.Status.COMPLETED, pageable);
+
+        Page<DoctorTestReportDto> dtoPage = sessions.map(testSessionMapper::toDoctorTestReportDto);
+
+        return pageMapper.toPageResponse(dtoPage);
     }
 
     // =====================================

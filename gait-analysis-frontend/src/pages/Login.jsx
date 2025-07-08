@@ -52,15 +52,15 @@ const Card = styled(MuiCard)(({ theme }) => ({
   flexDirection: 'column',
   alignSelf: 'center',
   width: '100%',
-  maxWidth: '480px',
-  padding: theme.spacing(5),
-  gap: theme.spacing(3),
+  maxWidth: '450px',
+  padding: theme.spacing(4),
+  gap: theme.spacing(2.5),
   margin: 'auto',
-  background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(255, 255, 255, 0.95) 100%)',
-  backdropFilter: 'blur(20px)',
-  borderRadius: '20px',
-  border: '1px solid rgba(255, 255, 255, 0.2)',
-  boxShadow: '0 20px 60px rgba(0, 0, 0, 0.15), 0 8px 32px rgba(0, 0, 0, 0.1)',
+  background: 'rgba(255, 255, 255, 0.98)',
+  backdropFilter: 'blur(10px)',
+  borderRadius: '16px',
+  border: '1px solid rgba(255, 255, 255, 0.3)',
+  boxShadow: '0 10px 40px rgba(0, 0, 0, 0.12)',
   position: 'relative',
   overflow: 'hidden',
   '&::before': {
@@ -69,21 +69,21 @@ const Card = styled(MuiCard)(({ theme }) => ({
     top: 0,
     left: 0,
     right: 0,
-    height: '4px',
-    background: 'linear-gradient(90deg, #3b82f6 0%, #10b981 50%, #f59e0b 100%)',
+    height: '3px',
+    background: 'linear-gradient(90deg, #4299e1 0%, #48bb78 50%, #ed8936 100%)',
   },
   [theme.breakpoints.down('sm')]: {
     maxWidth: '100%',
-    padding: theme.spacing(4),
-    borderRadius: '16px',
+    padding: theme.spacing(3),
+    borderRadius: '12px',
   },
 }));
 
 const LoginContainer = styled(Stack)(({ theme }) => ({
   minHeight: '100vh',
   width: '100vw',
-  padding: theme.spacing(4),
-  background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%)',
+  padding: theme.spacing(3),
+  background: 'linear-gradient(135deg, #1a202c 0%, #2d3748 50%, #4a5568 100%)',
   position: 'relative',
   overflow: 'auto',
   [theme.breakpoints.down('sm')]: {
@@ -94,8 +94,8 @@ const LoginContainer = styled(Stack)(({ theme }) => ({
 const BackgroundDecoration = styled(Box)({
   position: 'absolute',
   borderRadius: '50%',
-  background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(16, 185, 129, 0.1) 100%)',
-  filter: 'blur(40px)',
+  background: 'linear-gradient(135deg, rgba(66, 153, 225, 0.06) 0%, rgba(72, 187, 120, 0.06) 100%)',
+  filter: 'blur(30px)',
 });
 
 const FeatureChip = ({ icon, text }) => (
@@ -104,12 +104,12 @@ const FeatureChip = ({ icon, text }) => (
     label={text}
     size="small"
     sx={{
-      backgroundColor: 'rgba(59, 130, 246, 0.1)',
-      color: '#3b82f6',
+      backgroundColor: 'rgba(66, 153, 225, 0.12)',
+      color: '#2b6cb0',
       fontWeight: 600,
-      border: '1px solid rgba(59, 130, 246, 0.2)',
+      border: '1px solid rgba(66, 153, 225, 0.2)',
       '& .MuiChip-icon': {
-        color: '#3b82f6',
+        color: '#2b6cb0',
       },
     }}
   />
@@ -248,7 +248,7 @@ export default function Login() {
                     fontWeight: 400,
                   }}
                 >
-                  Empowering healthcare professionals with modern technology to monitor gait analysis and accelerate recovery outcomes.
+                  Empowering healthcare professionals with modern technology to monitor gait and accelerate recovery.
                 </Typography>
 
                 {/* Benefits */}
@@ -291,7 +291,7 @@ export default function Login() {
             <Grid item xs={12} md={5}>
               <Card variant="outlined">
             {/* Header with Enhanced Logo */}
-            <Box sx={{ textAlign: "center", mb: 4 , marginTop: 7}}>
+            <Box sx={{ textAlign: "center", mb: 4 }}>
               <Box
                 sx={{
                   display: 'inline-flex',
@@ -358,7 +358,7 @@ export default function Login() {
             <Box 
               component="form" 
               onSubmit={handleSubmit(onSubmit)} 
-              sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}
+              sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}
             >
               <FormControl>
                 <FormLabel 
@@ -392,17 +392,16 @@ export default function Login() {
                   }}
                   sx={{
                     '& .MuiOutlinedInput-root': {
-                      borderRadius: '12px',
-                      backgroundColor: 'rgba(248, 250, 252, 0.8)',
-                      transition: 'all 0.3s ease',
+                      borderRadius: '10px',
+                      backgroundColor: 'rgba(247, 250, 252, 0.9)',
+                      transition: 'all 0.2s ease',
                       '&:hover': {
-                        backgroundColor: 'rgba(248, 250, 252, 1)',
-                        transform: 'translateY(-1px)',
-                        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.05)',
+                        backgroundColor: 'rgba(247, 250, 252, 1)',
+                        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.04)',
                       },
                       '&.Mui-focused': {
                         backgroundColor: 'white',
-                        boxShadow: '0 0 0 3px rgba(59, 130, 246, 0.1)',
+                        boxShadow: '0 0 0 2px rgba(66, 153, 225, 0.2)',
                       },
                     },
                   }}
@@ -453,17 +452,16 @@ export default function Login() {
                   }}
                   sx={{
                     '& .MuiOutlinedInput-root': {
-                      borderRadius: '12px',
-                      backgroundColor: 'rgba(248, 250, 252, 0.8)',
-                      transition: 'all 0.3s ease',
+                      borderRadius: '10px',
+                      backgroundColor: 'rgba(247, 250, 252, 0.9)',
+                      transition: 'all 0.2s ease',
                       '&:hover': {
-                        backgroundColor: 'rgba(248, 250, 252, 1)',
-                        transform: 'translateY(-1px)',
-                        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.05)',
+                        backgroundColor: 'rgba(247, 250, 252, 1)',
+                        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.04)',
                       },
                       '&.Mui-focused': {
                         backgroundColor: 'white',
-                        boxShadow: '0 0 0 3px rgba(59, 130, 246, 0.1)',
+                        boxShadow: '0 0 0 2px rgba(66, 153, 225, 0.2)',
                       },
                     },
                   }}
@@ -478,21 +476,21 @@ export default function Login() {
                 startIcon={<LoginIcon />}
                 sx={{
                   py: 1.5,
-                  fontSize: '1.1rem',
-                  fontWeight: 700,
-                  borderRadius: '12px',
-                  background: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
-                  boxShadow: '0 8px 24px rgba(59, 130, 246, 0.3)',
+                  fontSize: '1rem',
+                  fontWeight: 600,
+                  borderRadius: '10px',
+                  background: 'linear-gradient(135deg, #4299e1 0%, #3182ce 100%)',
+                  boxShadow: '0 4px 15px rgba(66, 153, 225, 0.25)',
                   textTransform: 'none',
-                  transition: 'all 0.3s ease',
+                  transition: 'all 0.2s ease',
                   '&:hover': {
-                    background: 'linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%)',
-                    transform: 'translateY(-2px)',
-                    boxShadow: '0 12px 32px rgba(59, 130, 246, 0.4)',
+                    background: 'linear-gradient(135deg, #3182ce 0%, #2c5282 100%)',
+                    transform: 'translateY(-1px)',
+                    boxShadow: '0 6px 20px rgba(66, 153, 225, 0.3)',
                   },
                 }}
               >
-                Sign In to RehabGait
+                Sign In
               </Button>
             </Box>
 
@@ -502,12 +500,12 @@ export default function Login() {
               </Typography>
             </Divider>
 
-            <Paper
+            <Box
               sx={{
-                p: 3,
-                borderRadius: '16px',
-                background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.05) 0%, rgba(16, 185, 129, 0.05) 100%)',
-                border: '1px solid rgba(59, 130, 246, 0.1)',
+                p: 2.5,
+                borderRadius: '12px',
+                background: 'rgba(66, 153, 225, 0.04)',
+                border: '1px solid rgba(66, 153, 225, 0.15)',
                 textAlign: 'center',
               }}
             >
@@ -518,7 +516,7 @@ export default function Login() {
                 href="/contact" 
                 underline="hover" 
                 sx={{ 
-                  color: '#3b82f6', 
+                  color: '#2b6cb0', 
                   fontWeight: 600,
                   textDecoration: 'none',
                   '&:hover': {
@@ -528,27 +526,27 @@ export default function Login() {
               >
                 Contact us to get started →
               </Link>
-            </Paper>
+            </Box>
               </Card>
             </Grid>
           </Grid>
         </Container>
 
-        {/* Trust Indicators - Bottom */}
-        <Box sx={{ textAlign: 'center', mt: 4, position: 'relative', zIndex: 1 }}>
-          <Typography variant="caption" color="rgba(255, 255, 255, 0.7)" sx={{ mb: 2, display: 'block' }}>
+        {/* Trust Indicators */}
+        <Box sx={{ textAlign: 'center', mt: 3, position: 'relative', zIndex: 1 }}>
+          <Typography variant="caption" color="rgba(255, 255, 255, 0.8)" sx={{ mb: 1, display: 'block' }}>
             Trusted by healthcare professionals worldwide
           </Typography>
           <Box sx={{ display: 'flex', justifyContent: 'center', gap: 3, flexWrap: 'wrap' }}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              <SecurityIcon sx={{ fontSize: 16, color: 'rgba(255, 255, 255, 0.7)' }} />
-              <Typography variant="caption" color="rgba(255, 255, 255, 0.7)">
+              <SecurityIcon sx={{ fontSize: 14, color: 'rgba(255, 255, 255, 0.8)' }} />
+              <Typography variant="caption" color="rgba(255, 255, 255, 0.8)">
                 HIPAA Compliant
               </Typography>
             </Box>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              <VerifiedUserIcon sx={{ fontSize: 16, color: 'rgba(255, 255, 255, 0.7)' }} />
-              <Typography variant="caption" color="rgba(255, 255, 255, 0.7)">
+              <VerifiedUserIcon sx={{ fontSize: 14, color: 'rgba(255, 255, 255, 0.8)' }} />
+              <Typography variant="caption" color="rgba(255, 255, 255, 0.8)">
                 Medical Grade Security
               </Typography>
             </Box>
