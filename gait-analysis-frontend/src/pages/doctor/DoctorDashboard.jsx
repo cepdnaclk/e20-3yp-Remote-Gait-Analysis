@@ -41,7 +41,7 @@ import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement
 import { useNavigate } from "react-router-dom";
 import { getDoctorPatients } from "../../services/doctorServices";
 import Appointments from "../Appointments";
-import Reports from "../Reports";
+import Reports from "../../components/Reports"; // Updated import for your new Reports component
 import Messages from "../Messages";
 import Settings from "../Settings";
 
@@ -178,76 +178,50 @@ export default function DoctorDashboard() {
   };
 
   const renderContent = () => {
-    if (selectedSection === "Dashboard") {
-      return (
-        <Container maxWidth="xl" sx={{ px: 0 }}>
-          <Grid container spacing={3} sx={{ mb: 4 }}>
-            <Grid item xs={12} sm={6} md={4}>
-              <StatCard
-                title="Total Patients"
-                value={patients.length}
-                icon={<PeopleIcon sx={{ fontSize: 32 }} />}
-                gradient="linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)"
-                trend="+2 this week"
-              />
-            </Grid>
-            <Grid item xs={12} sm={6} md={4}>
-              <StatCard
-                title="Today's Appointments"
-                value={Math.floor(Math.random() * 20) + 5}
-                icon={<CalendarTodayIcon sx={{ fontSize: 32 }} />}
-                gradient="linear-gradient(135deg, #10b981 0%, #059669 100%)"
-                trend="+4 today"
-              />
-            </Grid>
-            <Grid item xs={12} sm={6} md={4}>
-              <StatCard
-                title="Pending Reports"
-                value={`${Math.floor(Math.random() * 10) + 1}`}
-                icon={<DescriptionIcon sx={{ fontSize: 32 }} />}
-                gradient="linear-gradient(135deg, #f59e0b 0%, #d97706 100%)"
-                trend="Awaiting Review"
-              />
-            </Grid>
-          </Grid>
-
-          <Grid container spacing={3} sx={{ mb: 4 }}>
-            <Grid item xs={12} sm={6}>
-              <QuickActionCard
-                title="Real-Time Gait Monitoring"
-                description="View live gait analysis data for your patients."
-                icon={<PlayCircleFilledWhiteIcon sx={{ fontSize: 24 }} />}
-                onClick={() => setSelectedSection("Patients")}
-                color="#10b981"
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <QuickActionCard
-                title="Review Gait Reports"
-                description="Analyze test session results and leave feedback."
-                icon={<VisibilityIcon sx={{ fontSize: 24 }} />}
-                onClick={() => setSelectedSection("Reports")}
-                color="#3b82f6"
-              />
-            </Grid>
-          </Grid>
-
-          <Grid container spacing={3}>
-            <Grid item xs={12} md={8}>
-              <Card sx={{ p: 3 }}>
-                <Typography variant="h6" fontWeight={700} mb={2}>Weekly Trends</Typography>
-                <Line data={chartData} />
-              </Card>
-            </Grid>
-            <Grid item xs={12} md={4}>
-              <Card sx={{ p: 3 }}>
-                <Typography variant="h6" fontWeight={700} mb={2}>Upcoming Appointments</Typography>
-                <Box>
-                  <Typography variant="body2">July 10 - Gait Analysis with John Doe</Typography>
-                  <Typography variant="body2">July 11 - Checkup for Jane Smith</Typography>
-                  <Typography variant="body2">July 12 - Evaluation for Sam Fernando</Typography>
-                </Box>
-              </Card>
+    switch (selectedSection) {
+      case "Patients":
+        return <DoctorPatientsPage patients={patients} isLoading={isLoading} error={error} />;
+      case "Appointments":
+        return <Appointments />;
+      case "Reports":
+        return <Reports />; // Now using your new Reports component
+      case "Messages":
+        return <Messages />;
+      case "Settings":
+        return <Settings />;
+      default:
+        return (
+          <>
+            <Grid container spacing={3} mt={2}>
+              <Grid item xs={12} sm={6} md={4}>
+                <Card sx={{ p: 2, textAlign: "center", background: "radial-gradient(rgb(136, 223, 255),rgb(130, 205, 255))", boxShadow: 3 }}>
+                  <CardContent>
+                    <PeopleIcon fontSize="large" />
+                    <Typography variant="h6" sx={{ fontWeight: 600 }}>Total Patients</Typography>
+                    <Typography variant="h4">{patients?.length || 0}</Typography>
+                  </CardContent>
+                </Card>
+              </Grid>
+              <Grid item xs={12} sm={6} md={4}>
+                <Card sx={{ p: 2, textAlign: "center", background: "radial-gradient(rgb(136, 223, 255),rgb(130, 205, 255))", boxShadow: 3 }}>
+                  <CardContent>
+                    <CalendarTodayIcon fontSize="large" />
+                    <Typography variant="h6" sx={{ fontWeight: 600 }}>Today's Appointments</Typography>
+                    <Typography variant="h4">{Math.floor(Math.random() * 20) + 5}</Typography>
+                  </CardContent>
+                </Card>
+              </Grid>
+              <Grid item xs={12} sm={6} md={4}>
+                <Card sx={{ p: 2, textAlign: "center", background: "radial-gradient(rgb(136, 223, 255),rgb(130, 205, 255))", boxShadow: 3 }}>
+                  <CardContent>
+                    <DescriptionIcon fontSize="large" />
+                    <Typography variant="h6" sx={{ fontWeight: 600 }}>Pending Reports</Typography>
+                    <Typography variant="h4">
+                      <Chip label={`${Math.floor(Math.random() * 10) + 1} Pending`} color="primary" />
+                    </Typography>
+                  </CardContent>
+                </Card>
+              </Grid>
             </Grid>
           </Grid>
         </Container>
