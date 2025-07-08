@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import React from "react";
 import {
   Box,
   Typography,
@@ -19,6 +20,7 @@ import {
   Divider,
   Paper,
   Container,
+  LinearProgress,
 } from "@mui/material";
 
 import MenuIcon from "@mui/icons-material/Menu";
@@ -30,12 +32,305 @@ import LogoutIcon from "@mui/icons-material/Logout";
 import HistoryIcon from "@mui/icons-material/History";
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 import TrendingUpIcon from "@mui/icons-material/TrendingUp";
+import TrendingDownIcon from "@mui/icons-material/TrendingDown";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import LocalHospitalIcon from "@mui/icons-material/LocalHospital";
+import DirectionsWalkIcon from "@mui/icons-material/DirectionsWalk";
+import BalanceIcon from "@mui/icons-material/Balance";
+import SpeedIcon from "@mui/icons-material/Speed";
+import InsightsIcon from "@mui/icons-material/Insights";
 
 import { useNavigate } from "react-router-dom";
-import { getPatientProfile, getMyTestSessions } from "../../services/patientServices";
+import { getPatientProfile, getDashboardStats } from "../../services/patientServices";
 import { useMemo } from "react";
+import PatientTestSessionsList from "../../components/PatientTestSessionList";
+
+// Enhanced Stat Card Component
+const StatCard = ({ title, value, subtitle, icon, gradient, trend }) => (
+  <Card 
+    sx={{ 
+      p: 3, 
+      height: "100%",
+      background: gradient,
+      color: "white",
+      boxShadow: "0 8px 24px rgba(0,0,0,0.15)",
+      borderRadius: 3,
+      position: "relative",
+      overflow: "hidden",
+      "&::before": {
+        content: '""',
+        position: "absolute",
+        top: 0,
+        right: 0,
+        width: "80px",
+        height: "80px",
+        background: "rgba(255,255,255,0.1)",
+        borderRadius: "50%",
+        transform: "translate(20px, -20px)",
+      }
+    }}
+  >
+    <Box sx={{ position: "relative", zIndex: 1 }}>
+      <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", mb: 2 }}>
+        <Box sx={{ fontSize: 32, opacity: 0.9 }}>
+          {icon}
+        </Box>
+        {trend && (
+          <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+            {trend.startsWith('+') ? 
+              <TrendingUpIcon sx={{ fontSize: 16, color: "rgba(255,255,255,0.9)" }} /> :
+              <TrendingDownIcon sx={{ fontSize: 16, color: "rgba(255,255,255,0.7)" }} />
+            }
+            <Typography variant="caption" sx={{ opacity: 0.9, fontWeight: 600 }}>
+              {trend}
+            </Typography>
+          </Box>
+        )}
+      </Box>
+      <Typography variant="h4" fontWeight="800" gutterBottom>
+        {value}
+      </Typography>
+      <Typography variant="body2" sx={{ opacity: 0.9 }}>
+        {title}
+      </Typography>
+      {subtitle && (
+        <Typography variant="caption" sx={{ opacity: 0.8, display: "block", mt: 0.5 }}>
+          {subtitle}
+        </Typography>
+      )}
+    </Box>
+  </Card>
+);
+
+// Performance Overview Component
+const PerformanceOverview = ({ averageMetrics, trends }) => (
+  <Card sx={{ p: 2, mb: 3 }}>
+    <Typography variant="h6" fontWeight="600" gutterBottom sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+      <InsightsIcon color="primary" />
+      Performance Overview
+    </Typography>
+    <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+      Your average metrics across all sessions
+    </Typography>
+    
+    <Grid container spacing={2}>
+      <Grid item xs={6}>
+        <Box sx={{ mb: 2 }}>
+          <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 0.5 }}>
+            <Typography variant="body2" fontWeight="600">Balance Score</Typography>
+            <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+              <Typography variant="body2" fontWeight="700" color="primary.main">
+                {averageMetrics.balanceScore.toFixed(1)}
+              </Typography>
+              <Chip 
+                label={trends.balanceScoreChange} 
+                size="small" 
+                color={trends.balanceScoreChange.startsWith('+') ? "success" : "error"}
+                sx={{ fontSize: 10, height: 18 }}
+              />
+            </Box>
+          </Box>
+          <LinearProgress 
+            variant="determinate" 
+            value={averageMetrics.balanceScore} 
+            sx={{ height: 6, borderRadius: 3 }}
+          />
+        </Box>
+
+        <Box sx={{mb:2}}>
+          <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 0.5 }}>
+            <Typography variant="body2" fontWeight="600">Steps</Typography>
+            <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+              <Typography variant="body2" fontWeight="700" color="primary.main">
+                {Math.round(averageMetrics.steps)}
+              </Typography>
+              <Chip 
+                label={trends.stepsChange} 
+                size="small" 
+                color={trends.stepsChange.startsWith('+') ? "success" : "error"}
+                sx={{ fontSize: 10, height: 18 }}
+              />
+            </Box>
+          </Box>
+          <LinearProgress 
+            variant="determinate" 
+            value={(averageMetrics.steps / 2000) * 100}
+            sx={{ height: 6, borderRadius: 3 }}
+          />
+        </Box>
+      </Grid>
+
+      <Grid item xs={6}>
+        <Box sx={{ mb: 2 }}>
+          <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 0.5 }}>
+            <Typography variant="body2" fontWeight="600">Cadence</Typography>
+            <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+              <Typography variant="body2" fontWeight="700" color="primary.main">
+                {averageMetrics.cadence.toFixed(1)}
+              </Typography>
+              <Chip 
+                label={trends.cadenceChange} 
+                size="small" 
+                color={trends.cadenceChange.startsWith('+') ? "success" : "error"}
+                sx={{ fontSize: 10, height: 18 }}
+              />
+            </Box>
+          </Box>
+          <LinearProgress 
+            variant="determinate" 
+            value={(averageMetrics.cadence / 150) * 100}
+            sx={{ height: 6, borderRadius: 3 }}
+          />
+        </Box>
+
+        <Box sx={{mb:2}}>
+          <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 0.5 }}>
+            <Typography variant="body2" fontWeight="600">Avg Duration</Typography>
+            <Typography variant="body2" fontWeight="700" color="primary.main">
+              {Math.round(averageMetrics.sessionDuration / 60)}m
+            </Typography>
+          </Box>
+          <LinearProgress 
+            variant="determinate" 
+            value={(averageMetrics.sessionDuration / 1200) * 100}
+            sx={{ height: 6, borderRadius: 3 }}
+          />
+        </Box>
+      </Grid>
+    </Grid>
+  </Card>
+);
+
+// Latest Session Component
+const LatestSessionCard = ({ latestSession, setSelectedSection }) => {
+  const navigate = useNavigate();
+  
+  if (!latestSession) {
+    return (
+      <Card sx={{ p: 3, height: "100%" }}>
+        <Typography variant="h6" fontWeight="600" gutterBottom>
+          Latest Session
+        </Typography>
+        <Box sx={{ textAlign: "center", py: 4 }}>
+          <Typography variant="body2" color="text.secondary">
+            No sessions completed yet
+          </Typography>
+          <Button
+            variant="contained"
+            startIcon={<PlayArrowIcon />}
+            sx={{ mt: 2 }}
+            onClick={() => navigate("/patient/test-session")}
+          >
+            Start Your First Session
+          </Button>
+        </Box>
+      </Card>
+    );
+  }
+
+  const formatDate = (dateString) => {
+    return new Date(dateString).toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric'
+    });
+  };
+
+  const formatTime = (dateString) => {
+    return new Date(dateString).toLocaleTimeString('en-US', {
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  };
+
+  return (
+    <Card sx={{ p: 3, height: "100%" }}>
+      <Typography variant="h6" fontWeight="600" gutterBottom>
+        Latest Session
+      </Typography>
+      
+      <Box sx={{ mb: 2 }}>
+        <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 1 }}>
+          <Typography variant="body2" color="text.secondary">
+            Session #{latestSession.sessionId}
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            {formatDate(latestSession.startTime)}
+          </Typography>
+        </Box>
+        <Typography variant="caption" color="text.secondary">
+          {formatTime(latestSession.startTime)} - {formatTime(latestSession.endTime)}
+        </Typography>
+      </Box>
+
+      {/* Key Metrics */}
+      <Grid container spacing={2} sx={{ mb: 3 }}>
+        <Grid item xs={4}>
+          <Box sx={{ textAlign: "center", p: 1.5, bgcolor: "primary.50", borderRadius: 1 }}>
+            <Typography variant="h6" fontWeight="700" color="primary.main">
+              {latestSession.results.balanceScore}
+            </Typography>
+            <Typography variant="caption" color="text.secondary">
+              Balance
+            </Typography>
+          </Box>
+        </Grid>
+        <Grid item xs={4}>
+          <Box sx={{ textAlign: "center", p: 1.5, bgcolor: "success.50", borderRadius: 1 }}>
+            <Typography variant="h6" fontWeight="700" color="success.main">
+              {latestSession.results.steps}
+            </Typography>
+            <Typography variant="caption" color="text.secondary">
+              Steps
+            </Typography>
+          </Box>
+        </Grid>
+        <Grid item xs={4}>
+          <Box sx={{ textAlign: "center", p: 1.5, bgcolor: "warning.50", borderRadius: 1 }}>
+            <Typography variant="h6" fontWeight="700" color="warning.main">
+              {latestSession.results.cadence.toFixed(1)}
+            </Typography>
+            <Typography variant="caption" color="text.secondary">
+              Cadence
+            </Typography>
+          </Box>
+        </Grid>
+      </Grid>
+
+      {/* Feedback */}
+      {latestSession.feedback && (
+        <Box>
+          <Typography variant="subtitle2" fontWeight="600" gutterBottom>
+            Healthcare Provider Feedback
+          </Typography>
+          <Typography variant="body2" sx={{ 
+            fontStyle: "italic",
+            p: 2,
+            bgcolor: "grey.50",
+            borderRadius: 1,
+            borderLeft: "3px solid #3b82f6",
+            mb: 2,
+            display: "-webkit-box",
+            WebkitLineClamp: 3,
+            WebkitBoxOrient: "vertical",
+            overflow: "hidden",
+          }}>
+            "{latestSession.feedback.notes}"
+          </Typography>
+        </Box>
+      )}
+      
+      <Button 
+        variant="outlined" 
+        size="small" 
+        fullWidth
+        onClick={() => setSelectedSection("Test Sessions")}
+      >
+        View Full Session Details
+      </Button>
+    </Card>
+  );
+};
 
 export default function PatientDashboard() {
   const navigate = useNavigate();
@@ -43,19 +338,23 @@ export default function PatientDashboard() {
   const [selectedSection, setSelectedSection] = useState("Dashboard");
   const [patient, setPatient] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [testSessions, setTestSessions] = useState([]);
+  const [dashboardStats, setDashboardStats] = useState(null); // New state for analytics
 
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const res = await getPatientProfile();
-        setPatient(res.data);
-
-        const testRes = await getMyTestSessions();
-        console.log("Loaded test sessions:", testRes.data); 
-        setTestSessions(testRes.data);
+        // Fetch patient profile and dashboard analytics in parallel
+        const [profileRes, statsRes] = await Promise.all([
+          getPatientProfile(),
+          getDashboardStats()
+        ]);
+        
+        setPatient(profileRes.data);
+        setDashboardStats(statsRes.data);
+        
+        console.log("Loaded dashboard stats:", statsRes.data);
       } catch (err) {
-        console.error("Failed to fetch patient profile", err);
+        console.error("Failed to fetch patient data", err);
       } finally {
         setLoading(false);
       }
@@ -98,16 +397,10 @@ export default function PatientDashboard() {
     </Box>
   );
 
-  // Latest session
-  const latestSession = useMemo(() => {
-    return [...testSessions]
-      .filter((s) => s.status === "COMPLETED")
-      .sort((a, b) => new Date(b.startTime) - new Date(a.startTime))[0];
-  }, [testSessions]);
-
   const renderContent = () => {
     switch (selectedSection) {
       case "Profile":
+        // KEEP EXISTING PROFILE UNCHANGED
         return (
           <Card
             sx={{
@@ -242,71 +535,201 @@ export default function PatientDashboard() {
         );
 
       case "Test Sessions":
+        // KEEP EXISTING TEST SESSIONS PAGE UNCHANGED
         return (
-          <Grid container spacing={3}>
-            <Grid item xs={12} sm={6}>
-              <Card 
+          <Container maxWidth="xl" sx={{ px: 0 }}>
+            {/* Page Header */}
+            <Box sx={{ mb: 3 }}>
+              <Typography 
+                variant="h4" 
+                fontWeight="800" 
                 sx={{ 
-                  p: 4, 
-                  background: "linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)",
-                  color: "white", 
-                  boxShadow: "0 12px 32px rgba(59, 130, 246, 0.3)",
-                  borderRadius: 3,
-                  position: "relative",
-                  overflow: "hidden",
-                  "&::before": {
-                    content: '""',
-                    position: "absolute",
-                    top: 0,
-                    right: 0,
-                    width: "100px",
-                    height: "100px",
-                    background: "rgba(255,255,255,0.1)",
-                    borderRadius: "50%",
-                    transform: "translate(30px, -30px)",
-                  }
+                  color: "text.primary",
+                  mb: 1,
+                  background: "linear-gradient(135deg, #1e293b 0%, #3b82f6 100%)",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                  backgroundClip: "text",
                 }}
               >
-                <Box sx={{ position: "relative", zIndex: 1 }}>
-                  <PlayArrowIcon sx={{ fontSize: 48, mb: 2, opacity: 0.9 }} />
-                  <Typography variant="h5" fontWeight="700" gutterBottom>
-                    Start New Session
-                  </Typography>
-                  <Typography variant="body1" sx={{ mb: 3, opacity: 0.9 }}>
-                    Begin a comprehensive gait analysis using your assigned sensor kit.
-                  </Typography>
-                  <Button
-                    variant="contained"
-                    size="large"
-                    sx={{ 
-                      bgcolor: "rgba(255,255,255,0.2)",
-                      color: "white",
-                      fontWeight: 600,
-                      px: 3,
-                      py: 1.5,
-                      "&:hover": { bgcolor: "rgba(255,255,255,0.3)" },
-                      backdropFilter: "blur(10px)",
-                    }}
-                    onClick={() => navigate("/patient/test-session")}
-                  >
-                    Launch Session
-                  </Button>
-                </Box>
-              </Card>
+                Test Sessions
+              </Typography>
+              <Typography 
+                variant="h6" 
+                color="text.secondary" 
+                sx={{ fontWeight: 400 }}
+              >
+                Start new sessions and track your gait analysis progress
+              </Typography>
+            </Box>
+
+            {/* Action Cards Row - Improved sizing and spacing */}
+            <Grid container spacing={3} sx={{ mb: 4 }}>
+              {/* Start New Session - Reduced height */}
+              <Grid item xs={12} md={7}>
+                <Card 
+                  sx={{ 
+                    p: 3,  // Reduced from 4 to 3
+                    background: "linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)",
+                    color: "white", 
+                    boxShadow: "0 12px 32px rgba(59, 130, 246, 0.3)",
+                    borderRadius: 3,
+                    position: "relative",
+                    overflow: "hidden",
+                    minHeight: "220px", // Set fixed height instead of 100%
+                    "&::before": {
+                      content: '""',
+                      position: "absolute",
+                      top: 0,
+                      right: 0,
+                      width: "120px",
+                      height: "120px",
+                      background: "rgba(255,255,255,0.08)",
+                      borderRadius: "50%",
+                      transform: "translate(40px, -40px)",
+                    }
+                  }}
+                >
+                  <Box sx={{ position: "relative", zIndex: 1, height: "100%", display: "flex", flexDirection: "column" }}>
+                    <Box sx={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", mb: 2 }}>
+                      <Box sx={{ flex: 1 }}>
+                        <PlayArrowIcon sx={{ fontSize: 40, mb: 1.5, opacity: 0.9 }} />
+                        <Typography variant="h5" fontWeight="700" gutterBottom>
+                          Ready for Your Next Session?
+                        </Typography>
+                        <Typography variant="body1" sx={{ mb: 2, opacity: 0.9, maxWidth: "380px", lineHeight: 1.5 }}>
+                          Begin a comprehensive gait analysis using your assigned sensor kit. 
+                          Each session helps track your progress and provides valuable insights.
+                        </Typography>
+                      </Box>
+                      <Chip 
+                        label="New" 
+                        size="small" 
+                        sx={{ 
+                          bgcolor: "rgba(255,255,255,0.2)",
+                          color: "white",
+                          fontWeight: 600
+                        }} 
+                      />
+                    </Box>
+                    
+                    <Box sx={{ display: "flex", gap: 2, alignItems: "center", mt: "auto" }}>
+                      <Button
+                        variant="contained"
+                        size="large"
+                        startIcon={<PlayArrowIcon />}
+                        sx={{ 
+                          bgcolor: "rgba(255,255,255,0.2)",
+                          color: "white",
+                          fontWeight: 600,
+                          px: 3,
+                          py: 1.2,
+                          "&:hover": { bgcolor: "rgba(255,255,255,0.3)" },
+                          backdropFilter: "blur(10px)",
+                        }}
+                        onClick={() => navigate("/patient/test-session")}
+                      >
+                        Launch New Session
+                      </Button>
+                      
+                      <Typography variant="caption" sx={{ opacity: 0.8, ml: 1 }}>
+                        Estimated time: 10-15 minutes
+                      </Typography>
+                    </Box>
+                  </Box>
+                </Card>
+              </Grid>
+              
+              {/* Quick Stats - Better spacing */}
+              <Grid item xs={12} md={5}>
+                <Grid container spacing={2}> {/* Reduced spacing from 3 to 2 */}
+                  <Grid item xs={12}>
+                    <Card 
+                      sx={{ 
+                        p: 2.5, 
+                        height: "100px", // Fixed height
+                        background: "linear-gradient(135deg, #10b981 0%, #059669 100%)",
+                        color: "white",
+                        boxShadow: "0 8px 24px rgba(16, 185, 129, 0.3)",
+                        borderRadius: 2,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        textAlign: "center",
+                      }}
+                    >
+                      <Box>
+                        <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 1, mb: 1 }}>
+                          <AssessmentIcon sx={{ fontSize: 24, opacity: 0.9 }} />
+                          <Typography variant="h4" fontWeight="800">
+                            {dashboardStats?.totalSessions || 0}
+                          </Typography>
+                        </Box>
+                        <Typography variant="body2" sx={{ opacity: 0.9, fontSize: 13 }}>
+                          Completed Sessions
+                        </Typography>
+                      </Box>
+                    </Card>
+                  </Grid>
+                  <Grid item xs={12}>
+                    <Card 
+                      sx={{ 
+                        p: 2.5, 
+                        height: "100px", // Fixed height
+                        background: "linear-gradient(135deg, #f59e0b 0%, #d97706 100%)",
+                        color: "white",
+                        boxShadow: "0 8px 24px rgba(245, 158, 11, 0.3)",
+                        borderRadius: 2,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        textAlign: "center",
+                      }}
+                    >
+                      <Box>
+                        <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 1, mb: 1 }}>
+                          <TrendingUpIcon sx={{ fontSize: 24, opacity: 0.9 }} />
+                          <Typography variant="h4" fontWeight="800">
+                            {dashboardStats?.latestSession?.results?.balanceScore || "N/A"}
+                          </Typography>
+                        </Box>
+                        <Typography variant="body2" sx={{ opacity: 0.9, fontSize: 13 }}>
+                          Latest Balance Score
+                        </Typography>
+                      </Box>
+                    </Card>
+                  </Grid>
+                </Grid>
+              </Grid>
             </Grid>
-          </Grid>
+
+            {/* Divider with more space */}
+            <Divider sx={{ my: 3, borderColor: "rgba(148, 163, 184, 0.2)" }} />
+
+            {/* Session History */}
+            <Box sx={{ mt: 2 }}>
+              <PatientTestSessionsList 
+                embedded={true}
+                initialPageSize={8}
+                showControls={true}
+                title="Session History & Progress"
+              />
+            </Box>
+          </Container>
         );
 
       default:
+        // NEW ANALYTICS DASHBOARD - Replaces the old "Recent Sessions" section
         return (
           <Container maxWidth="xl" sx={{ px: 0 }}>
             <Grid container spacing={3}>
-              {/* Stats Cards */}
+              
+              {/* Row 1: Keep existing appointment cards but make them smaller */}
               <Grid item xs={12} sm={6} md={6}>
                 <Card 
                   sx={{ 
                     p: 3, 
-                    height: "100%",
+                    height: "180px", // Reduced height
                     background: "linear-gradient(135deg, #06b6d4 0%, #0891b2 100%)",
                     color: "white",
                     boxShadow: "0 12px 32px rgba(6, 182, 212, 0.3)",
@@ -328,7 +751,7 @@ export default function PatientDashboard() {
                 >
                   <Box sx={{ position: "relative", zIndex: 1 }}>
                     <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", mb: 2 }}>
-                      <DescriptionIcon sx={{ fontSize: 32, opacity: 0.9 }} />
+                      <DescriptionIcon sx={{ fontSize: 28, opacity: 0.9 }} />
                       <Chip 
                         label="Latest" 
                         size="small" 
@@ -342,15 +765,15 @@ export default function PatientDashboard() {
                     <Typography variant="h6" fontWeight="700" gutterBottom>
                       Latest Report
                     </Typography>
-                    <Typography variant="body2" sx={{ opacity: 0.9, mb: 3 }}>
+                    <Typography variant="body2" sx={{ opacity: 0.9, mb: 2 }}>
                       Last reviewed on{" "}
-                      {latestSession
-                        ? new Date(latestSession.endTime).toLocaleDateString()
+                      {dashboardStats?.latestSession
+                        ? new Date(dashboardStats.latestSession.endTime).toLocaleDateString()
                         : "No data available"}
                     </Typography>
                     <Button
                       variant="contained"
-                      size="medium"
+                      size="small"
                       sx={{
                         bgcolor: "rgba(255,255,255,0.2)",
                         color: "white",
@@ -358,24 +781,7 @@ export default function PatientDashboard() {
                         "&:hover": { bgcolor: "rgba(255,255,255,0.3)" },
                         backdropFilter: "blur(10px)",
                       }}
-                      onClick={() => {
-                        if (latestSession) {
-                          const el = document.getElementById(`session-${latestSession.sessionId}`);
-                          if (el) {
-                            el.scrollIntoView({ behavior: "smooth" });
-                            el.style.transition = "background-color 0.5s";
-                            el.style.backgroundColor = "#fff9c4";
-                            setTimeout(() => {
-                              el.style.backgroundColor = "";
-                            }, 1200);
-                            setTimeout(() => {
-                              el.click();
-                            }, 600);
-                          } else {
-                            console.warn("Element not found:", `session-${latestSession.sessionId}`);
-                          }
-                        }
-                      }}
+                      onClick={() => setSelectedSection("Test Sessions")}
                     >
                       View Details
                     </Button>
@@ -387,7 +793,7 @@ export default function PatientDashboard() {
                 <Card 
                   sx={{ 
                     p: 3, 
-                    height: "100%",
+                    height: "180px", // Reduced height
                     background: "linear-gradient(135deg, #f59e0b 0%, #d97706 100%)",
                     color: "white",
                     boxShadow: "0 12px 32px rgba(245, 158, 11, 0.3)",
@@ -409,7 +815,7 @@ export default function PatientDashboard() {
                 >
                   <Box sx={{ position: "relative", zIndex: 1 }}>
                     <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", mb: 2 }}>
-                      <CalendarTodayIcon sx={{ fontSize: 32, opacity: 0.9 }} />
+                      <CalendarTodayIcon sx={{ fontSize: 28, opacity: 0.9 }} />
                       <Chip 
                         label="Upcoming" 
                         size="small" 
@@ -424,163 +830,78 @@ export default function PatientDashboard() {
                       Next Appointment
                     </Typography>
                     <Typography variant="body2" sx={{ opacity: 0.9, mb: 1 }}>
-                      {patient.nextAppointment || "Not scheduled"}
+                      {patient?.nextAppointment || "Not scheduled"}
                     </Typography>
                     <Typography variant="caption" sx={{ opacity: 0.8 }}>
-                      with {patient.doctor?.name || "Healthcare Provider"}
+                      with {patient?.doctor?.name || "Healthcare Provider"}
                     </Typography>
                   </Box>
                 </Card>
               </Grid>
 
-              {/* Test Session History */}
-              <Grid item xs={12} sx={{ mt: 2 }}>
-                <Card 
-                  sx={{ 
-                    p: 4, 
-                    boxShadow: "0 8px 32px rgba(0,0,0,0.08)",
-                    borderRadius: 3,
-                    background: "linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)",
-                    border: "1px solid rgba(226, 232, 240, 0.8)",
-                    marginTop: 4,
-                  }}
-                >
-                  <Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: 4 }}>
-                    <Box 
-                      sx={{
-                        p: 1.5,
-                        borderRadius: 2,
-                        background: "linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)",
-                        color: "white",
-                      }}
-                    >
-                      <HistoryIcon sx={{ fontSize: 24 }} />
-                    </Box>
-                    <Box>
-                      <Typography variant="h5" fontWeight="700" sx={{ color: "text.primary" }}>
-                        Session History
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary">
-                        Track your progress over time
-                      </Typography>
-                    </Box>
-                  </Box>
+              {/* Row 2: NEW Analytics KPI Cards */}
+              <Grid item xs={12} sm={6} md={3}>
+                <StatCard 
+                  title="Total Sessions"
+                  value={dashboardStats?.totalSessions || 0}
+                  subtitle="Completed"
+                  icon={<AssessmentIcon />}
+                  gradient="linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
+                />
+              </Grid>
+              
+              <Grid item xs={12} sm={6} md={3}>
+                <StatCard 
+                  title="Latest Balance"
+                  value={dashboardStats?.latestSession?.results?.balanceScore || "N/A"}
+                  subtitle="Score"
+                  icon={<BalanceIcon />}
+                  gradient="linear-gradient(135deg, #f093fb 0%, #f5576c 100%)"
+                  trend={dashboardStats?.trends?.balanceScoreChange}
+                />
+              </Grid>
+              
+              <Grid item xs={12} sm={6} md={3}>
+                <StatCard 
+                  title="Avg Steps"
+                  value={dashboardStats?.averageMetrics?.steps ? Math.round(dashboardStats.averageMetrics.steps) : 0}
+                  subtitle="Per session"
+                  icon={<DirectionsWalkIcon />}
+                  gradient="linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)"
+                  trend={dashboardStats?.trends?.stepsChange}
+                />
+              </Grid>
+              
+              <Grid item xs={12} sm={6} md={3}>
+                <StatCard 
+                  title="Avg Cadence"
+                  value={dashboardStats?.averageMetrics?.cadence ? dashboardStats.averageMetrics.cadence.toFixed(1) : 0}
+                  subtitle="Steps per minute"
+                  icon={<SpeedIcon />}
+                  gradient="linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)"
+                  trend={dashboardStats?.trends?.cadenceChange}
+                />
+              </Grid>
 
-                  {testSessions.length === 0 ? (
-                    <Paper 
-                      sx={{ 
-                        p: 4, 
-                        textAlign: "center",
-                        background: "rgba(148, 163, 184, 0.05)",
-                        border: "1px dashed rgba(148, 163, 184, 0.3)",
-                        borderRadius: 2,
-                      }}
-                    >
-                      <Typography variant="h6" color="text.secondary">
-                        No sessions found
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary">
-                        Your test sessions will appear here once you start
-                      </Typography>
-                    </Paper>
-                  ) : (
-                    <Grid container spacing={2}>
-                      {testSessions.map((session) => (
-                        <Grid item xs={12} key={session.sessionId}>
-                          <Card
-                            id={`session-${session.sessionId}`}
-                            sx={{
-                              p: 3,
-                              cursor: "pointer",
-                              border: "1px solid rgba(226, 232, 240, 0.8)",
-                              borderRadius: 2,
-                              transition: "all 0.2s ease",
-                              borderLeft: session.status === "FAILED" 
-                                ? "4px solid #ef4444" 
-                                : "4px solid #3b82f6",
-                              backgroundColor: session.status === "FAILED" 
-                                ? "rgba(239, 68, 68, 0.05)" 
-                                : "white",
-                              "&:hover": { 
-                                transform: "translateY(-2px)",
-                                boxShadow: "0 12px 32px rgba(0,0,0,0.12)",
-                                borderColor: session.status === "FAILED" 
-                                  ? "#ef4444" 
-                                  : "#3b82f6",
-                              },
-                            }}
-                            onClick={() => {
-                              if (session.status !== "FAILED") 
-                                navigate(`/patient/test-session/${session.sessionId}`)
-                            }}
-                          >
-                            <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", mb: 2 }}>
-                              <Typography variant="h6" fontWeight="700" sx={{ color: "text.primary" }}>
-                                Session #{session.sessionId}
-                              </Typography>
-                              <Chip 
-                                label={session.status} 
-                                size="small" 
-                                sx={{ 
-                                  bgcolor: session.status === "FAILED" 
-                                    ? "rgba(239, 68, 68, 0.1)" 
-                                    : "rgba(34, 197, 94, 0.1)",
-                                  color: session.status === "FAILED" 
-                                    ? "#dc2626" 
-                                    : "#16a34a",
-                                  fontWeight: 600,
-                                  fontSize: 11,
-                                }} 
-                              />
-                            </Box>
-                            
-                            <Box sx={{ display: "flex", gap: 3, mb: 2 }}>
-                              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                                <Typography variant="body2" color="text.secondary">
-                                  📅 {new Date(session.startTime).toLocaleDateString()}
-                                </Typography>
-                              </Box>
-                              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                                <Typography variant="body2" color="text.secondary">
-                                  🕐 {new Date(session.startTime).toLocaleTimeString()}
-                                </Typography>
-                              </Box>
-                            </Box>
+              {/* Row 3: Performance Overview and Latest Session */}
+              <Grid item xs={12} md={8} mt={5}>
+                {dashboardStats ? (
+                  <PerformanceOverview 
+                    averageMetrics={dashboardStats.averageMetrics}
+                    trends={dashboardStats.trends}
+                  />
+                ) : (
+                  <Card sx={{ p: 3, height: "350px", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    <CircularProgress />
+                  </Card>
+                )}
+              </Grid>
 
-                            <Box sx={{ display: "flex", gap: 4, mb: 2 }}>
-                              <Box>
-                                <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600 }}>
-                                  STEPS
-                                </Typography>
-                                <Typography variant="body1" fontWeight="600">
-                                  {session.results?.steps ?? "N/A"}
-                                </Typography>
-                              </Box>
-                              <Box>
-                                <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600 }}>
-                                  BALANCE SCORE
-                                </Typography>
-                                <Typography variant="body1" fontWeight="600">
-                                  {session.results?.balanceScore ?? "N/A"}
-                                </Typography>
-                              </Box>
-                            </Box>
-
-                            <Typography variant="body2" color="text.secondary" sx={{ 
-                              fontStyle: "italic",
-                              backgroundColor: "rgba(148, 163, 184, 0.05)",
-                              p: 1.5,
-                              borderRadius: 1,
-                              border: "1px solid rgba(148, 163, 184, 0.1)"
-                            }}>
-                              {session.feedback?.notes?.substring(0, 100) || "No feedback available yet..."}
-                            </Typography>
-                          </Card>
-                        </Grid>
-                      ))}
-                    </Grid>
-                  )}
-                </Card>
+              <Grid item xs={12} md={4} mt={5}>
+                <LatestSessionCard 
+                  latestSession={dashboardStats?.latestSession}
+                  setSelectedSection={setSelectedSection}
+                />
               </Grid>
             </Grid>
           </Container>
