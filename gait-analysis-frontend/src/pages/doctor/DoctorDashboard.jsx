@@ -51,6 +51,7 @@ import Appointments from "../Appointments";
 import Reports from "../../components/Reports";
 import Messages from "../Messages";
 import Settings from "../Settings";
+import DoctorPatientsPage from "./DoctorPatientsPage";
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 
@@ -143,57 +144,7 @@ const QuickActionCard = ({ title, description, icon, onClick, color }) => (
   </Card>
 );
 
-// Patients component placeholder
-const DoctorPatientsPage = ({ patients, isLoading, error }) => {
-  if (isLoading) {
-    return (
-      <Box display="flex" justifyContent="center" alignItems="center" height="400px">
-        <CircularProgress />
-        <Typography ml={2}>Loading patients...</Typography>
-      </Box>
-    );
-  }
-
-  if (error) {
-    return (
-      <Box textAlign="center" py={4}>
-        <Typography color="error" variant="h6">
-          Error loading patients: {error.message}
-        </Typography>
-      </Box>
-    );
-  }
-
-  return (
-    <Box>
-      <Typography variant="h5" fontWeight={700} mb={3}>
-        Your Patients ({patients.length})
-      </Typography>
-      <Grid container spacing={3}>
-        {patients.map((patient, index) => (
-          <Grid item xs={12} md={6} lg={4} key={index}>
-            <Card sx={{ p: 2, borderRadius: 2, boxShadow: 2 }}>
-              <CardContent>
-                <Typography variant="h6" fontWeight={600}>
-                  {patient.name || `Patient ${index + 1}`}
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  {patient.condition || "Regular checkup"}
-                </Typography>
-                <Chip 
-                  label={patient.status || "Active"} 
-                  size="small" 
-                  color="primary" 
-                  sx={{ mt: 1 }}
-                />
-              </CardContent>
-            </Card>
-          </Grid>
-        ))}
-      </Grid>
-    </Box>
-  );
-};
+// Now using the imported DoctorPatientsPage component
 
 export default function DoctorDashboard() {
   const navigate = useNavigate();
