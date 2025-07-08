@@ -17,9 +17,9 @@ public interface TestSessionRepository extends JpaRepository<TestSession, Long> 
 
     Page<TestSession> findAllByPatient(Patient patient , Pageable pageable);
 
-    Page<TestSession> findByPatient_Doctor_IdAndStatus(
+    Page<TestSession> findByPatient_Doctor_IdAndStatusIn(
             Long doctorId,
-            TestSession.Status status,
+            List<TestSession.Status> statuses,
             Pageable pageable
     );
 

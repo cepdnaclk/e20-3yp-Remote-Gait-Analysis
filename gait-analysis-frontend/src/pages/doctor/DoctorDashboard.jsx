@@ -45,7 +45,7 @@ import {
   Tooltip, 
   Legend 
 } from 'chart.js';
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { getDoctorPatients } from "../../services/doctorServices";
 import Appointments from "../Appointments";
 import Reports from "../../components/Reports";
@@ -144,14 +144,18 @@ const QuickActionCard = ({ title, description, icon, onClick, color }) => (
   </Card>
 );
 
-// Now using the imported DoctorPatientsPage component
-
 export default function DoctorDashboard() {
   const navigate = useNavigate();
-  const [patients, setPatients] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [selectedSection, setSelectedSection] = useState("Dashboard");
+  const location = useLocation();
+  const [dashboardStats, setDashboardStats] = useState({
+    totalPatients: 0,
+    todayAppointments: 0,
+    pendingReports: 0
+  });
+  const [isLoadingStats, setIsLoadingStats] = useState(true);
+  const [selectedSection, setSelectedSection] = useState(
+    location.state?.selectedSection || "Dashboard"
+  );
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
   // Extract doctor name from token
@@ -167,22 +171,43 @@ export default function DoctorDashboard() {
     doctorName = "Doctor";
   }
 
-  // Fetch patients data
+  // Fetch dashboard statistics
   useEffect(() => {
-    const fetchPatients = async () => {
+    const fetchDashboardStats = async () => {
       try {
-        setIsLoading(true);
-        const res = await getDoctorPatients();
-        setPatients(res.data || []);
+        setIsLoadingStats(true);
+        
+        // Fetch basic patient count for dashboard using axios service
+        const res = await getDoctorPatients({ page: 0, size: 1 });
+        const totalPatients = res.data?.totalElements || 0;
+        
+        // Generate mock data for other stats (replace with real API calls)
+        const todayAppointments = Math.floor(Math.random() * 20) + 5;
+        const pendingReports = Math.floor(Math.random() * 10) + 1;
+        
+        setDashboardStats({
+          totalPatients,
+          todayAppointments,
+          pendingReports
+        });
       } catch (err) {
-        console.error("Error fetching patients:", err);
-        setError(err);
+        console.error("Error fetching dashboard stats:", err);
+        // Set default values on error
+        setDashboardStats({
+          totalPatients: 0,
+          todayAppointments: Math.floor(Math.random() * 20) + 5,
+          pendingReports: Math.floor(Math.random() * 10) + 1
+        });
       } finally {
-        setIsLoading(false);
+        setIsLoadingStats(false);
       }
     };
-    fetchPatients();
-  }, []);
+    
+    // Only fetch stats when on dashboard
+    if (selectedSection === "Dashboard") {
+      fetchDashboardStats();
+    }
+  }, [selectedSection]);
 
   const menuItems = [
     { text: "Dashboard", icon: <DashboardIcon /> },
@@ -247,10 +272,6 @@ export default function DoctorDashboard() {
     },
   };
 
-  // Generate mock data for demo
-  const todayAppointments = Math.floor(Math.random() * 20) + 5;
-  const pendingReports = Math.floor(Math.random() * 10) + 1;
-
   // Dashboard content
   const DashboardContent = () => (
     <Box>
@@ -259,7 +280,7 @@ export default function DoctorDashboard() {
         <Grid item xs={12} sm={6} md={4}>
           <StatCard
             title="Total Patients"
-            value={patients?.length || 0}
+            value={isLoadingStats ? "..." : dashboardStats.totalPatients}
             icon={<PeopleIcon fontSize="large" />}
             gradient="linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
             trend="+12%"
@@ -268,7 +289,7 @@ export default function DoctorDashboard() {
         <Grid item xs={12} sm={6} md={4}>
           <StatCard
             title="Today's Appointments"
-            value={todayAppointments}
+            value={isLoadingStats ? "..." : dashboardStats.todayAppointments}
             icon={<CalendarTodayIcon fontSize="large" />}
             gradient="linear-gradient(135deg, #f093fb 0%, #f5576c 100%)"
             trend="+8%"
@@ -277,7 +298,7 @@ export default function DoctorDashboard() {
         <Grid item xs={12} sm={6} md={4}>
           <StatCard
             title="Pending Reports"
-            value={pendingReports}
+            value={isLoadingStats ? "..." : dashboardStats.pendingReports}
             icon={<DescriptionIcon fontSize="large" />}
             gradient="linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)"
             trend="-5%"
@@ -335,7 +356,7 @@ export default function DoctorDashboard() {
   const renderContent = () => {
     switch (selectedSection) {
       case "Patients":
-        return <DoctorPatientsPage patients={patients} isLoading={isLoading} error={error} />;
+        return <DoctorPatientsPage />;
       case "Appointments":
         return <Appointments />;
       case "Reports":
@@ -355,8 +376,8 @@ export default function DoctorDashboard() {
     navigate("/");
   };
 
-  // Loading state
-  if (isLoading && selectedSection === "Dashboard") {
+  // Loading state for initial dashboard load
+  if (isLoadingStats && selectedSection === "Dashboard") {
     return (
       <Box display="flex" justifyContent="center" alignItems="center" height="100vh">
         <CircularProgress size={60} />

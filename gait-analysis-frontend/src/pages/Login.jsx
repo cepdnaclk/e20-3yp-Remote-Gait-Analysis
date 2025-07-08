@@ -57,10 +57,10 @@ const Card = styled(MuiCard)(({ theme }) => ({
   gap: theme.spacing(2.5),
   margin: 'auto',
   background: 'rgba(255, 255, 255, 0.98)',
-  backdropFilter: 'blur(10px)',
-  borderRadius: '16px',
+  backdropFilter: 'blur(15px)',
+  borderRadius: '20px',
   border: '1px solid rgba(255, 255, 255, 0.3)',
-  boxShadow: '0 10px 40px rgba(0, 0, 0, 0.12)',
+  boxShadow: '0 20px 60px rgba(0, 0, 0, 0.12)',
   position: 'relative',
   overflow: 'hidden',
   '&::before': {
@@ -69,21 +69,21 @@ const Card = styled(MuiCard)(({ theme }) => ({
     top: 0,
     left: 0,
     right: 0,
-    height: '3px',
-    background: 'linear-gradient(90deg, #4299e1 0%, #48bb78 50%, #ed8936 100%)',
+    height: '4px',
+    background: 'linear-gradient(90deg, #1976D2 0%, #388E3C 50%, #F57C00 100%)',
   },
   [theme.breakpoints.down('sm')]: {
     maxWidth: '100%',
     padding: theme.spacing(3),
-    borderRadius: '12px',
+    borderRadius: '16px',
   },
 }));
 
 const LoginContainer = styled(Stack)(({ theme }) => ({
   minHeight: '100vh',
   width: '100vw',
-  padding: theme.spacing(3),
-  background: 'linear-gradient(135deg, #1a202c 0%, #2d3748 50%, #4a5568 100%)',
+  padding: theme.spacing(4),
+  background: 'linear-gradient(135deg, #E3F2FD 0%, #BBDEFB 25%, #90CAF9 50%, #64B5F6 75%, #42A5F5 100%)',
   position: 'relative',
   overflow: 'auto',
   [theme.breakpoints.down('sm')]: {
@@ -94,8 +94,8 @@ const LoginContainer = styled(Stack)(({ theme }) => ({
 const BackgroundDecoration = styled(Box)({
   position: 'absolute',
   borderRadius: '50%',
-  background: 'linear-gradient(135deg, rgba(66, 153, 225, 0.06) 0%, rgba(72, 187, 120, 0.06) 100%)',
-  filter: 'blur(30px)',
+  background: 'linear-gradient(135deg, rgba(25, 118, 210, 0.08) 0%, rgba(56, 142, 60, 0.08) 100%)',
+  filter: 'blur(40px)',
 });
 
 const FeatureChip = ({ icon, text }) => (
@@ -104,12 +104,12 @@ const FeatureChip = ({ icon, text }) => (
     label={text}
     size="small"
     sx={{
-      backgroundColor: 'rgba(66, 153, 225, 0.12)',
-      color: '#2b6cb0',
+      backgroundColor: 'rgba(25, 118, 210, 0.1)',
+      color: '#1565C0',
       fontWeight: 600,
-      border: '1px solid rgba(66, 153, 225, 0.2)',
+      border: '1px solid rgba(25, 118, 210, 0.2)',
       '& .MuiChip-icon': {
-        color: '#2b6cb0',
+        color: '#1565C0',
       },
     }}
   />
@@ -174,27 +174,27 @@ export default function Login() {
         {/* Background Decorations */}
         <BackgroundDecoration 
           sx={{ 
-            width: '500px', 
-            height: '500px', 
-            top: '10%', 
+            width: '400px', 
+            height: '400px', 
+            top: '15%', 
             right: '10%',
             animation: 'float 8s ease-in-out infinite',
           }} 
         />
         <BackgroundDecoration 
           sx={{ 
-            width: '300px', 
-            height: '300px', 
-            bottom: '10%', 
+            width: '250px', 
+            height: '250px', 
+            bottom: '15%', 
             left: '10%',
-            background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.08) 0%, rgba(245, 158, 11, 0.08) 100%)',
+            background: 'linear-gradient(135deg, rgba(56, 142, 60, 0.1) 0%, rgba(245, 124, 0, 0.1) 100%)',
             animation: 'float 6s ease-in-out infinite reverse',
           }} 
         />
 
-        {/* Left Side - Branding (Desktop Only) */}
-        <Container maxWidth="xl" sx={{ position: 'relative', zIndex: 1 }}>
-          <Grid container spacing={4} alignItems="center" sx={{ minHeight: '80vh' }}>
+        {/* Main Container */}
+        <Container maxWidth="xl" sx={{ position: 'relative', zIndex: 1, mt: 4 }}>
+          <Grid container spacing={6} alignItems="center" sx={{ minHeight: '85vh' }}>
             
             {/* Left Side - Marketing Content */}
             <Grid item xs={12} md={7} sx={{ display: { xs: 'none', md: 'block' } }}>
@@ -202,15 +202,15 @@ export default function Login() {
                 <Chip 
                   label="Next-Generation Healthcare Technology" 
                   sx={{ 
-                    mb: 3,
-                    px: 2,
-                    py: 1,
-                    backgroundColor: "rgba(59, 130, 246, 0.1)",
-                    color: "#60a5fa",
+                    mb: 4,
+                    px: 3,
+                    py: 1.5,
+                    backgroundColor: "rgba(25, 118, 210, 0.1)",
+                    color: "#1565C0",
                     borderRadius: 3,
                     fontSize: "14px",
                     fontWeight: 600,
-                    border: "1px solid rgba(59, 130, 246, 0.2)",
+                    border: "1px solid rgba(25, 118, 210, 0.2)",
                   }} 
                 />
                 
@@ -219,31 +219,35 @@ export default function Login() {
                   sx={{
                     fontWeight: 800,
                     fontSize: { md: "3rem", lg: "3.5rem" },
-                    color: 'white',
-                    mb: 3,
+                    color: '#1A237E',
+                    mb: 2,
                     lineHeight: 1.2,
                   }}
                 >
                   Advanced Gait Analysis
-                  <br />
-                  <Box 
-                    component="span" 
-                    sx={{
-                      background: "linear-gradient(135deg, #3b82f6 0%, #10b981 100%)",
-                      WebkitBackgroundClip: "text",
-                      WebkitTextFillColor: "transparent",
-                      backgroundClip: "text",
-                    }}
-                  >
-                    Platform
-                  </Box>
+                </Typography>
+                
+                <Typography 
+                  variant="h2" 
+                  sx={{
+                    fontWeight: 800,
+                    fontSize: { md: "3rem", lg: "3.5rem" },
+                    background: "linear-gradient(135deg, #1976D2 0%, #388E3C 100%)",
+                    WebkitBackgroundClip: "text",
+                    WebkitTextFillColor: "transparent",
+                    backgroundClip: "text",
+                    mb: 4,
+                    lineHeight: 1.2,
+                  }}
+                >
+                  Platform
                 </Typography>
 
                 <Typography 
                   variant="h6" 
                   sx={{ 
-                    color: "rgba(255, 255, 255, 0.8)",
-                    mb: 4,
+                    color: "#37474F",
+                    mb: 5,
                     lineHeight: 1.6,
                     fontWeight: 400,
                   }}
@@ -252,32 +256,32 @@ export default function Login() {
                 </Typography>
 
                 {/* Benefits */}
-                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
                   {[
                     { icon: <SecurityIcon />, text: 'HIPAA Compliant Security', desc: 'Bank-level encryption and compliance' },
                     { icon: <VerifiedUserIcon />, text: 'Medical Grade Accuracy', desc: 'FDA approved technology' },
                     { icon: <CloudIcon />, text: 'Cloud-Based Analytics', desc: 'Real-time data processing' },
                   ].map((benefit, index) => (
-                    <Box key={index} sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                    <Box key={index} sx={{ display: 'flex', alignItems: 'center', gap: 3 }}>
                       <Box 
                         sx={{
-                          width: 40,
-                          height: 40,
-                          borderRadius: '10px',
-                          background: 'rgba(59, 130, 246, 0.1)',
+                          width: 50,
+                          height: 50,
+                          borderRadius: '12px',
+                          background: 'rgba(25, 118, 210, 0.1)',
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
-                          color: '#60a5fa',
+                          color: '#1976D2',
                         }}
                       >
                         {benefit.icon}
                       </Box>
                       <Box>
-                        <Typography variant="body1" fontWeight="600" color="white">
+                        <Typography variant="h6" fontWeight="600" color="#1A237E">
                           {benefit.text}
                         </Typography>
-                        <Typography variant="body2" color="rgba(255, 255, 255, 0.7)">
+                        <Typography variant="body2" color="#546E7A">
                           {benefit.desc}
                         </Typography>
                       </Box>
@@ -290,263 +294,245 @@ export default function Login() {
             {/* Right Side - Login Form */}
             <Grid item xs={12} md={5}>
               <Card variant="outlined">
-            {/* Header with Enhanced Logo */}
-            <Box sx={{ textAlign: "center", mb: 4 }}>
-              <Box
-                sx={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  width: 70,
-                  height: 70,
-                  borderRadius: '16px',
-                  background: 'linear-gradient(135deg, #3b82f6 0%, #10b981 100%)',
-                  mb: 3,
-                  boxShadow: '0 8px 32px rgba(59, 130, 246, 0.3)',
-                  position: 'relative',
-                  overflow: 'hidden',
-                  '&::before': {
-                    content: '""',
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    bottom: 0,
-                    background: 'url(' + logo + ') center/contain no-repeat',
-                    filter: 'brightness(0) invert(1)',
-                  }
-                }}
-              >
-                <LocalHospitalIcon sx={{ fontSize: 28, color: 'white', position: 'relative', zIndex: 1 }} />
-              </Box>
+                {/* Header with Logo */}
+                <Box sx={{ textAlign: "center", mb: 4 }}>
+                  <Box
+                    component="img"
+                    src={logo}
+                    alt="RehabGait Logo"
+                    sx={{
+                      height: 60,
+                      width: "auto",
+                      mb: 3,
+                    }}
+                  />
 
-              <Typography
-                variant="h4"
-                sx={{
-                  fontWeight: 800,
-                  background: 'linear-gradient(135deg, #1e293b 0%, #3b82f6 100%)',
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                  backgroundClip: 'text',
-                  mb: 1,
-                  fontSize: { xs: '1.8rem', sm: '2.125rem' },
-                }}
-              >
-                RehabGait
-              </Typography>
-              
-              <Typography
-                variant="body1"
-                sx={{
-                  color: 'text.secondary',
-                  fontWeight: 500,
-                  mb: 3,
-                }}
-              >
-                Welcome Back
-              </Typography>
+                  <Typography
+                    variant="h4"
+                    sx={{
+                      fontWeight: 800,
+                      color: '#1A237E',
+                      mb: 1,
+                      fontSize: { xs: '1.8rem', sm: '2.125rem' },
+                    }}
+                  >
+                    RehabGait
+                  </Typography>
+                  
+                  <Typography
+                    variant="body1"
+                    sx={{
+                      color: '#546E7A',
+                      fontWeight: 500,
+                      mb: 3,
+                    }}
+                  >
+                    Welcome Back
+                  </Typography>
 
-              {/* Feature Chips - Mobile Responsive */}
-              <Box sx={{ display: { xs: 'flex', md: 'flex' }, gap: 1, justifyContent: 'center', flexWrap: 'wrap', mb: 2 }}>
-                <FeatureChip icon={<SecurityIcon sx={{ fontSize: 14 }} />} text="HIPAA" />
-                <FeatureChip icon={<CloudIcon sx={{ fontSize: 14 }} />} text="Secure" />
-                <FeatureChip icon={<VerifiedUserIcon sx={{ fontSize: 14 }} />} text="FDA" />
-              </Box>
-            </Box>
+                  {/* Feature Chips */}
+                  <Box sx={{ display: 'flex', gap: 1, justifyContent: 'center', flexWrap: 'wrap', mb: 2 }}>
+                    <FeatureChip icon={<SecurityIcon sx={{ fontSize: 14 }} />} text="HIPAA" />
+                    <FeatureChip icon={<CloudIcon sx={{ fontSize: 14 }} />} text="Secure" />
+                    <FeatureChip icon={<VerifiedUserIcon sx={{ fontSize: 14 }} />} text="FDA" />
+                  </Box>
+                </Box>
 
-            {/* Login Form */}
-            <Box 
-              component="form" 
-              onSubmit={handleSubmit(onSubmit)} 
-              sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}
-            >
-              <FormControl>
-                <FormLabel 
-                  htmlFor="username"
-                  sx={{ 
-                    fontWeight: 600, 
-                    color: 'text.primary',
-                    mb: 1,
+                {/* Login Form */}
+                <Box 
+                  component="form" 
+                  onSubmit={handleSubmit(onSubmit)} 
+                  sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}
+                >
+                  <FormControl>
+                    <FormLabel 
+                      htmlFor="username"
+                      sx={{ 
+                        fontWeight: 600, 
+                        color: '#1A237E',
+                        mb: 1,
+                      }}
+                    >
+                      Username
+                    </FormLabel>
+                    <TextField
+                      autoFocus
+                      required
+                      fullWidth
+                      id="username"
+                      placeholder="Enter your username"
+                      name="username"
+                      autoComplete="username"
+                      variant="outlined"
+                      error={!!errors.username}
+                      helperText={errors.username?.message}
+                      {...register("username")}
+                      InputProps={{
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <AccountCircleIcon sx={{ color: '#546E7A' }} />
+                          </InputAdornment>
+                        ),
+                      }}
+                      sx={{
+                        '& .MuiOutlinedInput-root': {
+                          borderRadius: '12px',
+                          backgroundColor: 'rgba(248, 250, 252, 0.8)',
+                          transition: 'all 0.3s ease',
+                          '&:hover': {
+                            backgroundColor: 'rgba(248, 250, 252, 1)',
+                            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.05)',
+                          },
+                          '&.Mui-focused': {
+                            backgroundColor: 'white',
+                            boxShadow: '0 0 0 3px rgba(25, 118, 210, 0.1)',
+                            borderColor: '#1976D2',
+                          },
+                        },
+                      }}
+                    />
+                  </FormControl>
+
+                  <FormControl>
+                    <FormLabel 
+                      htmlFor="password"
+                      sx={{ 
+                        fontWeight: 600, 
+                        color: '#1A237E',
+                        mb: 1,
+                      }}
+                    >
+                      Password
+                    </FormLabel>
+                    <TextField
+                      required
+                      fullWidth
+                      name="password"
+                      placeholder="Enter your password"
+                      type={showPassword ? 'text' : 'password'}
+                      id="password"
+                      autoComplete="current-password"
+                      variant="outlined"
+                      error={!!errors.password}
+                      helperText={errors.password?.message}
+                      {...register("password")}
+                      InputProps={{
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <LockIcon sx={{ color: '#546E7A' }} />
+                          </InputAdornment>
+                        ),
+                        endAdornment: (
+                          <InputAdornment position="end">
+                            <IconButton
+                              aria-label="toggle password visibility"
+                              onClick={() => setShowPassword(!showPassword)}
+                              edge="end"
+                              sx={{ color: '#546E7A' }}
+                            >
+                              {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
+                            </IconButton>
+                          </InputAdornment>
+                        ),
+                      }}
+                      sx={{
+                        '& .MuiOutlinedInput-root': {
+                          borderRadius: '12px',
+                          backgroundColor: 'rgba(248, 250, 252, 0.8)',
+                          transition: 'all 0.3s ease',
+                          '&:hover': {
+                            backgroundColor: 'rgba(248, 250, 252, 1)',
+                            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.05)',
+                          },
+                          '&.Mui-focused': {
+                            backgroundColor: 'white',
+                            boxShadow: '0 0 0 3px rgba(25, 118, 210, 0.1)',
+                            borderColor: '#1976D2',
+                          },
+                        },
+                      }}
+                    />
+                  </FormControl>
+
+                  <Button 
+                    type="submit" 
+                    fullWidth 
+                    variant="contained"
+                    size="large"
+                    startIcon={<LoginIcon />}
+                    sx={{
+                      py: 2,
+                      fontSize: '1.1rem',
+                      fontWeight: 700,
+                      borderRadius: '12px',
+                      background: 'linear-gradient(135deg, #1976D2 0%, #1565C0 100%)',
+                      boxShadow: '0 8px 25px rgba(25, 118, 210, 0.3)',
+                      textTransform: 'none',
+                      transition: 'all 0.3s ease',
+                      '&:hover': {
+                        background: 'linear-gradient(135deg, #1565C0 0%, #0D47A1 100%)',
+                        transform: 'translateY(-2px)',
+                        boxShadow: '0 12px 30px rgba(25, 118, 210, 0.4)',
+                      },
+                    }}
+                  >
+                    Sign In
+                  </Button>
+                </Box>
+
+                <Divider sx={{ my: 3 }}>
+                  <Typography variant="body2" color="#546E7A" fontWeight="500">
+                    Need Access?
+                  </Typography>
+                </Divider>
+
+                <Box
+                  sx={{
+                    p: 3,
+                    borderRadius: '12px',
+                    background: 'rgba(25, 118, 210, 0.05)',
+                    border: '1px solid rgba(25, 118, 210, 0.15)',
+                    textAlign: 'center',
                   }}
                 >
-                  Username
-                </FormLabel>
-                <TextField
-                  autoFocus
-                  required
-                  fullWidth
-                  id="username"
-                  placeholder="Enter your username"
-                  name="username"
-                  autoComplete="username"
-                  variant="outlined"
-                  error={!!errors.username}
-                  helperText={errors.username?.message}
-                  {...register("username")}
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <AccountCircleIcon sx={{ color: 'text.secondary' }} />
-                      </InputAdornment>
-                    ),
-                  }}
-                  sx={{
-                    '& .MuiOutlinedInput-root': {
-                      borderRadius: '10px',
-                      backgroundColor: 'rgba(247, 250, 252, 0.9)',
-                      transition: 'all 0.2s ease',
+                  <Typography variant="body2" color="#546E7A" sx={{ mb: 1 }}>
+                    Don't have an account?
+                  </Typography>
+                  <Link 
+                    href="/contact" 
+                    underline="hover" 
+                    sx={{ 
+                      color: '#1976D2', 
+                      fontWeight: 600,
+                      textDecoration: 'none',
                       '&:hover': {
-                        backgroundColor: 'rgba(247, 250, 252, 1)',
-                        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.04)',
+                        textDecoration: 'underline',
                       },
-                      '&.Mui-focused': {
-                        backgroundColor: 'white',
-                        boxShadow: '0 0 0 2px rgba(66, 153, 225, 0.2)',
-                      },
-                    },
-                  }}
-                />
-              </FormControl>
-
-              <FormControl>
-                <FormLabel 
-                  htmlFor="password"
-                  sx={{ 
-                    fontWeight: 600, 
-                    color: 'text.primary',
-                    mb: 1,
-                  }}
-                >
-                  Password
-                </FormLabel>
-                <TextField
-                  required
-                  fullWidth
-                  name="password"
-                  placeholder="Enter your password"
-                  type={showPassword ? 'text' : 'password'}
-                  id="password"
-                  autoComplete="current-password"
-                  variant="outlined"
-                  error={!!errors.password}
-                  helperText={errors.password?.message}
-                  {...register("password")}
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <LockIcon sx={{ color: 'text.secondary' }} />
-                      </InputAdornment>
-                    ),
-                    endAdornment: (
-                      <InputAdornment position="end">
-                        <IconButton
-                          aria-label="toggle password visibility"
-                          onClick={() => setShowPassword(!showPassword)}
-                          edge="end"
-                          sx={{ color: 'text.secondary' }}
-                        >
-                          {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
-                        </IconButton>
-                      </InputAdornment>
-                    ),
-                  }}
-                  sx={{
-                    '& .MuiOutlinedInput-root': {
-                      borderRadius: '10px',
-                      backgroundColor: 'rgba(247, 250, 252, 0.9)',
-                      transition: 'all 0.2s ease',
-                      '&:hover': {
-                        backgroundColor: 'rgba(247, 250, 252, 1)',
-                        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.04)',
-                      },
-                      '&.Mui-focused': {
-                        backgroundColor: 'white',
-                        boxShadow: '0 0 0 2px rgba(66, 153, 225, 0.2)',
-                      },
-                    },
-                  }}
-                />
-              </FormControl>
-
-              <Button 
-                type="submit" 
-                fullWidth 
-                variant="contained"
-                size="large"
-                startIcon={<LoginIcon />}
-                sx={{
-                  py: 1.5,
-                  fontSize: '1rem',
-                  fontWeight: 600,
-                  borderRadius: '10px',
-                  background: 'linear-gradient(135deg, #4299e1 0%, #3182ce 100%)',
-                  boxShadow: '0 4px 15px rgba(66, 153, 225, 0.25)',
-                  textTransform: 'none',
-                  transition: 'all 0.2s ease',
-                  '&:hover': {
-                    background: 'linear-gradient(135deg, #3182ce 0%, #2c5282 100%)',
-                    transform: 'translateY(-1px)',
-                    boxShadow: '0 6px 20px rgba(66, 153, 225, 0.3)',
-                  },
-                }}
-              >
-                Sign In
-              </Button>
-            </Box>
-
-            <Divider sx={{ my: 2 }}>
-              <Typography variant="body2" color="text.secondary" fontWeight="500">
-                Need Access?
-              </Typography>
-            </Divider>
-
-            <Box
-              sx={{
-                p: 2.5,
-                borderRadius: '12px',
-                background: 'rgba(66, 153, 225, 0.04)',
-                border: '1px solid rgba(66, 153, 225, 0.15)',
-                textAlign: 'center',
-              }}
-            >
-              <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-                Don't have an account?
-              </Typography>
-              <Link 
-                href="/contact" 
-                underline="hover" 
-                sx={{ 
-                  color: '#2b6cb0', 
-                  fontWeight: 600,
-                  textDecoration: 'none',
-                  '&:hover': {
-                    textDecoration: 'underline',
-                  },
-                }}
-              >
-                Contact us to get started →
-              </Link>
-            </Box>
+                    }}
+                  >
+                    Contact us to get started →
+                  </Link>
+                </Box>
               </Card>
             </Grid>
           </Grid>
         </Container>
 
         {/* Trust Indicators */}
-        <Box sx={{ textAlign: 'center', mt: 3, position: 'relative', zIndex: 1 }}>
-          <Typography variant="caption" color="rgba(255, 255, 255, 0.8)" sx={{ mb: 1, display: 'block' }}>
+        <Box sx={{ textAlign: 'center', mt: 4, position: 'relative', zIndex: 1 }}>
+          <Typography variant="caption" color="#37474F" sx={{ mb: 2, display: 'block', fontWeight: 500 }}>
             Trusted by healthcare professionals worldwide
           </Typography>
-          <Box sx={{ display: 'flex', justifyContent: 'center', gap: 3, flexWrap: 'wrap' }}>
+          <Box sx={{ display: 'flex', justifyContent: 'center', gap: 4, flexWrap: 'wrap' }}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              <SecurityIcon sx={{ fontSize: 14, color: 'rgba(255, 255, 255, 0.8)' }} />
-              <Typography variant="caption" color="rgba(255, 255, 255, 0.8)">
+              <SecurityIcon sx={{ fontSize: 16, color: '#1976D2' }} />
+              <Typography variant="caption" color="#546E7A" fontWeight="500">
                 HIPAA Compliant
               </Typography>
             </Box>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              <VerifiedUserIcon sx={{ fontSize: 14, color: 'rgba(255, 255, 255, 0.8)' }} />
-              <Typography variant="caption" color="rgba(255, 255, 255, 0.8)">
+              <VerifiedUserIcon sx={{ fontSize: 16, color: '#1976D2' }} />
+              <Typography variant="caption" color="#546E7A" fontWeight="500">
                 Medical Grade Security
               </Typography>
             </Box>
@@ -577,7 +563,7 @@ export default function Login() {
         <style jsx>{`
           @keyframes float {
             0%, 100% { transform: translateY(0px) rotate(0deg); }
-            50% { transform: translateY(-20px) rotate(2deg); }
+            50% { transform: translateY(-15px) rotate(2deg); }
           }
         `}</style>
       </LoginContainer>
