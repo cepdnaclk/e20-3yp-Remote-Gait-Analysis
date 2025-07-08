@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import {
   Box,
   Typography,
@@ -50,7 +50,7 @@ import {
   Favorite as HeartIcon,
   Speed as SpeedIcon,
 } from "@mui/icons-material";
-import { getDoctorPatients, getPatientTestSession } from "../../services/doctorServices";
+import { getPatientTestSession, findPatientById } from "../../services/doctorServices";
 
 // Enhanced Info Section Component with animations
 const InfoSection = ({ title, children, color = "#3b82f6", icon }) => (
@@ -325,9 +325,10 @@ const StatsCard = ({ title, value, icon, color, trend }) => (
 export default function DoctorPatientProfilePage() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
 
-  const [patient, setPatient] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [patient, setPatient] = useState(location.state?.patient || null);
+  const [loading, setLoading] = useState(!location.state?.patient);
   const [reports, setReports] = useState([]);
   const [selectedReport, setSelectedReport] = useState(null);
   const [feedback, setFeedback] = useState("");
@@ -340,26 +341,52 @@ export default function DoctorPatientProfilePage() {
     const loadPatientAndReports = async () => {
       try {
         setLoading(true);
-        const res = await getDoctorPatients();
-        const selected = res.data.find((p) => p.id === parseInt(id));
-        setPatient(selected);
+        
+        let currentPatient = patient;
+        
+        // If no patient data was passed via navigation state, fetch it
+        if (!currentPatient) {
+          try {
+            const patientRes = await findPatientById(id);
+            currentPatient = patientRes.data;
+            setPatient(currentPatient);
+          } catch (findError) {
+            console.error("Patient not found:", findError);
+            setPatient(null);
+            setLoading(false);
+            return;
+          }
+        }
 
-        if (selected) {
-          const reportRes = await getPatientTestSession(selected.id);
-          // Sort reports by date (newest first)
-          const sortedReports = (reportRes.data || []).sort((a, b) => 
-            new Date(b.startTime) - new Date(a.startTime)
-          );
-          setReports(sortedReports);
+        // Load test sessions using your backend endpoint
+        if (currentPatient) {
+          try {
+            const reportRes = await getPatientTestSession(currentPatient.id);
+            // Your backend returns List<TestSessionDetailsResponse> directly
+            // Sort reports by date (newest first) - check for startTime field
+            const sortedReports = (reportRes.data || []).sort((a, b) => {
+              const dateA = new Date(a.startTime || a.createdAt || 0);
+              const dateB = new Date(b.startTime || b.createdAt || 0);
+              return dateB - dateA;
+            });
+            setReports(sortedReports);
+          } catch (reportError) {
+            console.error("Error loading test sessions:", reportError);
+            setReports([]); // Set empty array if test sessions fail to load
+          }
         }
       } catch (err) {
-        console.error("Error loading data:", err);
+        console.error("Error loading patient data:", err);
+        setPatient(null);
       } finally {
         setLoading(false);
       }
     };
-    loadPatientAndReports();
-  }, [id]);
+    
+    if (id) {
+      loadPatientAndReports();
+    }
+  }, [id, patient]);
 
   const handleOpenReport = (report) => {
     setSelectedReport(report);
@@ -378,6 +405,10 @@ export default function DoctorPatientProfilePage() {
 
   const handlePageChange = (event, page) => {
     setCurrentPage(page);
+  };
+
+  const handleBackToPatients = () => {
+    navigate("/doctor/dashboard", { state: { selectedSection: "Patients" } });
   };
 
   // Calculate pagination
@@ -440,6 +471,9 @@ export default function DoctorPatientProfilePage() {
         <Alert severity="error" sx={{ maxWidth: 400, borderRadius: 3 }}>
           <Typography variant="h6">Patient not found</Typography>
           <Typography>The requested patient could not be found.</Typography>
+          <Button onClick={handleBackToPatients} sx={{ mt: 2 }}>
+            Back to Patients
+          </Button>
         </Alert>
       </Box>
     );
@@ -480,7 +514,7 @@ export default function DoctorPatientProfilePage() {
             <Box sx={{ display: "flex", alignItems: "center", gap: 2.5 }}>
               <Tooltip title="Back to Patients">
                 <IconButton
-                  onClick={() => navigate(-1)}
+                  onClick={handleBackToPatients}
                   size="small"
                   sx={{
                     bgcolor: "#f1f5f9",
@@ -787,7 +821,7 @@ export default function DoctorPatientProfilePage() {
                         key={idx}
                         report={report}
                         isRecent={idx === 0 && currentPage === 1}
-                        onClick={() => navigate(`/patient/test-session/${report.sessionId}`)}
+                        onClick={() => handleOpenReport(report)}
                       />
                     ))}
                   </Stack>

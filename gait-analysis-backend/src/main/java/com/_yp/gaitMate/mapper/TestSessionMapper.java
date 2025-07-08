@@ -1,6 +1,7 @@
 package com._yp.gaitMate.mapper;
 
 import com._yp.gaitMate.dto.doctor.DoctorTestReportDto;
+import com._yp.gaitMate.dto.feedback.FeedbackResponseDto;
 import com._yp.gaitMate.dto.testSession.TestSessionDetailsResponse;
 import com._yp.gaitMate.model.Feedback;
 import com._yp.gaitMate.model.ProcessedTestResults;
@@ -55,12 +56,25 @@ public class TestSessionMapper {
     public DoctorTestReportDto toDoctorTestReportDto(TestSession session) {
         ProcessedTestResults result = session.getResults();
 
+        Feedback feedback = session.getFeedback();
+
+        FeedbackResponseDto feedbackDto = null;
+        if (feedback != null) {
+            feedbackDto = FeedbackResponseDto.builder()
+                    .notes(feedback.getNotes())
+                    .createdAt(feedback.getCreatedAt())
+                    .updatedAt(feedback.getUpdatedAt())
+                    .build();
+        }
+
         return DoctorTestReportDto.builder()
                 .sessionId(session.getId())
                 .patientId(session.getPatient().getId())
                 .patientName(session.getPatient().getName())
                 .startTime(session.getStartTime())
                 .endTime(session.getEndTime())
+                .status(session.getStatus())
+                .feedback(feedbackDto)
                 .results(result != null ? DoctorTestReportDto.ProcessedResults.builder()
                         .steps(result.getSteps())
                         .cadence(result.getCadence())
