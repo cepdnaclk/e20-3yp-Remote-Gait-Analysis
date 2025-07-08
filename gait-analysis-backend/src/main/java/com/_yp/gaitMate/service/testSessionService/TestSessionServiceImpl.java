@@ -1,9 +1,12 @@
 package com._yp.gaitMate.service.testSessionService;
 
 import com._yp.gaitMate.dto.ApiResponse;
+import com._yp.gaitMate.dto.doctor.DoctorTestReportDto;
+import com._yp.gaitMate.dto.page.PageResponseDto;
 import com._yp.gaitMate.dto.patient.PatientInfoResponse;
 import com._yp.gaitMate.dto.testSession.*;
 import com._yp.gaitMate.exception.ApiException;
+import com._yp.gaitMate.mapper.PageMapper;
 import com._yp.gaitMate.mapper.TestSessionMapper;
 import com._yp.gaitMate.model.*;
 import com._yp.gaitMate.mqtt.core.MqttPublisher;
@@ -14,6 +17,8 @@ import com.amazonaws.services.iot.client.AWSIotQos;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -31,6 +36,7 @@ public class TestSessionServiceImpl implements TestSessionService {
     private final MqttPublisher mqttPublisher;
     private final DataProcessingService dataProcessingService;
     private final TestSessionMapper testSessionMapper;
+    private final PageMapper pageMapper;
 
 
 
@@ -162,14 +168,14 @@ public class TestSessionServiceImpl implements TestSessionService {
     }
 
     @Override
-    public List<TestSessionDetailsResponse> getSessionsOfLoggedInPatient() {
+    public PageResponseDto<TestSessionDetailsResponse> getSessionsOfLoggedInPatient(Pageable pageable) {
         Patient loggedInPatient = authUtil.getLoggedInPatient();
 
-        List<TestSession> sessions = testSessionRepository.findAllByPatient(loggedInPatient);
+        Page<TestSession> sessions = testSessionRepository.findAllByPatient(loggedInPatient,pageable);
 
-        return sessions.stream()
-                .map(testSessionMapper::toDetailsResponse)
-                .toList();
+        Page<TestSessionDetailsResponse> responses = sessions.map(testSessionMapper::toDetailsResponse);
+
+        return pageMapper.toPageResponse(responses);
     }
 
     @Override
@@ -188,6 +194,18 @@ public class TestSessionServiceImpl implements TestSessionService {
         return testSessions.stream()
                 .map(testSessionMapper::toDetailsResponse)
                 .toList();
+    }
+
+    @Override
+    public PageResponseDto<DoctorTestReportDto> getReportsOfLoggedInDoctor(Pageable pageable) {
+
+        Long doctorID = authUtil.getLoggedInDoctor().getId();
+
+        Page<TestSession> sessions = testSessionRepository.findByPatient_Doctor_IdAndStatus(doctorID, TestSession.Status.COMPLETED, pageable);
+
+        Page<DoctorTestReportDto> dtoPage = sessions.map(testSessionMapper::toDoctorTestReportDto);
+
+        return pageMapper.toPageResponse(dtoPage);
     }
 
     // =====================================
