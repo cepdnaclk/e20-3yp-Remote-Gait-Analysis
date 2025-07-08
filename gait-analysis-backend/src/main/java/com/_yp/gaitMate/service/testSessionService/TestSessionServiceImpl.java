@@ -15,19 +15,15 @@ import com._yp.gaitMate.repository.TestSessionRepository;
 import com._yp.gaitMate.security.utils.AuthUtil;
 import com.amazonaws.services.iot.client.AWSIotQos;
 import lombok.RequiredArgsConstructor;
-import org.aspectj.weaver.ast.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -172,14 +168,14 @@ public class TestSessionServiceImpl implements TestSessionService {
     }
 
     @Override
-    public List<TestSessionDetailsResponse> getSessionsOfLoggedInPatient() {
+    public PageResponseDto<TestSessionDetailsResponse> getSessionsOfLoggedInPatient(Pageable pageable) {
         Patient loggedInPatient = authUtil.getLoggedInPatient();
 
-        List<TestSession> sessions = testSessionRepository.findAllByPatient(loggedInPatient);
+        Page<TestSession> sessions = testSessionRepository.findAllByPatient(loggedInPatient,pageable);
 
-        return sessions.stream()
-                .map(testSessionMapper::toDetailsResponse)
-                .toList();
+        Page<TestSessionDetailsResponse> responses = sessions.map(testSessionMapper::toDetailsResponse);
+
+        return pageMapper.toPageResponse(responses);
     }
 
     @Override

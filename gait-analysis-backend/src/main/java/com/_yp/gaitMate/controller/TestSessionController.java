@@ -10,7 +10,6 @@ import com._yp.gaitMate.service.testSessionService.TestSessionService;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -77,8 +76,14 @@ public class TestSessionController {
     @Operation(
             summary = "Get all sessions details of the logged in patient"
     )
-    public ResponseEntity<List<TestSessionDetailsResponse>> getSessionsOfLoggedInPatient() {
-        List<TestSessionDetailsResponse> response = testSessionService.getSessionsOfLoggedInPatient();
+    public ResponseEntity<PageResponseDto<TestSessionDetailsResponse>> getSessionsOfLoggedInPatient(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+
+        Pageable pageable = PageRequest.of(page, size);
+        PageResponseDto<TestSessionDetailsResponse> response = testSessionService.getSessionsOfLoggedInPatient(pageable);
+
         return ResponseEntity.ok(response);
     }
 
