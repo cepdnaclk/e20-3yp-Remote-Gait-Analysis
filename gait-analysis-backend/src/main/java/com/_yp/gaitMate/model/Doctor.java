@@ -1,5 +1,6 @@
 package com._yp.gaitMate.model;
 
+import com._yp.gaitMate.security.model.AccountStatus;
 import com._yp.gaitMate.security.model.User;
 import jakarta.persistence.*;
 import lombok.*;
@@ -70,6 +71,11 @@ public class Doctor {
     @OneToMany(mappedBy = "doctor", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
     private List<Patient> patients = new ArrayList<>();
 
+    @Column(name = "invitation_token", unique = true, nullable = false)
+    private String invitationToken;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "account_status", nullable = false)
+    private AccountStatus accountStatus = AccountStatus.INVITATION_SENT;
 
 }
