@@ -136,20 +136,6 @@ public class PatientController {
     }
 
 
-    @GetMapping("/doctors/me/patients")
-    @PreAuthorize("hasRole('DOCTOR')")
-    @Operation(summary = "Get the logged in doctor's patients")
-    public ResponseEntity<PageResponseDto<PatientInfoResponse>> getPatientsOfLoggedInDoctor(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size
-    ) {
-
-        Pageable pageable = PageRequest.of(page, size);
-        PageResponseDto<PatientInfoResponse> patients = patientService.getPatientsOfLoggedInDoctor(pageable);
-
-        return ResponseEntity.ok(patients);
-    }
-
     @GetMapping("/clinics/me/patients")
     @PreAuthorize("hasRole('CLINIC')")
     @Operation(summary = "Get the logged in clinic's patients")
