@@ -1,5 +1,5 @@
 // src/pages/DoctorPatientsPage.jsx
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Box,
   Typography,
@@ -19,6 +19,11 @@ import {
   Alert,
   InputAdornment,
   Tooltip,
+  Pagination,
+  FormControl,
+  Select,
+  MenuItem,
+  InputLabel,
 } from "@mui/material";
 import {
   Search as SearchIcon,
@@ -30,26 +35,89 @@ import {
   CalendarToday as CalendarTodayIcon,
 } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
+import { getDoctorPatients } from "../../services/doctorServices";
 
-export default function DoctorPatientsPage({ patients, isLoading, error }) {
+export default function DoctorPatientsPage() {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
+  const [patients, setPatients] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+  
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(0);
+  const [pageSize, setPageSize] = useState(5);
+  const [totalElements, setTotalElements] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
+
+  // Fetch patients with pagination
+  const fetchPatients = async (page = 0, size = 5, search = "") => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      
+      // Use the service function with parameters object
+      const params = {
+        page: page,
+        size: size,
+        ...(search.trim() && { search: search.trim() })
+      };
+      
+      const response = await getDoctorPatients(params);
+      
+      // Axios returns data in response.data
+      if (response.data) {
+        setPatients(response.data.content || []);
+        setTotalElements(response.data.totalElements || 0);
+        setTotalPages(response.data.totalPages || 0);
+        setCurrentPage(response.data.page || 0);
+      }
+    } catch (err) {
+      console.error("Error fetching patients:", err);
+      setError(err);
+      setPatients([]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Initial load
+  useEffect(() => {
+    fetchPatients(currentPage, pageSize, searchQuery);
+  }, []);
+
+  // Handle search with debounce
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      // Reset to first page when searching
+      setCurrentPage(0);
+      fetchPatients(0, pageSize, searchQuery);
+    }, 500); // 500ms delay
+
+    return () => clearTimeout(timeoutId);
+  }, [searchQuery, pageSize]);
 
   const handleSearchChange = (e) => {
     setSearchQuery(e.target.value);
   };
 
-  // Filter patients based on search query
-  const filteredPatients = patients?.filter((patient) =>
-    patient.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    patient.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    patient.phoneNumber?.includes(searchQuery) ||
-    patient.id?.toString().includes(searchQuery)
-  ) || [];
+  const handlePageChange = (event, page) => {
+    const newPage = page - 1; // MUI Pagination is 1-based, API is 0-based
+    setCurrentPage(newPage);
+    fetchPatients(newPage, pageSize, searchQuery);
+  };
 
-  const handleViewProfile = (patientId, event) => {
+  const handlePageSizeChange = (event) => {
+    const newSize = event.target.value;
+    setPageSize(newSize);
+    setCurrentPage(0); // Reset to first page
+    fetchPatients(0, newSize, searchQuery);
+  };
+
+  const handleViewProfile = (patient, event) => {
     event?.stopPropagation();
-    navigate(`/patients/${patientId}`);
+    // Pass patient data via navigation state
+    navigate(`/patients/${patient.id}`, { state: { patient } });
   };
 
   const handleRealtimeGait = (patientId, event) => {
@@ -58,7 +126,7 @@ export default function DoctorPatientsPage({ patients, isLoading, error }) {
   };
 
   // Loading state
-  if (isLoading) {
+  if (isLoading && patients.length === 0) {
     return (
       <Box display="flex" justifyContent="center" alignItems="center" height="50vh">
         <CircularProgress size={60} />
@@ -68,11 +136,14 @@ export default function DoctorPatientsPage({ patients, isLoading, error }) {
   }
 
   // Error state
-  if (error) {
+  if (error && patients.length === 0) {
     return (
       <Alert severity="error" sx={{ mb: 3 }}>
         <Typography variant="h6">Error fetching patients</Typography>
         <Typography>{error.message}</Typography>
+        <Button onClick={() => fetchPatients(currentPage, pageSize, searchQuery)} sx={{ mt: 1 }}>
+          Retry
+        </Button>
       </Alert>
     );
   }
@@ -89,7 +160,7 @@ export default function DoctorPatientsPage({ patients, isLoading, error }) {
         </Typography>
       </Box>
 
-      {/* Search Section */}
+      {/* Search and Filter Section */}
       <Paper
         elevation={0}
         sx={{
@@ -100,36 +171,63 @@ export default function DoctorPatientsPage({ patients, isLoading, error }) {
           background: "linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)",
         }}
       >
-        <TextField
-          fullWidth
-          variant="outlined"
-          placeholder="Search patients by name, email, phone, or ID..."
-          value={searchQuery}
-          onChange={handleSearchChange}
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <SearchIcon color="action" />
-              </InputAdornment>
-            ),
-          }}
-          sx={{
-            "& .MuiOutlinedInput-root": {
-              borderRadius: 2,
-              "&:hover fieldset": {
-                borderColor: "#3b82f6",
+        <Box sx={{ display: "flex", gap: 2, mb: 2, alignItems: "flex-end" }}>
+          <TextField
+            fullWidth
+            variant="outlined"
+            placeholder="Search patients by name, email, phone, or ID..."
+            value={searchQuery}
+            onChange={handleSearchChange}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon color="action" />
+                </InputAdornment>
+              ),
+            }}
+            sx={{
+              "& .MuiOutlinedInput-root": {
+                borderRadius: 2,
+                "&:hover fieldset": {
+                  borderColor: "#3b82f6",
+                },
               },
-            },
-          }}
-        />
-        <Box sx={{ mt: 2, display: "flex", alignItems: "center", gap: 2 }}>
+            }}
+          />
+          <FormControl variant="outlined" sx={{ minWidth: 120 }}>
+            <InputLabel>Per Page</InputLabel>
+            <Select
+              value={pageSize}
+              onChange={handlePageSizeChange}
+              label="Per Page"
+              sx={{ borderRadius: 2 }}
+            >
+              <MenuItem value={5}>5</MenuItem>
+              <MenuItem value={10}>10</MenuItem>
+              <MenuItem value={20}>20</MenuItem>
+              <MenuItem value={50}>50</MenuItem>
+            </Select>
+          </FormControl>
+        </Box>
+
+        <Box sx={{ display: "flex", alignItems: "center", gap: 2, flexWrap: "wrap" }}>
           <Typography variant="body2" color="text.secondary">
-            Total Patients: <strong>{patients?.length || 0}</strong>
+            Total Patients: <strong>{totalElements}</strong>
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            Page: <strong>{currentPage + 1}</strong> of <strong>{totalPages || 1}</strong>
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            Showing: <strong>{patients.length}</strong> results
           </Typography>
           {searchQuery && (
-            <Typography variant="body2" color="text.secondary">
-              Filtered Results: <strong>{filteredPatients.length}</strong>
-            </Typography>
+            <Chip
+              label={`Searching: "${searchQuery}"`}
+              onDelete={() => setSearchQuery("")}
+              size="small"
+              variant="outlined"
+              color="primary"
+            />
           )}
         </Box>
       </Paper>
@@ -142,8 +240,29 @@ export default function DoctorPatientsPage({ patients, isLoading, error }) {
           overflow: "hidden",
           border: "1px solid rgba(226, 232, 240, 0.8)",
           boxShadow: "0 4px 16px rgba(0,0,0,0.08)",
+          position: "relative",
         }}
       >
+        {/* Loading overlay */}
+        {isLoading && (
+          <Box
+            sx={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              backgroundColor: "rgba(255,255,255,0.8)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              zIndex: 1,
+            }}
+          >
+            <CircularProgress size={40} />
+          </Box>
+        )}
+
         <TableContainer>
           <Table>
             <TableHead>
@@ -156,11 +275,11 @@ export default function DoctorPatientsPage({ patients, isLoading, error }) {
               </TableRow>
             </TableHead>
             <TableBody>
-              {filteredPatients.length > 0 ? (
-                filteredPatients.map((patient) => (
+              {patients.length > 0 ? (
+                patients.map((patient) => (
                   <TableRow
                     key={patient.id}
-                    onClick={() => handleViewProfile(patient.id)}
+                    onClick={() => handleViewProfile(patient)}
                     sx={{
                       cursor: "pointer",
                       "&:hover": {
@@ -231,8 +350,8 @@ export default function DoctorPatientsPage({ patients, isLoading, error }) {
                     {/* Status */}
                     <TableCell>
                       <Chip
-                        label={patient.status || "Active"}
-                        color={patient.status === "Active" ? "success" : "default"}
+                        label="Active"
+                        color="success"
                         size="small"
                         sx={{ fontWeight: 600 }}
                       />
@@ -244,7 +363,7 @@ export default function DoctorPatientsPage({ patients, isLoading, error }) {
                         <Tooltip title="View Profile">
                           <IconButton
                             size="small"
-                            onClick={(e) => handleViewProfile(patient.id, e)}
+                            onClick={(e) => handleViewProfile(patient, e)}
                             sx={{
                               color: "#3b82f6",
                               "&:hover": { backgroundColor: "#eff6ff" },
@@ -296,8 +415,41 @@ export default function DoctorPatientsPage({ patients, isLoading, error }) {
         </TableContainer>
       </Paper>
 
-      {/* Summary Footer */}
-      {filteredPatients.length > 0 && (
+      {/* Pagination Section */}
+      {totalPages > 1 && (
+        <Box
+          sx={{
+            mt: 3,
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            flexWrap: "wrap",
+            gap: 2,
+          }}
+        >
+          <Typography variant="body2" color="text.secondary">
+            Showing {patients.length} of {totalElements} patients
+            {searchQuery && ` matching "${searchQuery}"`}
+          </Typography>
+          
+          <Pagination
+            count={totalPages}
+            page={currentPage + 1} // Convert 0-based to 1-based
+            onChange={handlePageChange}
+            color="primary"
+            showFirstButton
+            showLastButton
+            sx={{
+              "& .MuiPaginationItem-root": {
+                borderRadius: 2,
+              },
+            }}
+          />
+        </Box>
+      )}
+
+      {/* Summary Footer for single page */}
+      {totalPages <= 1 && patients.length > 0 && (
         <Box
           sx={{
             mt: 3,
@@ -308,7 +460,7 @@ export default function DoctorPatientsPage({ patients, isLoading, error }) {
           }}
         >
           <Typography variant="body2" color="text.secondary">
-            Showing {filteredPatients.length} of {patients?.length || 0} patients
+            Showing {patients.length} of {totalElements} patients
             {searchQuery && ` matching "${searchQuery}"`}
           </Typography>
         </Box>

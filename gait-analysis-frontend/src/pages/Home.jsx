@@ -13,8 +13,6 @@ import {
   Divider
 } from "@mui/material";
 import { Link } from "react-router-dom";
-import Navbar from "../components/Navbar";
-import MainImage from "../assets/images/gait.jpg";
 import DirectionsWalkIcon from "@mui/icons-material/DirectionsWalk";
 import ShowChartIcon from "@mui/icons-material/ShowChart";
 import CloudDoneIcon from "@mui/icons-material/CloudDone";
@@ -27,6 +25,92 @@ import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import VerifiedUserIcon from "@mui/icons-material/VerifiedUser";
 import TrendingUpIcon from "@mui/icons-material/TrendingUp";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
+import InfoIcon from "@mui/icons-material/Info";
+import LoginIcon from "@mui/icons-material/Login";
+
+// Import images
+import MainImage from "../assets/images/gait.jpg";
+import LogoImage from "../assets/images/logo-modified.png";
+
+// Mock Navbar component
+const Navbar = () => (
+  <Box
+    sx={{
+      position: "fixed",
+      top: 0,
+      left: 0,
+      right: 0,
+      zIndex: 1000,
+      height: "80px",
+      backgroundColor: "rgba(255, 255, 255, 0.95)",
+      backdropFilter: "blur(10px)",
+      borderBottom: "1px solid rgba(0, 0, 0, 0.08)",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "space-between",
+      px: { xs: 3, md: 6 },
+    }}
+  >
+    <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+      <Box
+        component="img"
+        src={LogoImage}
+        alt="RehabGait Logo"
+        sx={{
+          height: 50,
+          width: "auto",
+        }}
+      />
+      <Box>
+        <Typography variant="h5" fontWeight="700" color="#1565C0" sx={{ lineHeight: 1 }}>
+          RehabGait
+        </Typography>
+        <Typography variant="caption" color="#666" sx={{ lineHeight: 1 }}>
+          Medical Analytics
+        </Typography>
+      </Box>
+      <Chip 
+        label="Pro" 
+        size="small"
+        sx={{ 
+          backgroundColor: "#E3F2FD",
+          color: "#1565C0",
+          fontWeight: 600,
+          fontSize: "11px",
+          ml: 1,
+        }} 
+      />
+    </Box>
+
+    <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+      <Button
+        startIcon={<InfoIcon />}
+        sx={{ 
+          color: "#666", 
+          fontWeight: 600,
+          display: { xs: "none", sm: "flex" }
+        }}
+      >
+        About Us
+      </Button>
+      <Button
+        variant="contained"
+        startIcon={<LoginIcon />}
+        component={Link}
+        to="/login"
+        sx={{
+          backgroundColor: "#1976D2",
+          fontWeight: 600,
+          borderRadius: 2,
+          px: 3,
+          "&:hover": { backgroundColor: "#1565C0" },
+        }}
+      >
+        Login
+      </Button>
+    </Box>
+  </Box>
+);
 
 export default function Home() {
   const userTypes = [
@@ -34,22 +118,22 @@ export default function Home() {
       title: "Doctors",
       description: "Monitor patient progress and analyze gait patterns with advanced diagnostic tools",
       icon: <LocalHospitalIcon sx={{ fontSize: 32 }} />,
-      color: "#4299e1",
-      gradient: "linear-gradient(135deg, #4299e1 0%, #3182ce 100%)"
+      color: "#1976D2",
+      gradient: "linear-gradient(135deg, #1976D2 0%, #1565C0 100%)"
     },
     {
       title: "Patients",
       description: "Access your personalized gait analysis reports and track recovery progress",
       icon: <PersonIcon sx={{ fontSize: 32 }} />,
-      color: "#48bb78",
-      gradient: "linear-gradient(135deg, #48bb78 0%, #38a169 100%)"
+      color: "#388E3C",
+      gradient: "linear-gradient(135deg, #388E3C 0%, #2E7D32 100%)"
     },
     {
       title: "Clinic Admins",
       description: "Manage healthcare teams, patient records, and system operations efficiently",
       icon: <AdminPanelSettingsIcon sx={{ fontSize: 32 }} />,
-      color: "#ed8936",
-      gradient: "linear-gradient(135deg, #ed8936 0%, #dd6b20 100%)"
+      color: "#F57C00",
+      gradient: "linear-gradient(135deg, #F57C00 0%, #EF6C00 100%)"
     }
   ];
 
@@ -58,28 +142,28 @@ export default function Home() {
       title: "Real-Time Monitoring",
       desc: "Advanced sensor technology provides continuous gait pattern analysis with instant feedback and alerts",
       icon: <DirectionsWalkIcon fontSize="large" />,
-      color: "#4299e1",
+      color: "#1976D2",
       stats: "24/7 Monitoring"
     },
     {
       title: "Data Visualization",
       desc: "Interactive dashboards and comprehensive reports with AI-powered insights for better diagnosis",
       icon: <ShowChartIcon fontSize="large" />,
-      color: "#48bb78",
+      color: "#388E3C",
       stats: "Advanced Analytics"
     },
     {
       title: "Secure & Cloud-Based",
       desc: "HIPAA-compliant cloud infrastructure ensures patient data security with 99.9% uptime guarantee",
       icon: <CloudDoneIcon fontSize="large" />,
-      color: "#9f7aea",
+      color: "#7B1FA2",
       stats: "Bank-Level Security"
     },
     {
       title: "Smart Scheduling",
       desc: "Intelligent appointment management with automated reminders and telehealth integration",
       icon: <EventAvailableIcon fontSize="large" />,
-      color: "#ed8936",
+      color: "#F57C00",
       stats: "Automated Workflow"
     }
   ];
@@ -91,21 +175,8 @@ export default function Home() {
   ];
 
   return (
-    <Box sx={{ width: "100vw", overflowX: "hidden" }}>
+    <Box sx={{ width: "100%", overflowX: "hidden" }}>
       <Navbar />
-
-      {/* Background */}
-      <Box
-        sx={{
-          position: "fixed",
-          width: "100%",
-          height: "100vh",
-          top: 0,
-          left: 0,
-          zIndex: -2,
-          background: "linear-gradient(135deg, #1a202c 0%, #2d3748 50%, #4a5568 100%)",
-        }}
-      />
 
       {/* Hero Section */}
       <Box
@@ -117,7 +188,8 @@ export default function Home() {
           flexDirection: "column",
           justifyContent: "center",
           alignItems: "center",
-          paddingTop: "80px",
+          paddingTop: "100px", // Increased padding to prevent navbar overlap
+          paddingBottom: "60px",
           overflow: "hidden",
         }}
       >
@@ -139,8 +211,8 @@ export default function Home() {
               height: "100%",
               backgroundImage: `url(${MainImage})`,
               backgroundSize: "cover",
-              backgroundPosition: "center",
-              opacity: 0.4,
+              backgroundPosition: "center top 80px",
+              opacity: 0.7,
               zIndex: 1,
             },
             "&::after": {
@@ -150,7 +222,7 @@ export default function Home() {
               left: 0,
               width: "100%",
               height: "100%",
-              background: "linear-gradient(135deg, rgba(26, 32, 44, 0.6) 0%, rgba(45, 55, 72, 0.4) 100%)",
+              background: "linear-gradient(135deg, rgba(255, 255, 255, 0.7) 0%, rgba(227, 242, 253, 0.65) 25%, rgba(187, 222, 251, 0.6) 50%, rgba(144, 202, 249, 0.55) 75%, rgba(100, 181, 246, 0.5) 100%)",
               zIndex: 2,
             }
           }}
@@ -162,10 +234,10 @@ export default function Home() {
             position: "absolute",
             top: "20%",
             right: "10%",
-            width: "250px",
-            height: "250px",
+            width: "200px",
+            height: "200px",
             borderRadius: "50%",
-            background: "linear-gradient(135deg, rgba(66, 153, 225, 0.08) 0%, rgba(49, 130, 206, 0.06) 100%)",
+            background: "linear-gradient(135deg, rgba(25, 118, 210, 0.1) 0%, rgba(21, 101, 192, 0.08) 100%)",
             animation: "float 8s ease-in-out infinite",
             zIndex: 1,
           }}
@@ -176,10 +248,10 @@ export default function Home() {
             position: "absolute",
             bottom: "15%",
             left: "5%",
-            width: "180px",
-            height: "180px",
+            width: "150px",
+            height: "150px",
             borderRadius: "50%",
-            background: "linear-gradient(135deg, rgba(72, 187, 120, 0.08) 0%, rgba(56, 178, 172, 0.06) 100%)",
+            background: "linear-gradient(135deg, rgba(56, 142, 60, 0.1) 0%, rgba(46, 125, 50, 0.08) 100%)",
             animation: "float 10s ease-in-out infinite reverse",
             zIndex: 1,
           }}
@@ -191,16 +263,15 @@ export default function Home() {
             <Chip 
               label="Advanced Healthcare Technology" 
               sx={{ 
-                mb: 3,
-                px: 2,
-                py: 1,
-                backgroundColor: "rgba(66, 153, 225, 0.15)",
-                color: "#90cdf4",
-                borderRadius: 2,
+                mb: 4,
+                px: 3,
+                py: 1.5,
+                backgroundColor: "rgba(25, 118, 210, 0.1)",
+                color: "#1565C0",
+                borderRadius: 3,
                 fontSize: "14px",
                 fontWeight: 600,
-                border: "1px solid rgba(66, 153, 225, 0.25)",
-                backdropFilter: "blur(8px)",
+                border: "1px solid rgba(25, 118, 210, 0.2)",
               }} 
             />
           </Box>
@@ -210,34 +281,35 @@ export default function Home() {
             sx={{
               fontWeight: 800,
               fontSize: { xs: "2.5rem", sm: "3.5rem", md: "4.5rem" },
-              background: "linear-gradient(135deg, #ffffff 0%, #f7fafc 100%)",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-              backgroundClip: "text",
-              mb: 3,
+              color: "#1A237E",
+              mb: 2,
               lineHeight: 1.1,
             }}
           >
             Remote Gait Analysis
-            <br />
-            <Box 
-              component="span" 
-              sx={{
-                background: "linear-gradient(135deg, #4299e1 0%, #48bb78 100%)",
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-                backgroundClip: "text",
-              }}
-            >
-              System
-            </Box>
+          </Typography>
+          
+          <Typography 
+            variant="h1" 
+            sx={{
+              fontWeight: 800,
+              fontSize: { xs: "2.5rem", sm: "3.5rem", md: "4.5rem" },
+              background: "linear-gradient(135deg, #1976D2 0%, #388E3C 100%)",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+              backgroundClip: "text",
+              mb: 4,
+              lineHeight: 1.1,
+            }}
+          >
+            System
           </Typography>
 
           <Typography 
             variant="h5" 
             sx={{ 
-              color: "rgba(255, 255, 255, 0.8)",
-              mb: 4,
+              color: "#37474F",
+              mb: 6,
               maxWidth: "800px",
               mx: "auto",
               lineHeight: 1.6,
@@ -249,7 +321,7 @@ export default function Home() {
           </Typography>
 
           {/* CTA Buttons */}
-          <Box sx={{ display: "flex", gap: 2, justifyContent: "center", flexWrap: "wrap", mb: 6 }}>
+          <Box sx={{ display: "flex", gap: 3, justifyContent: "center", flexWrap: "wrap", mb: 8 }}>
             <Button
               variant="contained"
               size="large"
@@ -257,17 +329,17 @@ export default function Home() {
               to="/login"
               startIcon={<PlayArrowIcon />}
               sx={{
-                px: 4,
-                py: 2,
+                px: 5,
+                py: 2.5,
                 fontSize: "1.1rem",
                 fontWeight: 700,
-                borderRadius: 2,
-                background: "linear-gradient(135deg, #4299e1 0%, #3182ce 100%)",
-                boxShadow: "0 8px 25px rgba(66, 153, 225, 0.35)",
+                borderRadius: 3,
+                background: "linear-gradient(135deg, #1976D2 0%, #1565C0 100%)",
+                boxShadow: "0 8px 25px rgba(25, 118, 210, 0.3)",
                 "&:hover": {
-                  background: "linear-gradient(135deg, #3182ce 0%, #2c5282 100%)",
+                  background: "linear-gradient(135deg, #1565C0 0%, #0D47A1 100%)",
                   transform: "translateY(-2px)",
-                  boxShadow: "0 12px 30px rgba(66, 153, 225, 0.4)",
+                  boxShadow: "0 12px 30px rgba(25, 118, 210, 0.4)",
                 },
                 transition: "all 0.3s ease",
               }}
@@ -282,18 +354,19 @@ export default function Home() {
               to="/about"
               endIcon={<ArrowForwardIcon />}
               sx={{ 
-                px: 4,
-                py: 2,
+                px: 5,
+                py: 2.5,
                 fontSize: "1.1rem",
                 fontWeight: 600,
-                borderRadius: 2,
-                color: "white",
-                borderColor: "rgba(255, 255, 255, 0.4)",
-                backdropFilter: "blur(8px)",
+                borderRadius: 3,
+                color: "#1976D2",
+                borderColor: "#1976D2",
+                borderWidth: 2,
                 "&:hover": {
-                  borderColor: "rgba(255, 255, 255, 0.7)",
-                  backgroundColor: "rgba(255, 255, 255, 0.1)",
+                  borderColor: "#1565C0",
+                  backgroundColor: "rgba(25, 118, 210, 0.1)",
                   transform: "translateY(-2px)",
+                  borderWidth: 2,
                 },
                 transition: "all 0.3s ease",
               }}
@@ -310,21 +383,22 @@ export default function Home() {
                 sx={{ 
                   display: "flex", 
                   alignItems: "center", 
-                  gap: 1,
-                  px: 2,
-                  py: 1,
-                  borderRadius: 2,
-                  backgroundColor: "rgba(255, 255, 255, 0.08)",
-                  backdropFilter: "blur(8px)",
-                  border: "1px solid rgba(255, 255, 255, 0.15)",
+                  gap: 2,
+                  px: 4,
+                  py: 3,
+                  borderRadius: 3,
+                  backgroundColor: "rgba(255, 255, 255, 0.8)",
+                  backdropFilter: "blur(10px)",
+                  border: "1px solid rgba(255, 255, 255, 0.6)",
+                  boxShadow: "0 8px 32px rgba(0, 0, 0, 0.1)",
                 }}
               >
-                <Box sx={{ color: "#90cdf4" }}>{benefit.icon}</Box>
+                <Box sx={{ color: "#1976D2" }}>{benefit.icon}</Box>
                 <Box>
-                  <Typography variant="body2" fontWeight="600" color="white">
+                  <Typography variant="body2" fontWeight="600" color="#1A237E">
                     {benefit.text}
                   </Typography>
-                  <Typography variant="caption" color="rgba(255, 255, 255, 0.7)">
+                  <Typography variant="caption" color="#546E7A">
                     {benefit.subtext}
                   </Typography>
                 </Box>
@@ -335,20 +409,24 @@ export default function Home() {
       </Box>
 
       {/* User Types Section */}
-      <Box sx={{ backgroundColor: "rgba(26, 32, 44, 0.92)", py: 8 }}>
+      <Box sx={{ 
+        background: "linear-gradient(135deg, #F8FDFF 0%, #E8F4FD 50%, #F0F9FF 100%)", 
+        py: 10,
+        borderTop: "1px solid rgba(0, 0, 0, 0.05)"
+      }}>
         <Container maxWidth="lg">
-          <Box sx={{ textAlign: "center", mb: 6 }}>
+          <Box sx={{ textAlign: "center", mb: 8 }}>
             <Typography 
               variant="h3" 
               fontWeight="700" 
-              color="white" 
-              sx={{ mb: 2 }}
+              color="#1A237E" 
+              sx={{ mb: 3 }}
             >
               Built for Healthcare Professionals
             </Typography>
             <Typography 
               variant="h6" 
-              color="rgba(255, 255, 255, 0.7)" 
+              color="#546E7A" 
               sx={{ maxWidth: "600px", mx: "auto" }}
             >
               Comprehensive solutions tailored for every healthcare stakeholder
@@ -361,19 +439,19 @@ export default function Home() {
                 <Card
                   sx={{
                     height: "100%",
-                    background: "linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.04) 100%)",
-                    backdropFilter: "blur(15px)",
-                    border: "1px solid rgba(255, 255, 255, 0.15)",
+                    background: "linear-gradient(145deg, #FFFFFF 0%, #FAFAFA 100%)",
+                    border: "1px solid rgba(0, 0, 0, 0.08)",
                     borderRadius: 4,
+                    boxShadow: "0 8px 32px rgba(0, 0, 0, 0.08)",
                     transition: "all 0.3s ease",
                     "&:hover": {
                       transform: "translateY(-8px)",
-                      boxShadow: `0 20px 60px ${userType.color}40`,
-                      border: `1px solid ${userType.color}60`,
+                      boxShadow: `0 20px 40px ${userType.color}20`,
+                      border: `1px solid ${userType.color}30`,
                     },
                   }}
                 >
-                  <CardContent sx={{ p: 4, textAlign: "center" }}>
+                  <CardContent sx={{ p: 5, textAlign: "center" }}>
                     <Box
                       sx={{
                         width: 80,
@@ -385,17 +463,17 @@ export default function Home() {
                         justifyContent: "center",
                         margin: "0 auto 24px auto",
                         color: "white",
-                        boxShadow: `0 8px 32px ${userType.color}40`,
+                        boxShadow: `0 8px 25px ${userType.color}40`,
                       }}
                     >
                       {userType.icon}
                     </Box>
 
-                    <Typography variant="h5" fontWeight="700" color="white" sx={{ mb: 2 }}>
+                    <Typography variant="h5" fontWeight="700" color="#1A237E" sx={{ mb: 3 }}>
                       {userType.title}
                     </Typography>
 
-                    <Typography variant="body1" color="rgba(255, 255, 255, 0.7)" sx={{ lineHeight: 1.6 }}>
+                    <Typography variant="body1" color="#546E7A" sx={{ lineHeight: 1.6 }}>
                       {userType.description}
                     </Typography>
                   </CardContent>
@@ -407,20 +485,24 @@ export default function Home() {
       </Box>
 
       {/* Features Section */}
-      <Box sx={{ backgroundColor: "rgba(45, 55, 72, 0.92)", py: 8 }}>
+      <Box sx={{ 
+        background: "linear-gradient(135deg, #FDFAFF 0%, #F8F3FF 50%, #FBFAFF 100%)", 
+        py: 10,
+        borderTop: "1px solid rgba(0, 0, 0, 0.05)"
+      }}>
         <Container maxWidth="lg">
-          <Box sx={{ textAlign: "center", mb: 6 }}>
+          <Box sx={{ textAlign: "center", mb: 8 }}>
             <Typography 
               variant="h3" 
               fontWeight="700" 
-              color="white" 
-              sx={{ mb: 2 }}
+              color="#1A237E" 
+              sx={{ mb: 3 }}
             >
               Why Choose RehabGait?
             </Typography>
             <Typography 
               variant="h6" 
-              color="rgba(255, 255, 255, 0.7)" 
+              color="#546E7A" 
               sx={{ maxWidth: "700px", mx: "auto" }}
             >
               Advanced technology meets clinical excellence to deliver unprecedented patient care
@@ -433,26 +515,26 @@ export default function Home() {
                 <Card
                   sx={{
                     height: "100%",
-                    background: "linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%)",
-                    backdropFilter: "blur(15px)",
-                    border: "1px solid rgba(255, 255, 255, 0.15)",
+                    background: "linear-gradient(145deg, #FFFFFF 0%, #FAFAFA 100%)",
+                    border: "1px solid rgba(0, 0, 0, 0.08)",
                     borderRadius: 4,
+                    boxShadow: "0 8px 32px rgba(0, 0, 0, 0.08)",
                     transition: "all 0.3s ease",
                     "&:hover": {
                       transform: "translateY(-4px)",
-                      boxShadow: `0 16px 48px ${feature.color}30`,
-                      border: `1px solid ${feature.color}40`,
+                      boxShadow: `0 16px 40px ${feature.color}20`,
+                      border: `1px solid ${feature.color}30`,
                     },
                   }}
                 >
-                  <CardContent sx={{ p: 4 }}>
+                  <CardContent sx={{ p: 5 }}>
                     <Box sx={{ display: "flex", alignItems: "flex-start", gap: 3 }}>
                       <Box
                         sx={{
-                          width: 60,
-                          height: 60,
+                          width: 64,
+                          height: 64,
                           borderRadius: 3,
-                          background: `linear-gradient(135deg, ${feature.color}20 0%, ${feature.color}10 100%)`,
+                          background: `${feature.color}15`,
                           display: "flex",
                           alignItems: "center",
                           justifyContent: "center",
@@ -465,14 +547,14 @@ export default function Home() {
 
                       <Box sx={{ flex: 1 }}>
                         <Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: 2 }}>
-                          <Typography variant="h6" fontWeight="700" color="white">
+                          <Typography variant="h6" fontWeight="700" color="#1A237E">
                             {feature.title}
                           </Typography>
                           <Chip 
                             label={feature.stats} 
                             size="small" 
                             sx={{ 
-                              backgroundColor: `${feature.color}20`,
+                              backgroundColor: `${feature.color}15`,
                               color: feature.color,
                               fontWeight: 600,
                               fontSize: "11px",
@@ -482,7 +564,7 @@ export default function Home() {
 
                         <Typography 
                           variant="body1" 
-                          color="rgba(255, 255, 255, 0.7)" 
+                          color="#546E7A" 
                           sx={{ lineHeight: 1.6 }}
                         >
                           {feature.desc}
@@ -500,23 +582,22 @@ export default function Home() {
       {/* Footer */}
       <Box 
         sx={{ 
-          backgroundColor: "rgba(0, 0, 0, 0.7)", 
-          backdropFilter: "blur(15px)",
-          borderTop: "1px solid rgba(255, 255, 255, 0.15)",
-          py: 3,
+          background: "linear-gradient(180deg, #1A237E 0%, #0D47A1 100%)", 
+          py: 5,
+          borderTop: "1px solid rgba(255, 255, 255, 0.1)"
         }}
       >
         <Container maxWidth="lg">
-          <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", gap: 2 }}>
-            <Typography variant="body2" color="rgba(255, 255, 255, 0.7)">
+          <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", gap: 3, flexWrap: "wrap" }}>
+            <Typography variant="body2" color="rgba(255, 255, 255, 0.8)">
               &copy; 2025 RehabGait. All Rights Reserved.
             </Typography>
-            <Box sx={{ color: "rgba(255, 255, 255, 0.3)" }}>•</Box>
-            <Typography variant="body2" color="rgba(255, 255, 255, 0.7)">
+            <Box sx={{ color: "rgba(255, 255, 255, 0.4)" }}>•</Box>
+            <Typography variant="body2" color="rgba(255, 255, 255, 0.8)">
               HIPAA Compliant
             </Typography>
-            <Box sx={{ color: "rgba(255, 255, 255, 0.3)" }}>•</Box>
-            <Typography variant="body2" color="rgba(255, 255, 255, 0.7)">
+            <Box sx={{ color: "rgba(255, 255, 255, 0.4)" }}>•</Box>
+            <Typography variant="body2" color="rgba(255, 255, 255, 0.8)">
               FDA Approved Technology
             </Typography>
           </Box>

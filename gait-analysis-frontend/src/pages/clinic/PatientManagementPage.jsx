@@ -51,7 +51,7 @@ export default function PatientManagementPage({ patients: initialPatients, refre
   useEffect(() => {
     const filtered = patients.filter((patient) =>
       patient.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (patient.doctor?.name || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (patient.doctorName || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
       patient.gender.toLowerCase().includes(searchTerm.toLowerCase())
     );
     setFilteredPatients(filtered);
@@ -158,7 +158,7 @@ export default function PatientManagementPage({ patients: initialPatients, refre
                 Assigned Doctor
               </Typography>
               <Typography variant="body2" fontWeight="600" color="text.primary">
-                {patient.doctor?.name || "Not assigned"}
+                {patient.doctorName || "Not assigned"}
               </Typography>
             </Box>
           </Box>
@@ -171,7 +171,7 @@ export default function PatientManagementPage({ patients: initialPatients, refre
               </Typography>
               <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                 <Typography variant="body2" fontWeight="600" color="text.primary">
-                  {patient.sensorKit?.serialNo || "Not assigned"}
+                  {patient.sensorKitId ? `ID: ${patient.sensorKitId}` : "Not assigned"}
                 </Typography>
                 {patient.sensorKit?.serialNo && (
                   <Chip
@@ -293,7 +293,7 @@ export default function PatientManagementPage({ patients: initialPatients, refre
             }}
           >
             <Typography variant="h4" fontWeight="800">
-              {filteredPatients.filter(p => p.doctor?.name).length}
+              {filteredPatients.filter(p => p.doctorName).length}
             </Typography>
             <Typography variant="body2" sx={{ opacity: 0.9 }}>
               Assigned to Doctors
@@ -312,7 +312,7 @@ export default function PatientManagementPage({ patients: initialPatients, refre
             }}
           >
             <Typography variant="h4" fontWeight="800">
-              {filteredPatients.filter(p => p.sensorKit?.serialNo).length}
+              {filteredPatients.filter(p => p.sensorKitId).length}
             </Typography>
             <Typography variant="body2" sx={{ opacity: 0.9 }}>
               With Sensor Kits

@@ -76,6 +76,7 @@ public class TestSession {
         ACTIVE,
         PROCESSING,
         COMPLETED,
-        FAILED
+        FAILED,
+        REVIEWED
     }
 }

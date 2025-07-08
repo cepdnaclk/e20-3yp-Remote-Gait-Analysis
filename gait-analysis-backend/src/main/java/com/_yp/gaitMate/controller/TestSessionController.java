@@ -98,17 +98,17 @@ public class TestSessionController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/doctors/me/reports")
-    @PreAuthorize("hasRole('DOCTOR')")
-    @Operation(summary = "Get all test reports of patients assigned to the logged-in doctor")
-    public ResponseEntity<PageResponseDto<DoctorTestReportDto>> getTestReportsOfLoggedInDoctor(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size
-    ) {
-        Pageable pageable = PageRequest.of(page, size);
-        PageResponseDto<DoctorTestReportDto> reports = testSessionService.getReportsOfLoggedInDoctor(pageable);
-        return ResponseEntity.ok(reports);
-    }
+//    @GetMapping("/doctors/me/reports")
+//    @PreAuthorize("hasRole('DOCTOR')")
+//    @Operation(summary = "Get all test reports of patients assigned to the logged-in doctor")
+//    public ResponseEntity<PageResponseDto<DoctorTestReportDto>> getTestReportsOfLoggedInDoctor(
+//            @RequestParam(defaultValue = "0") int page,
+//            @RequestParam(defaultValue = "10") int size
+//    ) {
+//        Pageable pageable = PageRequest.of(page, size);
+//        PageResponseDto<DoctorTestReportDto> reports = testSessionService.getReportsOfLoggedInDoctor(pageable);
+//        return ResponseEntity.ok(reports);
+//    }
 
 
 }
