@@ -1,5 +1,8 @@
 package com._yp.gaitMate.dto.doctor;
 
+import com._yp.gaitMate.dto.feedback.FeedbackDto;
+import com._yp.gaitMate.dto.feedback.FeedbackResponseDto;
+import com._yp.gaitMate.model.TestSession;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -14,6 +17,8 @@ public class DoctorTestReportDto {
     private Long sessionId;
     private Long patientId;
     private String patientName;
+    private TestSession.Status status;
+    private FeedbackResponseDto feedback;
 
     private LocalDateTime startTime;
     private LocalDateTime endTime;

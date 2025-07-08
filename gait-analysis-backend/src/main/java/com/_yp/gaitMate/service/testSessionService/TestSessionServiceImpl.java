@@ -205,7 +205,12 @@ public class TestSessionServiceImpl implements TestSessionService {
 
         Long doctorID = authUtil.getLoggedInDoctor().getId();
 
-        Page<TestSession> sessions = testSessionRepository.findByPatient_Doctor_IdAndStatus(doctorID, TestSession.Status.COMPLETED, pageable);
+        List<TestSession.Status> statuses = List.of(
+                TestSession.Status.COMPLETED,
+                TestSession.Status.REVIEWED
+        );
+
+        Page<TestSession> sessions = testSessionRepository.findByPatient_Doctor_IdAndStatusIn(doctorID, statuses , pageable);
 
         Page<DoctorTestReportDto> dtoPage = sessions.map(testSessionMapper::toDoctorTestReportDto);
 
