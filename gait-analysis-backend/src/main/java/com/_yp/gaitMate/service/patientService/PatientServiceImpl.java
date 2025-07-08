@@ -4,6 +4,7 @@ import com._yp.gaitMate.dto.patient.CreatePatientRequest;
 import com._yp.gaitMate.dto.patient.PatientInfoResponse;
 import com._yp.gaitMate.exception.ApiException;
 import com._yp.gaitMate.exception.ResourceNotFoundException;
+import com._yp.gaitMate.mail.service.EmailService;
 import com._yp.gaitMate.mapper.PatientMapper;
 import com._yp.gaitMate.model.Clinic;
 import com._yp.gaitMate.model.Doctor;
@@ -14,20 +15,25 @@ import com._yp.gaitMate.repository.DoctorRepository;
 import com._yp.gaitMate.repository.PatientRepository;
 import com._yp.gaitMate.repository.SensorKitRepository;
 import com._yp.gaitMate.security.dto.SignupRequest;
+import com._yp.gaitMate.security.model.AccountStatus;
+import com._yp.gaitMate.security.model.AccountType;
 import com._yp.gaitMate.security.model.AppRole;
 import com._yp.gaitMate.security.model.User;
 import com._yp.gaitMate.security.service.AuthenticationService;
 import com._yp.gaitMate.security.utils.AuthUtil;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class PatientServiceImpl implements PatientService{
     private final AuthUtil authUtil;
     private final ClinicRepository clinicRepository;
@@ -36,6 +42,7 @@ public class PatientServiceImpl implements PatientService{
     private final SensorKitRepository sensorKitRepository;
     private final PatientRepository patientRepository;
     private final PatientMapper patientMapper;
+    private final EmailService emailService;
 
     @Transactional
     @Override
@@ -76,15 +83,19 @@ public class PatientServiceImpl implements PatientService{
         }
 
 
-        // create the user account for the patient
-        SignupRequest signup = SignupRequest.builder()
-                .username(request.getUsername())
-                .email(request.getEmail())
-                .password(request.getPassword())
-                .roles(Set.of(AppRole.ROLE_PATIENT.name()))
-                .build();
+        /* DEPRECATED - Old user creation
+    // create the user account for the patient
+    SignupRequest signup = SignupRequest.builder()
+            .username(request.getUsername())
+            .email(request.getEmail())
+            .password(request.getPassword())
+            .roles(Set.of(AppRole.ROLE_PATIENT.name()))
+            .build();
 
-        User user = authService.registerUser(signup);
+    User user = authService.registerUser(signup);
+    */
+        // ✅ Generate invitation token
+        String invitationToken = UUID.randomUUID().toString();
 
         // attach the patient with - user, clinic, doctor
         Patient patient = Patient.builder()
@@ -100,7 +111,9 @@ public class PatientServiceImpl implements PatientService{
                 .clinic(clinic)
                 .doctor(doctor)
                 .sensorKit(sensorKit)
-                .user(user)
+                .invitationToken(invitationToken)
+                .accountStatus(AccountStatus.INVITATION_SENT)
+                .user(null)
                 .build();
 
         patient = patientRepository.save(patient);
@@ -111,6 +124,12 @@ public class PatientServiceImpl implements PatientService{
         // consider the bidirectional nature as well
         // 6. Update sensor kit with patient reference (optional, bidirectional safety)
         // sensorKit.setPatient(patient);
+
+        // ✅ Send invitation email
+        emailService.sendInvitationEmail(request.getEmail(), invitationToken, AccountType.PATIENT);
+
+        log.info("👤 Patient '{}' created successfully. Invitation sent to: {}",
+                request.getName(), request.getEmail());
 
         return patientMapper.toPatientInfoResponse(patient);
     }

@@ -71,7 +71,7 @@ public class Doctor {
     @OneToMany(mappedBy = "doctor", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
     private List<Patient> patients = new ArrayList<>();
 
-    @Column(name = "invitation_token", unique = true, nullable = false)
+    @Column(name = "invitation_token", unique = true)
     private String invitationToken;
 
     @Enumerated(EnumType.STRING)

@@ -105,7 +105,7 @@ public class Patient {
     @JoinColumn(name = "doctor_id")
     private Doctor doctor;
 
-    @Column(name = "invitation_token", unique = true, nullable = false)
+    @Column(name = "invitation_token", unique = true)
     private String invitationToken;
 
     @Enumerated(EnumType.STRING)

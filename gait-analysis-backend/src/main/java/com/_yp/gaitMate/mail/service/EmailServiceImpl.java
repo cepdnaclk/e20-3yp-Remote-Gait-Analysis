@@ -23,8 +23,7 @@ public class EmailServiceImpl implements EmailService {
     public void sendInvitationEmail(String toEmail, String invitationToken,  AccountType accountType) {
         try {
             // URL with token, email, and type
-            String signupUrl = frontendUrl + "/signup?token=" + invitationToken +
-                    "&email=" + toEmail + "&type=" + accountType.getValue();
+            String signupUrl = frontendUrl + "/signup?token=" + invitationToken + "&type=" + accountType.getValue();
 
 
             SimpleMailMessage message = getMailMessage(toEmail, signupUrl);

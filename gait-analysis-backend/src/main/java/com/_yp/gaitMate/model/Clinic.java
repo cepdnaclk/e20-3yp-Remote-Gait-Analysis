@@ -47,7 +47,7 @@ public class Clinic {
      * User account associated with the clinic for authentication.
      */
     //TODO: decide the cascading
-    @OneToOne(cascade = CascadeType.ALL, optional = false)
+    @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "user_id", unique = true)
     private User user;
 
@@ -69,7 +69,7 @@ public class Clinic {
     private List<Doctor> doctors = new ArrayList<>();
 
 
-    @Column(name = "invitation_token", unique = true, nullable = false)
+    @Column(name = "invitation_token", unique = true)
     private String invitationToken;
 
     @Enumerated(EnumType.STRING)
