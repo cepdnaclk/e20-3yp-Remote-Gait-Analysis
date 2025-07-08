@@ -2,14 +2,17 @@ package com._yp.gaitMate.service.testSessionService;
 
 import com._yp.gaitMate.dto.ApiResponse;
 import com._yp.gaitMate.dto.doctor.DoctorTestReportDto;
+import com._yp.gaitMate.dto.feedback.FeedbackDto;
 import com._yp.gaitMate.dto.page.PageResponseDto;
 import com._yp.gaitMate.dto.patient.PatientInfoResponse;
 import com._yp.gaitMate.dto.testSession.*;
 import com._yp.gaitMate.exception.ApiException;
+import com._yp.gaitMate.exception.ResourceNotFoundException;
 import com._yp.gaitMate.mapper.PageMapper;
 import com._yp.gaitMate.mapper.TestSessionMapper;
 import com._yp.gaitMate.model.*;
 import com._yp.gaitMate.mqtt.core.MqttPublisher;
+import com._yp.gaitMate.repository.FeedbackRepository;
 import com._yp.gaitMate.repository.PatientRepository;
 import com._yp.gaitMate.repository.TestSessionRepository;
 import com._yp.gaitMate.security.utils.AuthUtil;
@@ -24,6 +27,7 @@ import org.springframework.stereotype.Service;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -207,6 +211,45 @@ public class TestSessionServiceImpl implements TestSessionService {
 
         return pageMapper.toPageResponse(dtoPage);
     }
+
+    @Override
+    public void createOrUpdateFeedback(Long sessionId, FeedbackDto feedbackDto, Doctor doctor) {
+        // Step 1: Fetch session
+        TestSession session = testSessionRepository.findById(sessionId)
+                .orElseThrow(() -> new ResourceNotFoundException("TestSession", "id", sessionId));
+
+        // Step 2: Validate session status
+        if (session.getStatus() != TestSession.Status.COMPLETED &&
+                session.getStatus() != TestSession.Status.REVIEWED) {
+            throw new IllegalStateException("Feedback can only be given for sessions with COMPLETED or REVIEWED status.");
+        }
+
+        Feedback feedback = session.getFeedback();
+
+        if (feedback == null) {
+            // Create new feedback (timestamps handled automatically)
+            feedback = Feedback.builder()
+                    .notes(feedbackDto.getComments())
+                    .build();
+        } else {
+            // Update existing feedback
+            feedback.setNotes(feedbackDto.getComments());
+            // No need to set updatedAt — JPA auditing handles it
+        }
+
+        // Attach feedback to session
+        session.setFeedback(feedback);
+
+        // Update session status if needed
+        if (session.getStatus() == TestSession.Status.COMPLETED) {
+            session.setStatus(TestSession.Status.REVIEWED);
+        }
+
+        testSessionRepository.save(session); // Cascade will handle Feedback persistence
+    }
+
+
+
 
     // =====================================
     // 🔽 PRIVATE HELPERS
