@@ -1,6 +1,7 @@
 package com._yp.gaitMate.mail.controller;
 
 import com._yp.gaitMate.mail.service.EmailService;
+import com._yp.gaitMate.security.model.AccountType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,7 +21,7 @@ public class TestController {
     public String testEmail(@RequestParam String email) {
         try {
             String testUrl = "http://localhost:3000/signup?token=test-123&email=" + email;
-            emailService.sendInvitationEmail(email, testUrl);
+            emailService.sendInvitationEmail(email, testUrl, AccountType.CLINIC);
 
             log.info("🧪 Test email sent successfully!");
             return "✅ Email sent successfully to " + email;

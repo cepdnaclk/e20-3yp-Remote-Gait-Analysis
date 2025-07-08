@@ -78,7 +78,7 @@ public class Patient {
      * Associated user account.
      */
     @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "userId", nullable = false)
+    @JoinColumn(name = "userId")
     private User user;
 
     /**

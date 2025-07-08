@@ -48,7 +48,7 @@ public class Clinic {
      */
     //TODO: decide the cascading
     @OneToOne(cascade = CascadeType.ALL, optional = false)
-    @JoinColumn(name = "user_id", nullable = false, unique = true)
+    @JoinColumn(name = "user_id", unique = true)
     private User user;
 
     /**

@@ -30,6 +30,10 @@ spring:
           starttls:
             enable: true # "Use encryption for security"
 
+frontend:
+  base:
+    url: ${FRONTEND_BASE_URL}
+
 jwt:
   secret: ${JWT_SECRET}
   expiration:
