@@ -37,14 +37,36 @@ import {
   History as HistoryIcon,
 } from "@mui/icons-material";
 import { getMyTestSessions } from "../services/patientServices"; // Use your existing service
+import { useNavigate } from "react-router-dom";
+import { useRef } from "react";
+import { forwardRef, useImperativeHandle } from "react";
+
 import axiosInstance from "../services/axiosInstance";
 
-const PatientTestSessionsList = ({ 
+const PatientTestSessionsList = forwardRef(({ 
   embedded = false, // New prop to control if it's embedded in dashboard
-  initialPageSize = 6,
+  initialPageSize = 12,
   showControls = true, // Whether to show search/filter controls
   title = "Session History"
-}) => {
+}, ref) => {
+  const navigate = useNavigate();
+  const sessionRefs = useRef({}); // map of sessionId => element
+
+  // 👇 expose method to parent via ref
+  useImperativeHandle(ref, () => ({
+    scrollToSession: (sessionId) => {
+      const el = sessionRefs.current[sessionId];
+      if (el) {
+        el.scrollIntoView({ behavior: "smooth", block: "start" });
+        el.classList.add("highlighted-session");
+        setTimeout(() => el.classList.remove("highlighted-session"), 1500);
+      }
+    },
+    navigateToSession: (sessionId) => {
+      navigate(`/patient/test-session/${sessionId}`);
+    }
+  }));
+
   const [sessions, setSessions] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -310,6 +332,10 @@ const handleDownloadReport = async (sessionId) => {
             {sessions.map((session) => (
               <Grid item xs={12} key={session.sessionId}>
                 <Card
+                  ref={(el) => {
+                    if (el) sessionRefs.current[session.sessionId] = el;
+                  }}
+                  onClick = {() => navigate(`/patient/test-session/${session.sessionId}`)}
                   sx={{
                     p: 3,
                     cursor: "pointer",
@@ -567,6 +593,6 @@ const handleDownloadReport = async (sessionId) => {
       )}
     </Box>
   );
-};
+});
 
 export default PatientTestSessionsList;
