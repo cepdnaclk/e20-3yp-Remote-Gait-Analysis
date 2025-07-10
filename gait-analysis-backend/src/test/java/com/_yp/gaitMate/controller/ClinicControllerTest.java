@@ -53,8 +53,6 @@ class ClinicControllerTest extends IntegrationTestSupport {
                     .name("NewCare Clinic")
                     .email("newcare@example.com")
                     .phoneNumber("0722222222")
-                    .username("newcare_user")
-                    .password("securepass")
                     .build();
 
             HttpEntity<String> entity = new HttpEntity<>(new ObjectMapper().writeValueAsString(req), adminHeaders);
@@ -98,8 +96,6 @@ class ClinicControllerTest extends IntegrationTestSupport {
                     .name("DuplicateClinic")
                     .email("cldup1@example.com")
                     .phoneNumber("0700000001")
-                    .username("cldup_user1")
-                    .password("pass123")
                     .build();
 
             HttpEntity<String> entity1 = new HttpEntity<>(new ObjectMapper().writeValueAsString(req1), adminHeaders);
@@ -112,8 +108,6 @@ class ClinicControllerTest extends IntegrationTestSupport {
                     .name("DuplicateClinic") // same name
                     .email("cldup2@example.com")
                     .phoneNumber("0700000002")
-                    .username("cldup_user2")
-                    .password("pass123")
                     .build();
 
             HttpEntity<String> entity2 = new HttpEntity<>(new ObjectMapper().writeValueAsString(req2), adminHeaders);
@@ -139,8 +133,6 @@ class ClinicControllerTest extends IntegrationTestSupport {
                     .name("UnauthorizedClinic")
                     .email("clunauth@example.com")
                     .phoneNumber("0777777777")
-                    .username("clunauth_user")
-                    .password("pass123")
                     .build();
 
             HttpEntity<String> entity = new HttpEntity<>(new ObjectMapper().writeValueAsString(req));
@@ -161,8 +153,6 @@ class ClinicControllerTest extends IntegrationTestSupport {
                     .name("WrongRoleClinic")
                     .email("wrongrole@example.com")
                     .phoneNumber("0788888888")
-                    .username("wrongrole_user")
-                    .password("pass123")
                     .build();
 
             HttpEntity<String> entity = new HttpEntity<>(new ObjectMapper().writeValueAsString(req), clinicHeaders);
