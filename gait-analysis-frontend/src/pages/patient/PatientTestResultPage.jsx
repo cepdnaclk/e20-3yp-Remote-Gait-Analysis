@@ -101,7 +101,11 @@ export default function PatientTestResultPage() {
       });
     } else if (error.response?.status === 500 || error.code === 'ECONNABORTED') {
       // Server error or timeout - try refresh and retry Spring Boot proxy
-      await handleRefreshAndRetry();
+      setNotification({
+        open: true,
+        message: "Server error or timeout. Please try again later",
+        severity: "error"
+      });
     } else {
       setNotification({
         open: true,
@@ -150,47 +154,7 @@ const attemptSpringBootDownload = async () => {
   });
 };
 
-const handleRefreshAndRetry = async () => {
-  try {
-    console.log("URL might be expired, refreshing and retrying...");
-    
-    // Step 1: Get fresh URL from Spring Boot
-    const refreshResponse = await axios.get(`/api/sessions/${session.sessionId}/report-url`);
-    
-    if (refreshResponse.data.success) {
-      setNotification({
-        open: true,
-        message: "Refreshed URL, retrying download...",
-        severity: "info"
-      });
-      
-      // Step 2: Try Spring Boot proxy download again with fresh URL in database
-      await attemptSpringBootDownload();
-      
-    } else {
-      throw new Error("Could not refresh URL");
-    }
-    
-  } catch (refreshError) {
-    console.error("Refresh and retry failed:", refreshError);
-    
-    // Final fallback: Open existing URL in new tab if available
-    if (session?.results?.pressureResultsPath) {
-      window.open(session.results.pressureResultsPath, '_blank');
-      setNotification({
-        open: true,
-        message: "Opened report in new tab (download service unavailable)",
-        severity: "warning"
-      });
-    } else {
-      setNotification({
-        open: true,
-        message: "Download service unavailable. Please try again later.",
-        severity: "error"
-      });
-    }
-  }
-};
+
 
   const handleViewReport = async () => {
     if (!session?.results?.pressureResultsPath) {
