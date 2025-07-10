@@ -75,95 +75,122 @@ export default function PatientTestResultPage() {
   }, [id]);
 
   const handleDownload = async () => {
-    if (!session?.results?.pressureResultsPath) {
+  if (!session?.sessionId) {
+    setNotification({
+      open: true,
+      message: "No session ID available",
+      severity: "error"
+    });
+    return;
+  }
+
+  setDownloading(true);
+  
+  try {
+    // Primary: Try Spring Boot proxy download
+    await attemptSpringBootDownload();
+    
+  } catch (error) {
+    console.error("Primary download failed:", error);
+    
+    if (error.response?.status === 404) {
       setNotification({
         open: true,
-        message: "No report available for download",
+        message: "Report not found for this session",
         severity: "error"
       });
-      return;
-    }
-
-    setDownloading(true);
-    
-    try {
-      let downloadUrl = session.results.pressureResultsPath;
-      
-      // Check if URL is expired (presigned URLs have expiration)
-      const testResponse = await fetch(downloadUrl, { method: 'HEAD' });
-      
-      if (!testResponse.ok && testResponse.status === 403) {
-        // URL might be expired, try to get a fresh one
-        try {
-          const refreshResponse = await axios.get(`/api/sessions/${session.sessionId}/report-url`);
-          if (refreshResponse.data.success) {
-            downloadUrl = refreshResponse.data.reportUrl;
-            setNotification({
-              open: true,
-              message: "Refreshed download link",
-              severity: "info"
-            });
-          }
-        } catch (refreshError) {
-          console.warn("Could not refresh URL:", refreshError);
-        }
-      }
-      
-      // Download the file
-      const response = await fetch(downloadUrl);
-      
-      if (!response.ok) {
-        throw new Error(`Failed to download: ${response.statusText}`);
-      }
-      
-      const blob = await response.blob();
-      
-      // Create download link
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      
-      // Generate filename with session info
-      const timestamp = new Date().toISOString().split('T')[0];
-      const filename = `Gait_Analysis_Report_Session_${session.sessionId}_${timestamp}.pdf`;
-      link.download = filename;
-      
-      // Trigger download
-      document.body.appendChild(link);
-      link.click();
-      
-      // Cleanup
-      document.body.removeChild(link);
-      window.URL.revokeObjectURL(url);
-      
+    } else if (error.response?.status === 500 || error.code === 'ECONNABORTED') {
+      // Server error or timeout - try refresh and retry Spring Boot proxy
+      await handleRefreshAndRetry();
+    } else {
       setNotification({
         open: true,
-        message: "Report downloaded successfully!",
-        severity: "success"
+        message: "Failed to download report. Please try again.",
+        severity: "error"
+      });
+    }
+  } finally {
+    setDownloading(false);
+  }
+};
+
+const attemptSpringBootDownload = async () => {
+  const response = await axios.get(`/api/sessions/${session.sessionId}/download-report`, {
+    responseType: 'blob',
+    timeout: 30000,
+  });
+  
+  // Create blob and trigger download
+  const blob = new Blob([response.data], { type: 'application/pdf' });
+  const url = window.URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  
+  // Extract filename from Content-Disposition header
+  let filename = `Gait_Analysis_Report_Session_${session.sessionId}.pdf`;
+  
+  const contentDisposition = response.headers['content-disposition'];
+  if (contentDisposition) {
+    const filenameMatch = contentDisposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/);
+    if (filenameMatch && filenameMatch[1]) {
+      filename = filenameMatch[1].replace(/['"]/g, '');
+    }
+  }
+  
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  window.URL.revokeObjectURL(url);
+  
+  setNotification({
+    open: true,
+    message: "Report downloaded successfully!",
+    severity: "success"
+  });
+};
+
+const handleRefreshAndRetry = async () => {
+  try {
+    console.log("URL might be expired, refreshing and retrying...");
+    
+    // Step 1: Get fresh URL from Spring Boot
+    const refreshResponse = await axios.get(`/api/sessions/${session.sessionId}/report-url`);
+    
+    if (refreshResponse.data.success) {
+      setNotification({
+        open: true,
+        message: "Refreshed URL, retrying download...",
+        severity: "info"
       });
       
-    } catch (error) {
-      console.error("Download failed:", error);
+      // Step 2: Try Spring Boot proxy download again with fresh URL in database
+      await attemptSpringBootDownload();
       
-      // Fallback: Try to open in new tab
-      try {
-        window.open(session.results.pressureResultsPath, '_blank');
-        setNotification({
-          open: true,
-          message: "Report opened in new tab (download failed)",
-          severity: "warning"
-        });
-      } catch (fallbackError) {
-        setNotification({
-          open: true,
-          message: "Failed to download or open report. The link may have expired.",
-          severity: "error"
-        });
-      }
-    } finally {
-      setDownloading(false);
+    } else {
+      throw new Error("Could not refresh URL");
     }
-  };
+    
+  } catch (refreshError) {
+    console.error("Refresh and retry failed:", refreshError);
+    
+    // Final fallback: Open existing URL in new tab if available
+    if (session?.results?.pressureResultsPath) {
+      window.open(session.results.pressureResultsPath, '_blank');
+      setNotification({
+        open: true,
+        message: "Opened report in new tab (download service unavailable)",
+        severity: "warning"
+      });
+    } else {
+      setNotification({
+        open: true,
+        message: "Download service unavailable. Please try again later.",
+        severity: "error"
+      });
+    }
+  }
+};
 
   const handleViewReport = async () => {
     if (!session?.results?.pressureResultsPath) {
