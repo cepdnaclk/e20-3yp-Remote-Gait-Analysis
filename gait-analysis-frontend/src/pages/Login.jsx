@@ -29,6 +29,7 @@ import * as z from "zod";
 import axios from "axios";
 import logo from "../assets/images/logo-modified.png";
 import BASE_URL from '../config';
+import BackButton from '../components/BackButton'; 
 
 // Icons
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
@@ -170,7 +171,7 @@ export default function Login() {
     <React.Fragment>
       <CssBaseline enableColorScheme />
       <LoginContainer direction="column" justifyContent="center" alignItems="center" sx={{ py: 8 }}>
-        
+        <BackButton/>
         {/* Background Decorations */}
         <BackgroundDecoration 
           sx={{ 
