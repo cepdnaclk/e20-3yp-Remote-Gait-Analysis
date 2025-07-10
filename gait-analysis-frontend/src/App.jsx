@@ -26,6 +26,7 @@ import PatientTestResultPage from "./pages/patient/PatientTestResultPage";
 import DoctorPatientsPage from "./pages/doctor/DoctorPatientsPage";
 import DoctorPatientProfilePage from "./pages/doctor/DoctorPatientProfilePage";
 import ContactPage from "./pages/ContactPage";
+import DoctorTestSessionReview from "./pages/doctor/DoctorTestSessionReview";
 
 
 // Create a Query Client instance for managing API data fetching, caching, and state updates
@@ -151,6 +152,12 @@ export default function App() {
           <Route path="/root/add-clinic" element={
             <RoleBasedRoute allowedRoles={["ROLE_ADMIN"]}>
             <AddClinicAdmin />
+            </RoleBasedRoute>
+          } />
+
+          <Route path="/doctor/test-session-review/:id" element={
+            <RoleBasedRoute allowedRoles={["ROLE_DOCTOR"]}>
+              <DoctorTestSessionReview />
             </RoleBasedRoute>
           } />
 

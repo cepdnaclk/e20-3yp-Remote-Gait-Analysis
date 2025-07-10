@@ -1,10 +1,15 @@
 package com._yp.gaitMate.controller;
 import com._yp.gaitMate.dto.doctor.CreateDoctorRequest;
 import com._yp.gaitMate.dto.doctor.DoctorInfoResponse;
+import com._yp.gaitMate.dto.doctor.DoctorTestReportDto;
+import com._yp.gaitMate.dto.feedback.FeedbackDto;
 import com._yp.gaitMate.dto.page.PageResponseDto;
+import com._yp.gaitMate.dto.patient.PatientDashboardStatsDto;
 import com._yp.gaitMate.dto.patient.PatientInfoResponse;
+import com._yp.gaitMate.model.Doctor;
 import com._yp.gaitMate.service.doctorService.DoctorService;
 import com._yp.gaitMate.service.patientService.PatientService;
+import com._yp.gaitMate.service.testSessionService.TestSessionService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
@@ -18,6 +23,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import com._yp.gaitMate.repository.PatientRepository;
 import com._yp.gaitMate.mapper.PatientMapper;
@@ -35,6 +41,7 @@ public class DoctorController {
     private final PatientMapper patientMapper;
     private final DoctorService doctorService;
     private final PatientService patientService;
+    private final TestSessionService testSessionService;
 
 
 //    public DoctorController(DoctorService doctorService) {
@@ -140,6 +147,32 @@ public class DoctorController {
     }
 
 
+    @GetMapping("test-sessions/doctors/me/reports")
+    @PreAuthorize("hasRole('DOCTOR')")
+    @Operation(summary = "Get all test reports of patients assigned to the logged-in doctor")
+    public ResponseEntity<PageResponseDto<DoctorTestReportDto>> getTestReportsOfLoggedInDoctor(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        Pageable pageable = PageRequest.of(page, size);
+        PageResponseDto<DoctorTestReportDto> reports = testSessionService.getReportsOfLoggedInDoctor(pageable);
+        return ResponseEntity.ok(reports);
+    }
+
+
+    @PutMapping("test-sessions/{sessionId}/feedback")
+    @PreAuthorize("hasRole('DOCTOR')")
+    @Operation(summary = "Create or update feedback for a completed test session")
+    public ResponseEntity<Void> createOrUpdateFeedback(
+            @PathVariable Long sessionId,
+            @Valid @RequestBody FeedbackDto feedbackDto) {
+
+        Doctor doctor = authUtil.getLoggedInDoctor(); // ✅ Use your existing method
+        testSessionService.createOrUpdateFeedback(sessionId, feedbackDto, doctor);
+
+        return ResponseEntity.ok().build();
+    }
+
 
 
 
@@ -175,6 +208,11 @@ public class DoctorController {
     public ResponseEntity<?> deleteDoctor(@PathVariable Long id) {
         throw new NotImplementedException();
     }
+
+
+
+
+
 
 
 
