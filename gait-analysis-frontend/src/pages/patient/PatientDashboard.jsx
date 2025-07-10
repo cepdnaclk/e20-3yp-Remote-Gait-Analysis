@@ -39,6 +39,7 @@ import DirectionsWalkIcon from "@mui/icons-material/DirectionsWalk";
 import BalanceIcon from "@mui/icons-material/Balance";
 import SpeedIcon from "@mui/icons-material/Speed";
 import InsightsIcon from "@mui/icons-material/Insights";
+import PatientAppointmentRequest from "../../components/PatientAppointmentRequest";
 
 import { useNavigate } from "react-router-dom";
 import { getPatientProfile, getDashboardStats } from "../../services/patientServices";
@@ -368,6 +369,7 @@ export default function PatientDashboard() {
     { text: "Dashboard", icon: <DashboardIcon /> },
     { text: "Profile", icon: <PersonIcon /> },
     { text: "Test Sessions", icon: <AssessmentIcon /> },
+    { text: "Appointments", icon: <CalendarTodayIcon /> },
   ];
 
   const ProfileField = ({ label, value }) => (
@@ -721,6 +723,12 @@ export default function PatientDashboard() {
           </Container>
         );
 
+      case "Appointments":
+        return <PatientAppointmentRequest patient={patient} />;
+
+
+
+      // DEFAULT view
       default:
         // NEW ANALYTICS DASHBOARD - Replaces the old "Recent Sessions" section
         return (
