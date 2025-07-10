@@ -860,6 +860,8 @@ export default function PatientDashboard() {
                     </Typography>
                   </Box>
                 </Card>
+
+                
               </Grid>
 
               {/* Row 2: NEW Analytics KPI Cards */}
