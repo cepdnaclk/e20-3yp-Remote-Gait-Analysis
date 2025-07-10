@@ -41,10 +41,15 @@ cloud:
       static: eu-north-1
       auto: false
 
+# NEW: S3 Configuration section
+aws:
+  region: eu-north-1
+  s3:
+    bucket: gait-analysis-reports
 
 app:
   sqs:
-    queue-name: rehabgait-processing-request-dev
+    queue-name: rehabgait-processing-request-dev2
   cors:
     allowed-origin: http://localhost:5173
 
