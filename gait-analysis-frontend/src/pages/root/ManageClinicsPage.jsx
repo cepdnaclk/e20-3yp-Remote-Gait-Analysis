@@ -1,3 +1,6 @@
+// Final merged and resolved version of ManageClinicsPage
+
+import { useEffect, useState } from "react";
 import {
   Box,
   Typography,
@@ -17,25 +20,34 @@ import {
   CircularProgress,
   Snackbar,
   Alert,
+  InputAdornment,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
 } from "@mui/material";
-
-import { useEffect, useState } from "react";
+import { Search as SearchIcon } from "@mui/icons-material";
 import { getClinics, addClinic } from "../../services/rootServices";
 import { useNavigate } from "react-router-dom";
 
 export default function ManageClinicsPage() {
   const navigate = useNavigate();
-
   const [clinics, setClinics] = useState([]);
+  const [filteredClinics, setFilteredClinics] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(0);
+  const [pageSize, setPageSize] = useState(5);
+
   const [open, setOpen] = useState(false);
   const [newClinic, setNewClinic] = useState({
     name: "",
     phoneNumber: "",
     email: "",
-    // username: '',
-    // password: '',
   });
+
   const [snackbar, setSnackbar] = useState({
     open: false,
     message: "",
@@ -48,7 +60,10 @@ export default function ManageClinicsPage() {
 
   useEffect(() => {
     getClinics()
-      .then((res) => setClinics(res.data))
+      .then((res) => {
+        setClinics(res.data);
+        setFilteredClinics(res.data);
+      })
       .catch((err) => {
         console.error("Failed to load clinics", err);
         setSnackbar({
@@ -60,18 +75,24 @@ export default function ManageClinicsPage() {
       .finally(() => setLoading(false));
   }, []);
 
+  useEffect(() => {
+    const filtered = clinics.filter(
+      (clinic) =>
+        clinic.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        clinic.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        clinic.phoneNumber.includes(searchQuery)
+    );
+    setFilteredClinics(filtered);
+    setCurrentPage(0);
+  }, [searchQuery, clinics]);
+
   const handleAddClinic = () => {
     addClinic(newClinic)
       .then((res) => {
-        setClinics((prev) => [...prev, res.data]);
+        const updated = [...clinics, res.data];
+        setClinics(updated);
         setOpen(false);
-        setNewClinic({
-          name: "",
-          phoneNumber: "",
-          email: "",
-          username: "",
-          password: "",
-        });
+        setNewClinic({ name: "", phoneNumber: "", email: "" });
         setSnackbar({
           open: true,
           message: "Clinic added successfully",
@@ -96,6 +117,16 @@ export default function ManageClinicsPage() {
     setSnackbar({ ...snackbar, open: false });
   };
 
+  const handlePageSizeChange = (event) => {
+    setPageSize(event.target.value);
+    setCurrentPage(0);
+  };
+
+  const paginatedClinics = filteredClinics.slice(
+    currentPage * pageSize,
+    currentPage * pageSize + pageSize
+  );
+
   if (loading) {
     return (
       <Box
@@ -112,48 +143,106 @@ export default function ManageClinicsPage() {
 
   return (
     <Box p={4}>
-      <Typography variant="h5" gutterBottom>
-        Manage Clinics
-      </Typography>
-      <Button variant="contained" onClick={() => setOpen(true)} sx={{ mb: 2 }}>
-        Add Clinic
-      </Button>
-
-      <TableContainer
-        component={Paper}
-        sx={{
-          boxShadow: 4,
-          borderRadius: 2,
-          overflow: "hidden",
-          border: "1px solid #e0e0e0",
-        }}
+      <Box
+        display="flex"
+        justifyContent="space-between"
+        alignItems="center"
+        mb={3}
       >
+        <Typography variant="h4" fontWeight={700}>
+          Manage Clinics
+        </Typography>
+        <Button variant="contained" onClick={() => setOpen(true)}>
+          Add Clinic
+        </Button>
+      </Box>
+
+      <Box display="flex" gap={2} alignItems="flex-end" mb={2}>
+        <TextField
+          fullWidth
+          placeholder="Search clinics by name, phone, or email..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                <SearchIcon color="action" />
+              </InputAdornment>
+            ),
+          }}
+        />
+        <FormControl variant="outlined" sx={{ minWidth: 120 }}>
+          <InputLabel>Per Page</InputLabel>
+          <Select
+            value={pageSize}
+            onChange={handlePageSizeChange}
+            label="Per Page"
+          >
+            <MenuItem value={5}>5</MenuItem>
+            <MenuItem value={10}>10</MenuItem>
+            <MenuItem value={20}>20</MenuItem>
+          </Select>
+        </FormControl>
+      </Box>
+
+      <TableContainer component={Paper} sx={{ borderRadius: 3 }}>
         <Table>
-          <TableHead sx={{ backgroundColor: "#f5f7fa" }}>
-            <TableRow>
-              <TableCell sx={{ fontWeight: "bold" }}>Clinic Name</TableCell>
-              <TableCell sx={{ fontWeight: "bold" }}>Phone</TableCell>
-              <TableCell sx={{ fontWeight: "bold" }}>Email</TableCell>
-              {/*<TableCell>Username</TableCell> */}
+          <TableHead>
+            <TableRow sx={{ backgroundColor: "#f8fafc" }}>
+              <TableCell sx={{ fontWeight: 700 }}>Clinic Name</TableCell>
+              <TableCell sx={{ fontWeight: 700 }}>Phone</TableCell>
+              <TableCell sx={{ fontWeight: 700 }}>Email</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {clinics.map((clinic) => (
+            {paginatedClinics.map((clinic) => (
               <TableRow
-                key={clinic.id || clinic.username}
+                key={clinic.id || clinic.email}
                 hover
                 onClick={() => navigate(`/root/clinics/${clinic.id}`)}
-                style={{ cursor: "pointer" }}
+                sx={{ cursor: "pointer" }}
               >
                 <TableCell>{clinic.name}</TableCell>
                 <TableCell>{clinic.phoneNumber}</TableCell>
                 <TableCell>{clinic.email}</TableCell>
-                {/*<TableCell>{clinic.username}</TableCell>*/}
               </TableRow>
             ))}
+            {paginatedClinics.length === 0 && (
+              <TableRow>
+                <TableCell colSpan={3} align="center">
+                  No clinics found
+                </TableCell>
+              </TableRow>
+            )}
           </TableBody>
         </Table>
       </TableContainer>
+
+      <Box
+        mt={3}
+        display="flex"
+        justifyContent="space-between"
+        alignItems="center"
+      >
+        <Typography variant="body2">
+          Showing {paginatedClinics.length} of {filteredClinics.length} clinics
+        </Typography>
+        <Box>
+          {[...Array(Math.ceil(filteredClinics.length / pageSize)).keys()].map(
+            (page) => (
+              <Button
+                key={page}
+                variant={page === currentPage ? "contained" : "outlined"}
+                size="small"
+                onClick={() => setCurrentPage(page)}
+                sx={{ mx: 0.5 }}
+              >
+                {page + 1}
+              </Button>
+            )
+          )}
+        </Box>
+      </Box>
 
       {/* Add Clinic Dialog */}
       <Dialog open={open} onClose={() => setOpen(false)}>
@@ -180,21 +269,6 @@ export default function ManageClinicsPage() {
             value={newClinic.email}
             onChange={handleChange("email")}
           />
-          {/* <TextField
-            label="Username"
-            fullWidth
-            margin="normal"
-            value={newClinic.username}
-            onChange={handleChange("username")}
-          />
-          <TextField
-            label="Password"
-            type="password"
-            fullWidth
-            margin="normal"
-            value={newClinic.password}
-            onChange={handleChange("password")}
-          /> */}
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setOpen(false)}>Cancel</Button>
