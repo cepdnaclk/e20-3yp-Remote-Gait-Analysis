@@ -233,38 +233,50 @@ export default function PatientTestResultPage() {
 
   const MetricCard = ({ icon, title, value, unit, color = "#4299e1" }) => (
     <Card
+      elevation={3}
       sx={{
         height: "100%",
-        background: "white",
+        borderRadius: 3,
+        background: "linear-gradient(135deg, #f8fafc 0%, #ffffff 100%)",
         border: "1px solid #e2e8f0",
-        borderRadius: 2,
-        transition: "all 0.2s ease",
-        "&:hover": {
-          transform: "translateY(-2px)",
-          boxShadow: "0 8px 25px rgba(0,0,0,0.1)",
-        },
+        overflow: "hidden",
       }}
     >
       <CardContent sx={{ p: 3 }}>
-        <Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: 2 }}>
+        <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
           <Box
             sx={{
-              p: 1.5,
-              borderRadius: 2,
-              background: `${color}15`,
+              width: 36,
+              height: 36,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              borderRadius: "50%",
+              backgroundColor: `${color}20`,
               color: color,
+              mr: 2,
             }}
           >
             {icon}
           </Box>
-          <Typography variant="h6" fontWeight="600" color="text.primary">
+          <Typography variant="subtitle1" fontWeight="600" color="text.primary">
             {title}
           </Typography>
         </Box>
-        <Typography variant="h4" fontWeight="700" color="text.primary">
+        <Typography
+          variant="h4"
+          fontWeight="700"
+          color="text.primary"
+          sx={{ lineHeight: 1.2 }}
+        >
           {value}
           {unit && (
-            <Typography component="span" variant="body1" color="text.secondary" sx={{ ml: 1 }}>
+            <Typography
+              component="span"
+              variant="h6"
+              color="text.secondary"
+              sx={{ ml: 1 }}
+            >
               {unit}
             </Typography>
           )}
@@ -272,6 +284,7 @@ export default function PatientTestResultPage() {
       </CardContent>
     </Card>
   );
+  
 
   if (loading) {
     return (
