@@ -29,6 +29,7 @@ import * as z from "zod";
 import axios from "axios";
 import logo from "../assets/images/logo-modified.png";
 import BASE_URL from '../config';
+import BackButton from '../components/BackButton'; 
 
 // Icons
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
@@ -170,7 +171,7 @@ export default function Login() {
     <React.Fragment>
       <CssBaseline enableColorScheme />
       <LoginContainer direction="column" justifyContent="center" alignItems="center" sx={{ py: 8 }}>
-        
+        <BackButton/>
         {/* Background Decorations */}
         <BackgroundDecoration 
           sx={{ 
@@ -259,7 +260,7 @@ export default function Login() {
                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
                   {[
                     { icon: <SecurityIcon />, text: 'HIPAA Compliant Security', desc: 'Bank-level encryption and compliance' },
-                    { icon: <VerifiedUserIcon />, text: 'Medical Grade Accuracy', desc: 'FDA approved technology' },
+                    { icon: <VerifiedUserIcon />, text: 'Medical Grade Accuracy', desc: 'Clinically validated for reliable insights' },
                     { icon: <CloudIcon />, text: 'Cloud-Based Analytics', desc: 'Real-time data processing' },
                   ].map((benefit, index) => (
                     <Box key={index} sx={{ display: 'flex', alignItems: 'center', gap: 3 }}>
@@ -292,18 +293,17 @@ export default function Login() {
             </Grid>
 
             {/* Right Side - Login Form */}
-            <Grid item xs={12} md={5}>
+            <Grid item xs={12} md={5} maxHeight="90vh">
               <Card variant="outlined">
                 {/* Header with Logo */}
-                <Box sx={{ textAlign: "center", mb: 4 }}>
+                <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 2, mb: 1 }}>
                   <Box
                     component="img"
                     src={logo}
                     alt="RehabGait Logo"
                     sx={{
-                      height: 60,
+                      height: 48,
                       width: "auto",
-                      mb: 3,
                     }}
                   />
 
@@ -312,31 +312,25 @@ export default function Login() {
                     sx={{
                       fontWeight: 800,
                       color: '#1A237E',
-                      mb: 1,
                       fontSize: { xs: '1.8rem', sm: '2.125rem' },
                     }}
                   >
                     RehabGait
                   </Typography>
-                  
-                  <Typography
-                    variant="body1"
-                    sx={{
-                      color: '#546E7A',
-                      fontWeight: 500,
-                      mb: 3,
-                    }}
-                  >
-                    Welcome Back
-                  </Typography>
-
-                  {/* Feature Chips */}
-                  <Box sx={{ display: 'flex', gap: 1, justifyContent: 'center', flexWrap: 'wrap', mb: 2 }}>
-                    <FeatureChip icon={<SecurityIcon sx={{ fontSize: 14 }} />} text="HIPAA" />
-                    <FeatureChip icon={<CloudIcon sx={{ fontSize: 14 }} />} text="Secure" />
-                    <FeatureChip icon={<VerifiedUserIcon sx={{ fontSize: 14 }} />} text="FDA" />
-                  </Box>
                 </Box>
+
+                <Typography
+                  variant="body1"
+                  sx={{
+                    textAlign: "center",
+                    color: '#546E7A',
+                    fontSize: { xs: '1.0rem', sm: '1.5rem' },
+                    fontWeight: 500,
+                    mb: 3,
+                  }}
+                >
+                  Welcome Back
+                </Typography>
 
                 {/* Login Form */}
                 <Box 
@@ -479,6 +473,22 @@ export default function Login() {
                     Sign In
                   </Button>
                 </Box>
+                <Box sx = {{display:"flex",justifyContent: "center", alignItems: "center", gap: 2}}>
+                  <Link 
+                    href="/contact" 
+                    underline="hover" 
+                    sx={{ 
+                      color:'rgb(64, 131, 208)', 
+                      fontWeight: 500,
+                      textDecoration: 'none',
+                      '&:hover': {
+                        textDecoration: 'underline',
+                      },
+                    }}
+                  >
+                    Forgot your password?
+                  </Link>
+                </Box>
 
                 <Divider sx={{ my: 3 }}>
                   <Typography variant="body2" color="#546E7A" fontWeight="500">
@@ -518,26 +528,7 @@ export default function Login() {
           </Grid>
         </Container>
 
-        {/* Trust Indicators */}
-        <Box sx={{ textAlign: 'center', mt: 4, position: 'relative', zIndex: 1 }}>
-          <Typography variant="caption" color="#37474F" sx={{ mb: 2, display: 'block', fontWeight: 500 }}>
-            Trusted by healthcare professionals worldwide
-          </Typography>
-          <Box sx={{ display: 'flex', justifyContent: 'center', gap: 4, flexWrap: 'wrap' }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              <SecurityIcon sx={{ fontSize: 16, color: '#1976D2' }} />
-              <Typography variant="caption" color="#546E7A" fontWeight="500">
-                HIPAA Compliant
-              </Typography>
-            </Box>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              <VerifiedUserIcon sx={{ fontSize: 16, color: '#1976D2' }} />
-              <Typography variant="caption" color="#546E7A" fontWeight="500">
-                Medical Grade Security
-              </Typography>
-            </Box>
-          </Box>
-        </Box>
+        
 
         {/* Snackbar for feedback */}
         <Snackbar
