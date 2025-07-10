@@ -37,13 +37,17 @@ import {
   History as HistoryIcon,
 } from "@mui/icons-material";
 import { getMyTestSessions } from "../services/patientServices"; // Use your existing service
+import { useNavigate } from "react-router-dom";
+
+
 
 const PatientTestSessionsList = ({ 
   embedded = false, // New prop to control if it's embedded in dashboard
-  initialPageSize = 6,
+  initialPageSize = 12,
   showControls = true, // Whether to show search/filter controls
   title = "Session History"
 }) => {
+  const navigate = useNavigate();
   const [sessions, setSessions] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -312,6 +316,7 @@ const PatientTestSessionsList = ({
             {sessions.map((session) => (
               <Grid item xs={12} key={session.sessionId}>
                 <Card
+                  onClick = {() => navigate(`/patient/test-session/${session.sessionId}`)}
                   sx={{
                     p: 3,
                     cursor: "pointer",
