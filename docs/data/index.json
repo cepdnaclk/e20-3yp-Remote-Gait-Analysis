@@ -25,11 +25,8 @@
         ],
         "supervisors": [
             {
-            "name": "Dr. Isuru Nawinna",
-            "email": "isurunawinne@eng.pdn.ac.lk"
-            },
-            {
-            "name": "Mr. Keerthi Ilukkumbura"
+                "name": "Dr. Isuru Nawinna",
+                "email": "isurunawinne@eng.pdn.ac.lk"
             }
         ],
         "tags": ["Web", "Embedded Systems", "IoT"]
