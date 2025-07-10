@@ -67,6 +67,9 @@ public class ProcessedTestResultsServiceImpl implements ProcessedTestResultsServ
                     .pressureResultsPath(dto.getPressureResultsPath())
                     .strideTimes(dto.getStrideTimes()) // ✅ saving the list
                     .session(session) // ✅ set owning side of relationship
+                    .strideTimes(dto.getStrideTimes())
+                    .strideLength(dto.getStrideLength())
+                    .strideLengths(dto.getStrideLengths())
                     .build();
 
             processedTestResultsRepository.save(results);

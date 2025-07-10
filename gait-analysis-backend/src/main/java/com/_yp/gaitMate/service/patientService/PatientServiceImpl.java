@@ -1,10 +1,12 @@
 package com._yp.gaitMate.service.patientService;
 
+import com._yp.gaitMate.dto.page.PageResponseDto;
 import com._yp.gaitMate.dto.patient.CreatePatientRequest;
 import com._yp.gaitMate.dto.patient.PatientInfoResponse;
 import com._yp.gaitMate.exception.ApiException;
 import com._yp.gaitMate.exception.ResourceNotFoundException;
 import com._yp.gaitMate.mail.service.EmailService;
+import com._yp.gaitMate.mapper.PageMapper;
 import com._yp.gaitMate.mapper.PatientMapper;
 import com._yp.gaitMate.model.Clinic;
 import com._yp.gaitMate.model.Doctor;
@@ -23,6 +25,8 @@ import com._yp.gaitMate.security.service.AuthenticationService;
 import com._yp.gaitMate.security.utils.AuthUtil;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -42,6 +46,7 @@ public class PatientServiceImpl implements PatientService{
     private final SensorKitRepository sensorKitRepository;
     private final PatientRepository patientRepository;
     private final PatientMapper patientMapper;
+    private final PageMapper pageMapper;
     private final EmailService emailService;
 
     @Transactional
@@ -135,15 +140,18 @@ public class PatientServiceImpl implements PatientService{
     }
 
     @Override
-    public List<PatientInfoResponse> getPatientsOfLoggedInDoctor() {
+    public PageResponseDto<PatientInfoResponse> getPatientsOfLoggedInDoctor(Pageable pageable) {
         Doctor doctor = authUtil.getLoggedInDoctor();
-        List<Patient> patients = patientRepository.findByDoctor(doctor);
+        Page<Patient> patients = patientRepository.findByDoctor(doctor, pageable );
 
-        List<PatientInfoResponse> response = patients.stream()
-                .map(patientMapper::toPatientInfoResponse)
-                .toList();
+        Page<PatientInfoResponse> response = patients.map(patientMapper::toPatientInfoResponse);
 
-        return response;
+
+//        List<PatientInfoResponse> response = patients.stream()
+//                .map(patientMapper::toPatientInfoResponse)
+//                .toList();
+
+        return pageMapper.toPageResponse(response);
     }
 
 

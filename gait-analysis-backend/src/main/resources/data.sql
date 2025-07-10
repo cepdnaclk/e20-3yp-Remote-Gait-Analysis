@@ -295,11 +295,11 @@ INSERT INTO test_session(id, start_time, end_time, status, patient_id, feedback_
 
 -- Results for Patient 1 (501) - Sessions 1001-1005
 INSERT INTO processed_test_results(id, session_id, steps, cadence, avg_heel_force, avg_toe_force, avg_midfoot_force, balance_score, peak_impact, duration_seconds, avg_swing_time, avg_stance_time, pressure_results_path, stride_times) VALUES
-(2001, 1001, 1245, 112.5, 8.2, 6.7, 4.3, 85.2, 245, 930.0, 0.42, 0.58, '/results/patient1/session1_pressure.json', '0.89,0.92,0.88,0.91,0.87,0.93,0.90,0.89,0.91,0.88'),
+(2001, 1001, 1245, 112.5, 8.2, 6.7, 4.3, 85.2, 245, 930.0, 0.42, 0.58, '/results/patient1/session1_pressure.json', '0.80,0.92,0.88,0.91,0.87,0.93,0.90,0.89,0.91,0.88'),
 (2002, 1002, 1320, 115.8, 8.5, 7.1, 4.6, 87.4, 258, 735.0, 0.41, 0.57, '/results/patient1/session2_pressure.json', '0.88,0.90,0.89,0.92,0.87,0.91,0.89,0.90,0.88,0.91'),
 (2003, 1003, 1189, 110.2, 8.0, 6.9, 4.2, 83.1, 242, 885.0, 0.43, 0.59, '/results/patient1/session3_pressure.json', '0.91,0.89,0.93,0.88,0.90,0.87,0.92,0.88,0.90,0.89'),
 (2004, 1004, 1278, 114.3, 8.3, 7.0, 4.5, 86.7, 251, 750.0, 0.42, 0.58, '/results/patient1/session4_pressure.json', '0.87,0.91,0.88,0.90,0.89,0.92,0.87,0.90,0.88,0.91'),
-(2005, 1005, 1356, 117.1, 8.7, 7.3, 4.8, 88.9, 263, 800.0, 0.40, 0.56, '/results/patient1/session5_pressure.json', '0.89,0.87,0.91,0.88,0.90,0.89,0.92,0.87,0.91,0.88');
+(2005, 1005, 1356, 117.1, 8.7, 7.3, 4.8, 88.9, 263, 800.0, 0.40, 0.56, '/results/patient1/session5_pressure.json', '0.80,0.87,0.91,0.88,0.90,0.89,0.92,0.87,0.91,0.88');
 
 -- Results for Patient 2 (502) - Sessions 1006-1009 (1010 is FAILED, no results)
 INSERT INTO processed_test_results(id, session_id, steps, cadence, avg_heel_force, avg_toe_force, avg_midfoot_force, balance_score, peak_impact, duration_seconds, avg_swing_time, avg_stance_time, pressure_results_path, stride_times) VALUES

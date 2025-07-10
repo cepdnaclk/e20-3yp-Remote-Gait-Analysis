@@ -1,83 +1,10 @@
 spring:
-  datasource:
-    url: ${SPRING_DATASOURCE_URL}
-    username: ${SPRING_DATASOURCE_USERNAME}
-    password: ${SPRING_DATASOURCE_PASSWORD}
-    driver-class-name: org.postgresql.Driver
-  jpa:
-    hibernate:
-      ddl-auto: create-drop
-    defer-datasource-initialization: true  #This ensures the execution happens after Hibernate creates the tables
-    show-sql: false
-    properties:
-      hibernate:
-        format_sql: true
-    database: postgresql
-    database-platform: org.hibernate.dialect.PostgreSQLDialect
-  sql:
-    init:
-      mode: always
-
-  mail:
-    host: smtp.gmail.com # Gmail's email server address
-    port: 587  # Gmail's secure email port
-    username: ${GMAIL_ADDRESS}        # Replace with your Gmail
-    password: ${GMAIL_APP_PASSWORD}           # App password (Google's security requirement for apps accessing Gmail)
-    properties:
-      mail:
-        smtp:
-          auth: true # "Yes, I want to authenticate"
-          starttls:
-            enable: true # "Use encryption for security"
-
-frontend:
-  base:
-    url: ${FRONTEND_BASE_URL}
-
-jwt:
-  secret: ${JWT_SECRET}
-  expiration:
-    ms: 432000000
-
-
-mqtt:
-  client:
-    endpoint: ${MQTT_CLIENT_ENDPOINT}
-    id: ${MQTT_CLIENT_ID}
-  aws:
-    accessKey: ${MQTT_AWS_ACCESS_KEY}
-    accessId: ${MQTT_AWS_ACCESS_ID}
-
-cloud:
-  aws:
-    credentials:
-      access-key: ${MQTT_AWS_ACCESS_ID}
-      secret-key: ${MQTT_AWS_ACCESS_KEY}
-    region:
-      static: eu-north-1
-      auto: false
-
-
-app:
-  sqs:
-    queue-name: rehabgait-processing-request-dev
-
-
-
-microservices:
-  data:
-    processing:
-      url: http://localhost:8000/process-session
-
-
-
-
-
-# http://localhost:8080/swagger-ui.html
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:dev}  # Defaults to dev if not set
 
 logging:
   level:
-    org.springframework.security: DEBUG
+    org.springframework.boot.context.config: DEBUG
 
 
 #client:

@@ -1,0 +1,98 @@
+name: Sync to Prod
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  sync-prod:
+    name: Sync Deploy Folders to Prod
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: ⬇️ Checkout main branch
+      uses: actions/checkout@v4
+      with:
+        ref: main
+        token: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: 📦 Copy deploy folders to temp branch
+      id: sync-prod
+      run: |
+        BRANCH=auto-sync-prod-$(date +%Y%m%d-%H%M%S)
+        git config user.name "github-actions"
+        git config user.email "github-actions@github.com"
+
+        # Create new branch from prod
+        git fetch origin prod
+        git checkout -b $BRANCH origin/prod
+
+        # ⚠️ Remove everything except .ci and .git
+        find . -mindepth 1 -maxdepth 1 ! -name '.git' ! -name '.ci' -exec rm -rf {} +
+
+        # Restore only selected deploy folders from main
+        git checkout main -- \
+          gait-analysis-backend \
+          gait-analysis-frontend \
+          gait-processing-service
+
+        git add .
+        if git diff --cached --quiet; then
+          echo "✅ No changes to commit. Exiting gracefully."
+          exit 0
+        fi
+        git commit -m "🔄 Auto-sync deploy folders from main"
+        git push origin $BRANCH
+
+        echo "branch=$BRANCH" >> $GITHUB_OUTPUT
+
+    - name: 🔀 Open PR to prod
+      id: create-pr
+      uses: repo-sync/pull-request@v2
+      with:
+        source_branch: ${{ steps.sync-prod.outputs.branch }}
+        destination_branch: prod
+        pr_title: "🔄 Auto-sync deploy folders from main"
+        pr_body: |
+          Automated PR to sync deployment folders (`gait-analysis-backend`, `gait-analysis-frontend`, `gait-processing-service`) from `main` to `prod`.
+          
+          ## Changes
+          - ✅ Backend services updated
+          - ✅ Frontend application updated  
+          - ✅ Processing service updated
+          
+          **Please review and merge to deploy to production.**
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: 🛠️ Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: us-east-1
+
+    - name: 📧 Send notification via SES template
+      run: |
+        echo "📧 Sending notification email using SES template..."
+        
+        # Prepare timestamp in Sri Lanka time (Asia/Colombo) - 12 hour format
+        TIMESTAMP=$(TZ='Asia/Colombo' date '+%Y-%m-%d %I:%M:%S %p SLST')
+        
+        # Send email using SES template
+        aws ses send-templated-email \
+          --source "RehabGait CI <${{ secrets.FROM_EMAIL }}>" \
+          --destination "ToAddresses=yohansenanayake4321@gmail.com,e20037@eng.pdn.ac.lk,e20342@eng.pdn.ac.lk" \
+          --template "RehabGaitSyncNotification" \
+          --template-data "{
+            \"branch_name\": \"${{ steps.sync-prod.outputs.branch }}\",
+            \"repo_name\": \"${{ github.repository }}\",
+            \"triggered_by\": \"${{ github.actor }}\",
+            \"timestamp\": \"$TIMESTAMP\",
+            \"pr_url\": \"https://github.com/${{ github.repository }}/pull/${{ steps.create-pr.outputs.pr_number }}\",
+            \"repo_url\": \"https://github.com/${{ github.repository }}\"
+          }" \
+          --region us-east-1
+        
+        echo "✅ Email notification sent successfully!"
+        echo "📬 Email sent to team members about PR #${{ steps.create-pr.outputs.pr_number }}"

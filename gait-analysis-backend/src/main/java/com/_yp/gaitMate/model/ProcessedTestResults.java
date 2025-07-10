@@ -56,7 +56,8 @@ public class ProcessedTestResults {
     @Column(nullable = false)
     private Double avgStanceTime;
 
-    @Column(nullable = false)
+    // ✅ CHANGE THIS: Use columnDefinition = "TEXT" instead of @Lob
+    @Column(nullable = false, columnDefinition = "TEXT")
     private String pressureResultsPath;
 
     /**
@@ -65,4 +66,12 @@ public class ProcessedTestResults {
     @Convert(converter = com._yp.gaitMate.util.DoubleListToStringConverter.class)
     @Column(name = "stride_times", columnDefinition = "TEXT")
     private List<Double> strideTimes;
+
+
+    @Convert(converter = com._yp.gaitMate.util.DoubleListToStringConverter.class)
+    @Column(name = "stride_lengths", columnDefinition = "TEXT")
+    private List<Double> strideLengths;
+
+    @Column(nullable = true)
+    private Double strideLength;
 }

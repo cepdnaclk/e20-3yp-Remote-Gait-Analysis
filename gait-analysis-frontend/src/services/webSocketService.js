@@ -4,7 +4,8 @@ import { Client } from "@stomp/stompjs";
 let stompClient = null;
 
 export function connectWebSocket(authToken, onMessageHandlers) {
-  const socket = new SockJS("http://localhost:8080/ws");
+  //const socket = new SockJS("http://localhost:8080/ws");
+  const socket = new SockJS(import.meta.env.VITE_WS_BASE_URL);
 
   // Optional: log the token being used
   console.log("🔐 JWT Token for WebSocket:", authToken);

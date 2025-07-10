@@ -16,3 +16,9 @@
 **/.venv/
 
 
+.env.prod
+.env.development
+.env.production
+nginx-config.txt
+
+gait-analysis-frontend/.env

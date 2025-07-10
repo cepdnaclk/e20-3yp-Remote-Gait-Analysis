@@ -43,5 +43,10 @@ public class ProcessedTestResultsRequestDto {
 
     private List<Double> strideTimes;
 
+    private List<Double> strideLengths;
+
+    private Double strideLength;
+
+
 
 }

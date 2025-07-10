@@ -133,6 +133,7 @@
 	</dependencies>
 
 	<build>
+		<finalName>gait-backend</finalName>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
