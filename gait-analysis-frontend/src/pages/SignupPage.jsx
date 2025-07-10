@@ -242,7 +242,7 @@ const SignupPage = () => {
             </Box>
 
             {/* Account Type Info */}
-            <Paper
+            {/* <Paper
               sx={{
                 p: 3,
                 mb: 4,
@@ -259,7 +259,7 @@ const SignupPage = () => {
               </Typography>
             </Paper>
 
-            <Divider sx={{ my: 3 }} />
+            <Divider sx={{ my: 3 }} /> */}
 
             {/* Form */}
             <Box component="form" onSubmit={handleSubmit}>
@@ -353,7 +353,7 @@ const SignupPage = () => {
             </Box>
 
             {/* Debug Info (Optional - remove in production) */}
-            {process.env.NODE_ENV === "development" && (
+            {/* {process.env.NODE_ENV === "development" && (
               <Paper
                 sx={{
                   mt: 3,
@@ -385,7 +385,7 @@ const SignupPage = () => {
                   Type: {accountType || "Not found"}
                 </Typography>
               </Paper>
-            )}
+            )} */}
           </CardContent>
         </Card>
       </Box>

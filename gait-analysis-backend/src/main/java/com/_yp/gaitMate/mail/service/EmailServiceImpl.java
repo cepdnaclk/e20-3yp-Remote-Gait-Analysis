@@ -44,7 +44,7 @@ public class EmailServiceImpl implements EmailService {
         message.setSubject("Complete Your GaitMate Account Setup");
         message.setText(
                 "Hi there!\n\n" +
-                        "You've been invited to join GaitMate. Click the link below to complete your account setup:\n\n" +
+                        "You've been invited to join RehabGait. Click the link below to complete your account setup:\n\n" +
                         signupUrl + "\n\n" +
                         "Complete your registration by choosing a username and password.\n\n" +
                         "Thanks!"
