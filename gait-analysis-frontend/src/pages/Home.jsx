@@ -69,17 +69,7 @@ const Navbar = () => (
           Medical Analytics
         </Typography>
       </Box>
-      <Chip 
-        label="Pro" 
-        size="small"
-        sx={{ 
-          backgroundColor: "#E3F2FD",
-          color: "#1565C0",
-          fontWeight: 600,
-          fontSize: "11px",
-          ml: 1,
-        }} 
-      />
+      
     </Box>
 
     <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
@@ -169,9 +159,21 @@ export default function Home() {
   ];
 
   const benefits = [
-    { icon: <VerifiedUserIcon />, text: "FDA Compliant", subtext: "Medical grade accuracy" },
-    { icon: <TrendingUpIcon />, text: "98% Accuracy", subtext: "Clinical validation" },
-    { icon: <AccessTimeIcon />, text: "50% Faster", subtext: "Recovery tracking" },
+    {
+    icon: <VerifiedUserIcon />,
+    text: "Secure",
+    subtext: "Fully secure and encrypted data flow",
+  },
+  {
+    icon: <TrendingUpIcon />,
+    text: "Medical-Grade Accuracy",
+    subtext: "Clinically validated for reliable insights",
+  },
+  {
+    icon: <AccessTimeIcon />,
+    text: "50% Faster",
+    subtext: "Accelerated recovery tracking and feedback",
+  },
   ];
 
   return (
@@ -595,10 +597,6 @@ export default function Home() {
             <Box sx={{ color: "rgba(255, 255, 255, 0.4)" }}>•</Box>
             <Typography variant="body2" color="rgba(255, 255, 255, 0.8)">
               HIPAA Compliant
-            </Typography>
-            <Box sx={{ color: "rgba(255, 255, 255, 0.4)" }}>•</Box>
-            <Typography variant="body2" color="rgba(255, 255, 255, 0.8)">
-              FDA Approved Technology
             </Typography>
           </Box>
         </Container>
