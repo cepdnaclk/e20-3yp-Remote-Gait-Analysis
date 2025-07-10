@@ -1,6 +1,7 @@
 package com._yp.gaitMate.exception;
 
 import com._yp.gaitMate.dto.ApiResponse;
+import com._yp.gaitMate.s3.exception.PresignedUrlRefreshException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -38,4 +39,11 @@ public class GlobalExceptionHandler {
         ApiResponse apiResponse = new ApiResponse(e.getMessage(), false);
         return new ResponseEntity<>(apiResponse, HttpStatus.BAD_REQUEST);
     }
+
+    @ExceptionHandler(PresignedUrlRefreshException.class)
+    public ResponseEntity<ApiResponse> handlePresignedUrlRefreshException(PresignedUrlRefreshException e) {
+        ApiResponse apiResponse = new ApiResponse(e.getMessage(), false);
+        return new ResponseEntity<>(apiResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
 }

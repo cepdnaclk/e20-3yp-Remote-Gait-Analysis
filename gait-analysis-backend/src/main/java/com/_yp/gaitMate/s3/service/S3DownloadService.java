@@ -33,4 +33,16 @@ public interface S3DownloadService {
      * @throws S3DownloadException if S3 operation fails
      */
     boolean fileExists(String s3Url) throws S3UrlParsingException, S3DownloadException;
+
+    /**
+     * Regenerates a fresh presigned URL from an existing (possibly expired) S3 URL
+     *
+     * @param oldUrl The original presigned S3 URL (expired or not)
+     * @return A new valid presigned URL
+     */
+    String generatePresignedUrl(String oldUrl) throws S3UrlParsingException;
+
+
+
+
 }

@@ -1,7 +1,9 @@
 package com._yp.gaitMate.s3.service.impl;
 
+import com.amazonaws.HttpMethod;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.AmazonS3Exception;
+import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
 import com.amazonaws.services.s3.model.S3Object;
 import com.amazonaws.services.s3.model.S3ObjectInputStream;
 import com._yp.gaitMate.s3.exception.S3DownloadException;
@@ -13,6 +15,9 @@ import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.net.URL;
+import java.util.Date;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -82,9 +87,22 @@ public class S3DownloadServiceImpl implements S3DownloadService {
         }
     }
 
+    @Override
+    public String generatePresignedUrl(String oldUrl) throws S3UrlParsingException {
+        String s3Key = extractS3KeyFromUrl(oldUrl); // your existing private helper
+        // Then use s3Key to build a new presigned URL
+        // Example using AmazonS3:
+        Date expiration = new Date(System.currentTimeMillis() + TimeUnit.HOURS.toMillis(24));
+        GeneratePresignedUrlRequest request = new GeneratePresignedUrlRequest(bucketName, s3Key)
+                .withMethod(HttpMethod.GET)
+                .withExpiration(expiration);
+        return amazonS3.generatePresignedUrl(request).toString();
+    }
+
     /**
      * Private helper method to extract S3 key from URL
      */
+
     private String extractS3KeyFromUrl(String url) throws S3UrlParsingException {
         if (url == null || url.trim().isEmpty()) {
             throw new S3UrlParsingException("S3 URL cannot be null or empty");
@@ -113,4 +131,6 @@ public class S3DownloadServiceImpl implements S3DownloadService {
             throw new S3UrlParsingException("Error parsing S3 URL: " + e.getMessage());
         }
     }
+
+
 }
