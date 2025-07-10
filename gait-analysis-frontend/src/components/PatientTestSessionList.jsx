@@ -37,6 +37,7 @@ import {
   History as HistoryIcon,
 } from "@mui/icons-material";
 import { getMyTestSessions } from "../services/patientServices"; // Use your existing service
+import axiosInstance from "../services/axiosInstance";
 
 const PatientTestSessionsList = ({ 
   embedded = false, // New prop to control if it's embedded in dashboard
@@ -110,35 +111,32 @@ const PatientTestSessionsList = ({
     fetchSessions(0, newSize, searchTerm, sortBy, sortOrder);
   };
 
-  const handleDownloadReport = async (reportPath, sessionId) => {
-    try {
-      // Use your existing axios instance
-      const response = await fetch(reportPath, {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
-        },
-      });
-      
-      if (!response.ok) throw new Error('Download failed');
-      
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      
-      const filename = `Session_${sessionId}_Report.pdf`;
-      link.setAttribute('download', filename);
-      
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      window.URL.revokeObjectURL(url);
-    } catch (err) {
-      console.error("Failed to download report:", err);
-      alert("Failed to download report. Please try again.");
-    }
-  };
+
+
+const handleDownloadReport = async (sessionId) => {
+  try {
+    const response = await axiosInstance.get(`/api/sessions/${sessionId}/download-report`, {
+      responseType: 'blob',  // Required for downloading binary files
+    });
+
+    const url = window.URL.createObjectURL(new Blob([response.data]));
+    const link = document.createElement('a');
+    link.href = url;
+
+    const filename = `Session_${sessionId}_Report.pdf`;
+    link.setAttribute('download', filename);
+
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    window.URL.revokeObjectURL(url);
+  } catch (err) {
+    console.error("❌ Failed to download report:", err);
+    alert("Failed to download report. Please try again.");
+  }
+};
+
+
 
   const toggleCardExpansion = (sessionId) => {
     setExpandedCards(prev => ({
@@ -415,8 +413,9 @@ const PatientTestSessionsList = ({
                             startIcon={<DownloadIcon />}
                             onClick={(e) => {
                               e.stopPropagation();
-                              handleDownloadReport(session.results.pressureResultsPath, session.sessionId);
-                            }}
+                              handleDownloadReport(session.sessionId);
+                            }}  
+
                           >
                             Download Report
                           </Button>
