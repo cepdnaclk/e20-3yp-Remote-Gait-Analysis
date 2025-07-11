@@ -37,13 +37,13 @@ public class CreatePatientRequest {
             message = "Gender must be 'male', 'female', or 'other'")
     private String gender;
 
-    @NotBlank
-    @Size(min = 4, max = 20)
-    private String username;
-
-    @NotBlank
-    @Size(min = 6, max = 30)
-    private String password;
+//    @NotBlank
+//    @Size(min = 4, max = 20)
+//    private String username;
+//
+//    @NotBlank
+//    @Size(min = 6, max = 30)
+//    private String password;
 
     @NotNull
     private Long doctorId;
