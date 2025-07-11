@@ -233,6 +233,10 @@ INSERT INTO test_session(id, start_time, end_time, status, patient_id, feedback_
 (1004, '2024-02-05 16:00:00', '2024-02-05 16:12:30', 'COMPLETED', 501, 3004),
 (1005, '2024-02-12 11:45:00', '2024-02-12 11:58:20', 'COMPLETED', 501, 3005);
 
+-- Test download session for Patient 1 (501)
+INSERT INTO test_session(id, start_time, end_time, status, patient_id, feedback_id) VALUES
+    (9999, '2024-03-01 09:00:00', '2024-03-01 09:12:00', 'COMPLETED', 501, NULL);
+
 -- Patient 2 (502) - 5 sessions
 INSERT INTO test_session(id, start_time, end_time, status, patient_id, feedback_id) VALUES
 (1006, '2024-01-16 08:30:00', '2024-01-16 08:44:10', 'COMPLETED', 502, 3006),
@@ -300,6 +304,20 @@ INSERT INTO processed_test_results(id, session_id, steps, cadence, avg_heel_forc
 (2003, 1003, 1189, 110.2, 8.0, 6.9, 4.2, 83.1, 242, 885.0, 0.43, 0.59, '/results/patient1/session3_pressure.json', '0.91,0.89,0.93,0.88,0.90,0.87,0.92,0.88,0.90,0.89'),
 (2004, 1004, 1278, 114.3, 8.3, 7.0, 4.5, 86.7, 251, 750.0, 0.42, 0.58, '/results/patient1/session4_pressure.json', '0.87,0.91,0.88,0.90,0.89,0.92,0.87,0.90,0.88,0.91'),
 (2005, 1005, 1356, 117.1, 8.7, 7.3, 4.8, 88.9, 263, 800.0, 0.40, 0.56, '/results/patient1/session5_pressure.json', '0.80,0.87,0.91,0.88,0.90,0.89,0.92,0.87,0.91,0.88');
+
+-- Test download result for session 1042 (Patient 1)
+INSERT INTO processed_test_results(
+    id, session_id, steps, cadence, avg_heel_force, avg_toe_force, avg_midfoot_force,
+    balance_score, peak_impact, duration_seconds, avg_swing_time, avg_stance_time,
+    pressure_results_path, stride_times, stride_lengths, stride_length
+) VALUES (
+             2040, 9999, 1, 0.0, 309.8, 87.9, 0.0,
+             0.01, 3127, 26.8, 0.16, 0.24,
+             'https://gait-analysis-reports.s3.amazonaws.com/reports/gait_analysis_session_1_20250710_183121.pdf?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAU6VTTF4A25KKWNK3%2F20250710%2Feu-north-1%2Fs3%2Faws4_request&X-Amz-Date=20250710T130124Z&X-Amz-Expires=86400&X-Amz-SignedHeaders=host&X-Amz-Signature=ba8351e7dee7d3bb4508a0d852a56c2514de23c6249c4a044acf1b2651ebcc2abz',
+             '0.4',
+             '1.846,0.315',
+             1.081
+         );
 
 -- Results for Patient 2 (502) - Sessions 1006-1009 (1010 is FAILED, no results)
 INSERT INTO processed_test_results(id, session_id, steps, cadence, avg_heel_force, avg_toe_force, avg_midfoot_force, balance_score, peak_impact, duration_seconds, avg_swing_time, avg_stance_time, pressure_results_path, stride_times) VALUES
