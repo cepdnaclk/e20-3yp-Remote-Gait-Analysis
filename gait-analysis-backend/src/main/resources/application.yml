@@ -5,3 +5,20 @@ spring:
 logging:
   level:
     org.springframework.boot.context.config: DEBUG
+
+
+#client:
+#  domains:
+#        list:
+#          - apple
+#          - banana
+
+
+#logging:
+#  level:
+#    org:
+#      springframework: DEBUG
+#      hibernate.SQL: DEBUG
+#    com:
+#      _yp:
+#        gaitMate: DEBUG

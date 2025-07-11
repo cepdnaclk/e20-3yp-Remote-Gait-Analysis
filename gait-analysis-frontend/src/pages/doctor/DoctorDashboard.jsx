@@ -49,7 +49,6 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { getDoctorPatients } from "../../services/doctorServices";
 import Appointments from "../Appointments";
 import Reports from "../../components/Reports";
-import Messages from "../Messages";
 import Settings from "../Settings";
 import DoctorPatientsPage from "./DoctorPatientsPage";
 
@@ -214,7 +213,6 @@ export default function DoctorDashboard() {
     { text: "Patients", icon: <PeopleIcon /> },
     { text: "Appointments", icon: <CalendarTodayIcon /> },
     { text: "Reports", icon: <DescriptionIcon /> },
-    { text: "Messages", icon: <ChatIcon /> },
     { text: "Settings", icon: <SettingsIcon /> },
   ];
 
