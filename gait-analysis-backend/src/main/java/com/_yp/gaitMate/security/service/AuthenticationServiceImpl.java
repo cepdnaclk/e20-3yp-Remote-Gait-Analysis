@@ -1,6 +1,7 @@
 package com._yp.gaitMate.security.service;
 
 import com._yp.gaitMate.exception.ApiException;
+import com._yp.gaitMate.security.dto.InvitationSignupRequest;
 import com._yp.gaitMate.security.dto.LoginRequest;
 import com._yp.gaitMate.security.dto.SignupRequest;
 import com._yp.gaitMate.security.dto.UserInfoResponse;
@@ -152,5 +153,10 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Override
     public UserInfoResponse getUserDetails(Authentication authentication) {
         return authUtil.loggedInUserResponse();
+    }
+
+    @Override
+    public UserInfoResponse completeInvitationSignup(InvitationSignupRequest request) {
+        return null;
     }
 }

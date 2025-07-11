@@ -18,6 +18,18 @@ spring:
     init:
       mode: never
 
+  mail:
+    host: smtp.gmail.com # Gmail's email server address
+    port: 587  # Gmail's secure email port
+    username: ${GMAIL_ADDRESS}        # Replace with your Gmail
+    password: ${GMAIL_APP_PASSWORD}           # App password (Google's security requirement for apps accessing Gmail)
+    properties:
+      mail:
+        smtp:
+          auth: true # "Yes, I want to authenticate"
+          starttls:
+            enable: true # "Use encryption for security"
+
 
 jwt:
   secret: ${JWT_SECRET}
@@ -51,3 +63,7 @@ microservices:
   data:
     processing:
       url: http://localhost:8000/process-session
+
+frontend:
+  base:
+    url: ${FRONTEND_BASE_URL}
