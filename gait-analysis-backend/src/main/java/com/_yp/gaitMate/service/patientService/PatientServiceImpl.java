@@ -62,6 +62,10 @@ public class PatientServiceImpl implements PatientService{
             throw new ApiException("NIC already exists");
         }
 
+        if (patientRepository.existsByEmail(request.getEmail())) {
+            throw new ApiException("Email is already taken");
+        }
+
         // check whether the logged-in user is a clinic
         Long userId = authUtil.loggedInUserId();
 
