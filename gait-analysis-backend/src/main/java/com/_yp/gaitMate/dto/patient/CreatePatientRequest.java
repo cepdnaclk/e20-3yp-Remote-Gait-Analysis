@@ -21,15 +21,16 @@ public class CreatePatientRequest {
     @Pattern(regexp = "\\d{10}", message = "Phone number must be exactly 10 digits")
     private String phoneNumber;
 
-    @Min(1)
+    @Min(value = 1, message = "Invalid age")
+    @Max(value = 120, message = "Invalid age")
     private int age;
 
-    @Min(50)
-    @Max(250)
+    @Min(value = 50, message = "Invalid height")
+    @Max(value = 250, message = "Invalid height")
     private int height;
 
-    @Min(20)
-    @Max(300)
+    @Min(value = 20, message = "Invalid weight")
+    @Max(value = 300, message = "Invalid weight")
     private int weight;
 
     @NotNull
@@ -37,13 +38,13 @@ public class CreatePatientRequest {
             message = "Gender must be 'male', 'female', or 'other'")
     private String gender;
 
-    @NotBlank
-    @Size(min = 4, max = 20)
-    private String username;
-
-    @NotBlank
-    @Size(min = 6, max = 30)
-    private String password;
+//    @NotBlank
+//    @Size(min = 4, max = 20)
+//    private String username;
+//
+//    @NotBlank
+//    @Size(min = 6, max = 30)
+//    private String password;
 
     @NotNull
     private Long doctorId;

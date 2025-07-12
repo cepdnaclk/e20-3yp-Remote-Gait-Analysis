@@ -4,12 +4,15 @@ import com._yp.gaitMate.dto.doctor.CreateDoctorRequest;
 import com._yp.gaitMate.dto.doctor.DoctorInfoResponse;
 import com._yp.gaitMate.exception.ApiException;
 import com._yp.gaitMate.exception.ResourceNotFoundException;
+import com._yp.gaitMate.mail.service.EmailService;
 import com._yp.gaitMate.mapper.DoctorMapper;
 import com._yp.gaitMate.model.Clinic;
 import com._yp.gaitMate.model.Doctor;
 import com._yp.gaitMate.repository.ClinicRepository;
 import com._yp.gaitMate.repository.DoctorRepository;
 import com._yp.gaitMate.security.dto.SignupRequest;
+import com._yp.gaitMate.security.model.AccountStatus;
+import com._yp.gaitMate.security.model.AccountType;
 import com._yp.gaitMate.security.model.User;
 import com._yp.gaitMate.security.service.AuthenticationService;
 import com._yp.gaitMate.security.utils.AuthUtil;
@@ -41,14 +44,17 @@ class DoctorServiceImplTest {
     @Mock
     private DoctorRepository doctorRepository;
 
+
     @Mock
-    private AuthenticationService authService;
+    private EmailService emailService;
 
     @Mock
     private DoctorMapper doctorMapper;
 
     @Mock
     private AuthUtil authUtil;
+
+
 
     private CreateDoctorRequest request;
     private Clinic clinic;
@@ -64,8 +70,6 @@ class DoctorServiceImplTest {
                 .email("john@example.com")
                 .phoneNumber("0771112222")
                 .specialization("Orthopedics")
-                .username("drjohn")
-                .password("securepass")
                 .build();
 
         clinic_user = new User();
@@ -84,7 +88,9 @@ class DoctorServiceImplTest {
                 .phoneNumber("0771112222")
                 .specialization("Orthopedics")
                 .clinic(clinic)
-                .user(doctor_user)
+                .invitationToken("some-uuid-token")        // ✅ Add this
+                .accountStatus(AccountStatus.INVITATION_SENT)  // ✅ Add this
+                .user(null)  // ✅ Change from doctor_user to null
                 .createdAt(LocalDateTime.now())
                 .build();
 
@@ -109,9 +115,10 @@ class DoctorServiceImplTest {
             when(doctorRepository.existsByName(request.getName())).thenReturn(false);
             //when(authUtil.loggedInUserId()).thenReturn(99L);
             //when(clinicRepository.findByUser_UserId(99L)).thenReturn(Optional.of(clinic));
-            when(authService.registerUser(any(SignupRequest.class))).thenReturn(doctor_user);
+//            when(authService.registerUser(any(SignupRequest.class))).thenReturn(doctor_user);
             when(doctorRepository.save(any(Doctor.class))).thenReturn(doctor);
             when(doctorMapper.toDoctorInfoResponse(any(Doctor.class))).thenReturn(doctorResponse);
+            doNothing().when(emailService).sendInvitationEmail(anyString(), anyString(), any(AccountType.class));  // ✅ Add this
 
             // Act
             DoctorInfoResponse result = doctorService.createDoctor(request);
@@ -124,7 +131,7 @@ class DoctorServiceImplTest {
             // Verify
             verify(doctorRepository).existsByName(request.getName());
             //verify(clinicRepository).findByUser_UserId(99L);
-            verify(authService).registerUser(any(SignupRequest.class));
+           // verify(authService).registerUser(any(SignupRequest.class));
             verify(doctorRepository).save(any(Doctor.class));
             verify(doctorMapper).toDoctorInfoResponse(any(Doctor.class));
         }
@@ -146,7 +153,7 @@ class DoctorServiceImplTest {
 
             // Verify
             //verify(clinicRepository).findByUser_UserId(99L);
-            verifyNoInteractions(authService, doctorMapper);
+//            verifyNoInteractions(authService, doctorMapper);
             verify(doctorRepository, never()).save(any(Doctor.class));
         }
     }
