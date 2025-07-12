@@ -1,5 +1,6 @@
 package com._yp.gaitMate.appointment.mapper;
 
+import com._yp.gaitMate.appointment.dto.AppointmentDetailResponse;
 import com._yp.gaitMate.appointment.dto.AppointmentRequestDto;
 import com._yp.gaitMate.appointment.dto.AppointmentResponseDto;
 import com._yp.gaitMate.model.Appointment;
@@ -20,6 +21,7 @@ public class AppointmentMapper {
                 .status(null) // Status will be set in service
                 .createdBy(null) // Enum will be set in service
                 .isRecurring(false) // All user requests are non-recurring
+                .clinic(doctor.getClinic())
                 .build();
     }
 
@@ -35,6 +37,21 @@ public class AppointmentMapper {
                 .reason(appointment.getReason())
                 .notes(appointment.getNotes())
                 .isRecurring(appointment.getIsRecurring())
+                .build();
+    }
+
+    public AppointmentDetailResponse toDetailResponse(Appointment appointment) {
+        return AppointmentDetailResponse.builder()
+                .id(appointment.getId())
+                .patientName(appointment.getPatient().getName())
+                .email(appointment.getPatient().getEmail())
+                .startTime(appointment.getStartTime().toString())
+                .durationMinutes(appointment.getDurationMinutes())
+                .reason(appointment.getReason())
+                .status(appointment.getStatus())
+                .notes(appointment.getNotes())
+                .createdBy(appointment.getCreatedBy())
+                .clinicName(appointment.getClinic().getName())
                 .build();
     }
 }
