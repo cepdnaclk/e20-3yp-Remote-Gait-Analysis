@@ -135,28 +135,29 @@ const Reports = () => {
     }
   };
 
-  const handleDownloadReport = async (reportURL, patientName, sessionId) => {
-    try {
-      const response = await axiosInstance.get(reportURL, {
-        responseType: 'blob',
-      });
-      
-      const url = window.URL.createObjectURL(new Blob([response.data]));
-      const link = document.createElement('a');
-      link.href = url;
-      
-      const filename = `${patientName.replace(/\s+/g, '_')}_Session_${sessionId}_Report.pdf`;
-      link.setAttribute('download', filename);
-      
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      window.URL.revokeObjectURL(url);
-    } catch (err) {
-      console.error("Failed to download report:", err);
-      alert("Failed to download report. Please try again.");
-    }
-  };
+  const handleDownloadReport = async (patientName, sessionId) => {
+  try {
+    const response = await axiosInstance.get(`/api/sessions/${sessionId}/download-report`, {
+      responseType: 'blob', // because backend returns byte[]
+    });
+
+    const url = window.URL.createObjectURL(new Blob([response.data]));
+    const link = document.createElement('a');
+    link.href = url;
+
+    const filename = `${patientName.replace(/\s+/g, '_')}_Session_${sessionId}_Report.pdf`;
+    link.setAttribute('download', filename);
+
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    window.URL.revokeObjectURL(url);
+  } catch (err) {
+    console.error("❌ Failed to download report:", err);
+    alert("Failed to download report. Please try again later.");
+  }
+};
+
 
   const toggleCardExpansion = (sessionId) => {
     setExpandedCards(prev => ({
@@ -453,11 +454,7 @@ const Reports = () => {
                             startIcon={<DownloadIcon />}
                             onClick={(e) => {
                               e.stopPropagation(); // Prevent card click
-                              handleDownloadReport(
-                                report.results.reportURL, 
-                                report.patientName, 
-                                report.sessionId
-                              );
+                              handleDownloadReport(report.patientName, report.sessionId);
                             }}
                             sx={{ 
                               fontWeight: "bold",
@@ -471,6 +468,7 @@ const Reports = () => {
                           >
                             Download Report
                           </Button>
+
                           <IconButton
                             onClick={(e) => {
                               e.stopPropagation(); // Prevent card click
