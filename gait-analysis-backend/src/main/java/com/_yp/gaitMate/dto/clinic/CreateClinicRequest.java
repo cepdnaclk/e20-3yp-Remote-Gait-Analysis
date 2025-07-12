@@ -22,19 +22,19 @@ public class CreateClinicRequest {
 
     @NotBlank
     @Pattern(regexp = "\\d{10}",
-            message = "Phone number must be exactly 10 digits")
+            message = "must be exactly 10 digits")
     private String phoneNumber;
 
     @Email
     @NotBlank
     private String email;
 
-    @NotBlank
-    @Size(min = 4, max = 20)
-    private String username;
-
-    @NotBlank
-    @Size(min = 6, max = 20)
-    private String password;
+//    @NotBlank
+//    @Size(min = 4, max = 20)
+//    private String username;
+//
+//    @NotBlank
+//    @Size(min = 6, max = 20)
+//    private String password;
 }
 

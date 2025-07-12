@@ -106,11 +106,11 @@ export default function ClinicAdminDashboard() {
         transition: "all 0.3s ease",
       }}
     >
-      <CardContent sx={{ p: 4, position: "relative", zIndex: 1 }}>
+      <CardContent sx={{ p: 3, position: "relative", zIndex: 1 }}>
         <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", mb: 3 }}>
           <Box
             sx={{
-              p: 2,
+              p: 1,
               borderRadius: 2,
               backgroundColor: "rgba(255,255,255,0.2)",
               backdropFilter: "blur(10px)",
@@ -160,7 +160,7 @@ export default function ClinicAdminDashboard() {
   const QuickActionCard = ({ title, description, icon, onClick, color }) => (
     <Card
       sx={{
-        p: 3,
+        p: 1.5,
         height: "100%",
         cursor: "pointer",
         background: "linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)",
@@ -181,8 +181,8 @@ export default function ClinicAdminDashboard() {
       <Box sx={{ display: "flex", alignItems: "flex-start", gap: 2 }}>
         <Box
           sx={{
-            p: 2,
-            borderRadius: 2,
+            p: 1,
+            borderRadius: 1,
             background: `linear-gradient(135deg, ${color}15 0%, ${color}25 100%)`,
             color: color,
           }}
@@ -251,9 +251,9 @@ export default function ClinicAdminDashboard() {
               </Grid>
             </Grid>
 
-            <Grid container spacing={3}>
+            <Grid container spacing={3} alignItems={'stretch'}>
               {/* Quick Actions */}
-              <Grid item xs={12} md={8}>
+              <Grid item xs={12} md={8}  sx={{ display: 'flex', flexDirection: 'column' }}>
                 <Card
                   sx={{
                     p: 4,
@@ -305,7 +305,7 @@ export default function ClinicAdminDashboard() {
                       />
                     </Grid>
                     
-                    <Grid item xs={12} sm={6} marginTop={5}>
+                    <Grid item xs={12} sm={6} marginTop={4}>
                       <QuickActionCard
                         title="Add New Patient"
                         description="Register new patients and assign them to doctors with sensor kits."
@@ -316,7 +316,7 @@ export default function ClinicAdminDashboard() {
                       />
                     </Grid>
                     
-                    <Grid item xs={12} sm={6} marginTop={5}>
+                    <Grid item xs={12} sm={6} marginTop={4}>
                       <QuickActionCard
                         title="Sensor Management"
                         description="Monitor and manage available sensor kits and their assignments."
@@ -330,7 +330,7 @@ export default function ClinicAdminDashboard() {
               </Grid>
 
               {/* Recent Activity / Summary */}
-              <Grid item xs={12} md={4}>
+              <Grid item xs={12} md={4}  sx={{ display: 'flex', flexDirection: 'column' }}>
                 <Card
                   sx={{
                     p: 4,

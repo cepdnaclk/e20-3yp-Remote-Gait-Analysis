@@ -18,6 +18,8 @@ public class ResourceNotFoundException extends RuntimeException{
         this.field = field;
         this.fieldId = fieldId;
     }
+
+
     public ResourceNotFoundException() {
     }
 }
