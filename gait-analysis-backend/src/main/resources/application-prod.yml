@@ -18,6 +18,18 @@ spring:
     init:
       mode: never
 
+  mail:
+    host: smtp.gmail.com # Gmail's email server address
+    port: 587  # Gmail's secure email port
+    username: ${GMAIL_ADDRESS}        # Replace with your Gmail
+    password: ${GMAIL_APP_PASSWORD}           # App password (Google's security requirement for apps accessing Gmail)
+    properties:
+      mail:
+        smtp:
+          auth: true # "Yes, I want to authenticate"
+          starttls:
+            enable: true # "Use encryption for security"
+
 jwt:
   secret: ${JWT_SECRET}
   expiration:
@@ -41,6 +53,11 @@ cloud:
       static: eu-north-1
       auto: false
 
+# NEW: S3 Configuration section
+aws:
+  region: eu-north-1
+  s3:
+    bucket: gait-analysis-reports
 
 app:
   sqs:
@@ -58,4 +75,8 @@ server:
   port: 8080
 
 
+
+frontend:
+  base:
+    url: ${FRONTEND_BASE_URL}
 
