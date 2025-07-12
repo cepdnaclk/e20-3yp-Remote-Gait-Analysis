@@ -23,7 +23,7 @@ public class GlobalExceptionHandler {
                 .forEach(error -> {
                     var fieldName = ((FieldError) error).getField();
                     var errorMessage = error.getDefaultMessage();
-                    response.put("message", fieldName+" "+ errorMessage);
+                    response.put("message", errorMessage);
                 });
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
