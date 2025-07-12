@@ -1,3 +1,5 @@
+// src/pages/ManageSensorKitsPage.jsx
+
 import {
   Box,
   Typography,
@@ -19,8 +21,14 @@ import {
   DialogContent,
   DialogActions,
   TextField,
+  InputAdornment,
+  Chip,
+  Pagination,
+  FormControl,
+  InputLabel,
 } from '@mui/material';
 
+import SearchIcon from '@mui/icons-material/Search';
 import { useState, useEffect } from 'react';
 import {
   getClinics,
@@ -36,6 +44,11 @@ export default function ManageSensorKitsPage() {
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [newKit, setNewKit] = useState({ serialNo: '', firmwareVersion: '' });
+
+  const [searchQuery, setSearchQuery] = useState('');
+  const [statusFilter, setStatusFilter] = useState('ALL');
+  const [page, setPage] = useState(1);
+  const pageSize = 5;
 
   useEffect(() => {
     fetchData();
@@ -55,17 +68,14 @@ export default function ManageSensorKitsPage() {
   };
 
   const handleAssign = async (kitId, clinicId) => {
-  try {
-    console.log("Assigning kit", kitId, "to clinic", clinicId);
-    await assignSensorKits(clinicId, [kitId]);
-    setSnackbar({ open: true, message: 'Sensor kit assigned', severity: 'success' });
-    fetchData();
-  } catch (err) {
-    console.error("Assignment error:", err.response?.data || err.message);
-    setSnackbar({ open: true, message: 'Assignment failed', severity: 'error' });
-  }
-};
-
+    try {
+      await assignSensorKits(clinicId, [kitId]);
+      setSnackbar({ open: true, message: 'Sensor kit assigned', severity: 'success' });
+      fetchData();
+    } catch (err) {
+      setSnackbar({ open: true, message: 'Assignment failed', severity: 'error' });
+    }
+  };
 
   const handleAddKit = async () => {
     try {
@@ -85,14 +95,28 @@ export default function ManageSensorKitsPage() {
 
   const handleCloseSnackbar = () => setSnackbar({ ...snackbar, open: false });
 
-  if (loading) {
-    return (
-      <Box display="flex" justifyContent="center" alignItems="center" height="50vh">
-        <CircularProgress />
-        <Typography ml={2}>Loading Sensor Kits...</Typography>
-      </Box>
-    );
-  }
+  const getStatusChipColor = (status) => {
+    switch (status) {
+      case 'IN_STOCK':
+        return 'primary';
+      case 'AVAILABLE':
+        return 'success';
+      case 'IN_USE':
+        return 'warning';
+      default:
+        return 'default';
+    }
+  };
+
+  const filteredKits = kits
+    .filter((kit) =>
+      searchQuery.trim() === '' ||
+      kit.serialNo.toString().toLowerCase().includes(searchQuery.toLowerCase())
+    )
+    .filter((kit) => statusFilter === 'ALL' || kit.status === statusFilter);
+
+  const totalPages = Math.ceil(filteredKits.length / pageSize);
+  const paginatedKits = filteredKits.slice((page - 1) * pageSize, page * pageSize);
 
   return (
     <Box p={4}>
@@ -100,36 +124,83 @@ export default function ManageSensorKitsPage() {
         Manage Sensor Kits
       </Typography>
 
-      <Button variant="contained" onClick={() => setDialogOpen(true)} sx={{ mb: 2 }}>
-        Add New Sensor Kit
-      </Button>
+      <Box sx={{ display: 'flex', gap: 2, mb: 3 }}>
+        <TextField
+          label="Search by Serial No"
+          value={searchQuery}
+          onChange={(e) => {
+            setSearchQuery(e.target.value);
+            setPage(1);
+          }}
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                <SearchIcon color="action" />
+              </InputAdornment>
+            ),
+          }}
+        />
+        <FormControl sx={{ minWidth: 180 }}>
+          <InputLabel>Status</InputLabel>
+          <Select
+            value={statusFilter}
+            onChange={(e) => {
+              setStatusFilter(e.target.value);
+              setPage(1);
+            }}
+            label="Status"
+          >
+            <MenuItem value="ALL">All</MenuItem>
+            <MenuItem value="IN_STOCK">In Stock</MenuItem>
+            <MenuItem value="AVAILABLE">Available</MenuItem>
+            <MenuItem value="IN_USE">In Use</MenuItem>
+          </Select>
+        </FormControl>
 
-      <TableContainer component={Paper}
+        <Button variant="contained" sx={{ ml: 'auto' }} onClick={() => setDialogOpen(true)}>
+          Add New Sensor Kit
+        </Button>
+      </Box>
+
+      <TableContainer
+        component={Paper}
         sx={{
           boxShadow: 4,
           borderRadius: 2,
           overflow: 'hidden',
           border: '1px solid #e0e0e0',
-        }}>
+        }}
+      >
         <Table>
           <TableHead sx={{ backgroundColor: "#f5f7fa" }}>
             <TableRow>
-              <TableCell sx = {{fontWeight:"bold"}}>Serial No</TableCell>
-              <TableCell sx = {{fontWeight:"bold"}}>Firmware</TableCell>
-              <TableCell sx = {{fontWeight:"bold"}}>Status</TableCell>
-              <TableCell sx = {{fontWeight:"bold"}}>Assigned Clinic</TableCell>
-              <TableCell sx = {{fontWeight:"bold"}}>Assign</TableCell>
+              <TableCell sx={{ fontWeight: "bold" }}>Serial No</TableCell>
+              <TableCell sx={{ fontWeight: "bold" }}>Firmware</TableCell>
+              <TableCell sx={{ fontWeight: "bold" }}>Status</TableCell>
+              <TableCell sx={{ fontWeight: "bold" }}>Assigned Clinic</TableCell>
+              <TableCell sx={{ fontWeight: "bold" }}>Assign</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {kits.map((kit) => (
+            {paginatedKits.map((kit) => (
               <TableRow key={kit.serialNo}>
                 <TableCell>{kit.serialNo}</TableCell>
                 <TableCell>{kit.firmwareVersion}</TableCell>
-                <TableCell>{kit.status}</TableCell>
                 <TableCell>
-                {kit.clinic_id || (['AVAILABLE', 'IN_USE'].includes(kit.status) ? 'Assigned' : '-')}
+                  <Chip
+                    label={kit.status}
+                    color={getStatusChipColor(kit.status)}
+                    size="small"
+                    sx={{ fontWeight: 600 }}
+                  />
                 </TableCell>
+                <TableCell>
+                  {kit.clinicId
+                    ? clinics.find((c) => c.id === kit.clinicId)?.name || 'Assigned'
+                    : (['AVAILABLE', 'IN_USE'].includes(kit.status) ? 'Assigned' : '-')}
+                </TableCell>
+
+
                 <TableCell>
                   {kit.status === 'IN_STOCK' && (
                     <Select
@@ -155,7 +226,19 @@ export default function ManageSensorKitsPage() {
         </Table>
       </TableContainer>
 
-      {/* Add Sensor Kit Dialog */}
+      {totalPages > 1 && (
+        <Box mt={3} display="flex" justifyContent="flex-end">
+          <Pagination
+            count={totalPages}
+            page={page}
+            onChange={(e, value) => setPage(value)}
+            color="primary"
+            shape="rounded"
+          />
+        </Box>
+      )}
+
+      {/* Add Dialog */}
       <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)}>
         <DialogTitle>Add New Sensor Kit</DialogTitle>
         <DialogContent>
@@ -178,7 +261,11 @@ export default function ManageSensorKitsPage() {
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setDialogOpen(false)}>Cancel</Button>
-          <Button onClick={handleAddKit} variant="contained" disabled={!newKit.serialNo || !newKit.firmwareVersion}>
+          <Button
+            onClick={handleAddKit}
+            variant="contained"
+            disabled={!newKit.serialNo || !newKit.firmwareVersion}
+          >
             Add
           </Button>
         </DialogActions>

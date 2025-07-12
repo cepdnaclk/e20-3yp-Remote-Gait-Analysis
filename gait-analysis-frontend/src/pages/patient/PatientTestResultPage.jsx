@@ -75,95 +75,86 @@ export default function PatientTestResultPage() {
   }, [id]);
 
   const handleDownload = async () => {
-    if (!session?.results?.pressureResultsPath) {
+  if (!session?.sessionId) {
+    setNotification({
+      open: true,
+      message: "No session ID available",
+      severity: "error"
+    });
+    return;
+  }
+
+  setDownloading(true);
+  
+  try {
+    // Primary: Try Spring Boot proxy download
+    await attemptSpringBootDownload();
+    
+  } catch (error) {
+    console.error("Primary download failed:", error);
+    
+    if (error.response?.status === 404) {
       setNotification({
         open: true,
-        message: "No report available for download",
+        message: "Report not found for this session",
         severity: "error"
       });
-      return;
-    }
-
-    setDownloading(true);
-    
-    try {
-      let downloadUrl = session.results.pressureResultsPath;
-      
-      // Check if URL is expired (presigned URLs have expiration)
-      const testResponse = await fetch(downloadUrl, { method: 'HEAD' });
-      
-      if (!testResponse.ok && testResponse.status === 403) {
-        // URL might be expired, try to get a fresh one
-        try {
-          const refreshResponse = await axios.get(`/api/sessions/${session.sessionId}/report-url`);
-          if (refreshResponse.data.success) {
-            downloadUrl = refreshResponse.data.reportUrl;
-            setNotification({
-              open: true,
-              message: "Refreshed download link",
-              severity: "info"
-            });
-          }
-        } catch (refreshError) {
-          console.warn("Could not refresh URL:", refreshError);
-        }
-      }
-      
-      // Download the file
-      const response = await fetch(downloadUrl);
-      
-      if (!response.ok) {
-        throw new Error(`Failed to download: ${response.statusText}`);
-      }
-      
-      const blob = await response.blob();
-      
-      // Create download link
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      
-      // Generate filename with session info
-      const timestamp = new Date().toISOString().split('T')[0];
-      const filename = `Gait_Analysis_Report_Session_${session.sessionId}_${timestamp}.pdf`;
-      link.download = filename;
-      
-      // Trigger download
-      document.body.appendChild(link);
-      link.click();
-      
-      // Cleanup
-      document.body.removeChild(link);
-      window.URL.revokeObjectURL(url);
-      
+    } else if (error.response?.status === 500 || error.code === 'ECONNABORTED') {
+      // Server error or timeout - try refresh and retry Spring Boot proxy
       setNotification({
         open: true,
-        message: "Report downloaded successfully!",
-        severity: "success"
+        message: "Server error or timeout. Please try again later",
+        severity: "error"
       });
-      
-    } catch (error) {
-      console.error("Download failed:", error);
-      
-      // Fallback: Try to open in new tab
-      try {
-        window.open(session.results.pressureResultsPath, '_blank');
-        setNotification({
-          open: true,
-          message: "Report opened in new tab (download failed)",
-          severity: "warning"
-        });
-      } catch (fallbackError) {
-        setNotification({
-          open: true,
-          message: "Failed to download or open report. The link may have expired.",
-          severity: "error"
-        });
-      }
-    } finally {
-      setDownloading(false);
+    } else {
+      setNotification({
+        open: true,
+        message: "Failed to download report. Please try again.",
+        severity: "error"
+      });
     }
-  };
+  } finally {
+    setDownloading(false);
+  }
+};
+
+const attemptSpringBootDownload = async () => {
+  const response = await axios.get(`/api/sessions/${session.sessionId}/download-report`, {
+    responseType: 'blob',
+    timeout: 30000,
+  });
+  
+  // Create blob and trigger download
+  const blob = new Blob([response.data], { type: 'application/pdf' });
+  const url = window.URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  
+  // Extract filename from Content-Disposition header
+  let filename = `Gait_Analysis_Report_Session_${session.sessionId}.pdf`;
+  
+  const contentDisposition = response.headers['content-disposition'];
+  if (contentDisposition) {
+    const filenameMatch = contentDisposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/);
+    if (filenameMatch && filenameMatch[1]) {
+      filename = filenameMatch[1].replace(/['"]/g, '');
+    }
+  }
+  
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  window.URL.revokeObjectURL(url);
+  
+  setNotification({
+    open: true,
+    message: "Report downloaded successfully!",
+    severity: "success"
+  });
+};
+
+
 
   const handleViewReport = async () => {
     if (!session?.results?.pressureResultsPath) {
@@ -233,38 +224,50 @@ export default function PatientTestResultPage() {
 
   const MetricCard = ({ icon, title, value, unit, color = "#4299e1" }) => (
     <Card
+      elevation={3}
       sx={{
         height: "100%",
-        background: "white",
+        borderRadius: 3,
+        background: "linear-gradient(135deg, #f8fafc 0%, #ffffff 100%)",
         border: "1px solid #e2e8f0",
-        borderRadius: 2,
-        transition: "all 0.2s ease",
-        "&:hover": {
-          transform: "translateY(-2px)",
-          boxShadow: "0 8px 25px rgba(0,0,0,0.1)",
-        },
+        overflow: "hidden",
       }}
     >
       <CardContent sx={{ p: 3 }}>
-        <Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: 2 }}>
+        <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
           <Box
             sx={{
-              p: 1.5,
-              borderRadius: 2,
-              background: `${color}15`,
+              width: 36,
+              height: 36,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              borderRadius: "50%",
+              backgroundColor: `${color}20`,
               color: color,
+              mr: 2,
             }}
           >
             {icon}
           </Box>
-          <Typography variant="h6" fontWeight="600" color="text.primary">
+          <Typography variant="subtitle1" fontWeight="600" color="text.primary">
             {title}
           </Typography>
         </Box>
-        <Typography variant="h4" fontWeight="700" color="text.primary">
+        <Typography
+          variant="h4"
+          fontWeight="700"
+          color="text.primary"
+          sx={{ lineHeight: 1.2 }}
+        >
           {value}
           {unit && (
-            <Typography component="span" variant="body1" color="text.secondary" sx={{ ml: 1 }}>
+            <Typography
+              component="span"
+              variant="h6"
+              color="text.secondary"
+              sx={{ ml: 1 }}
+            >
               {unit}
             </Typography>
           )}
@@ -272,6 +275,7 @@ export default function PatientTestResultPage() {
       </CardContent>
     </Card>
   );
+  
 
   if (loading) {
     return (
