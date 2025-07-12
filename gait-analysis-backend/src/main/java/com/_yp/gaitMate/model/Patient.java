@@ -1,5 +1,6 @@
 package com._yp.gaitMate.model;
 
+import com._yp.gaitMate.security.model.AccountStatus;
 import com._yp.gaitMate.security.model.User;
 import jakarta.persistence.*;
 import lombok.*;
@@ -77,7 +78,7 @@ public class Patient {
      * Associated user account.
      */
     @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "userId", nullable = false)
+    @JoinColumn(name = "user_id")
     private User user;
 
     /**
@@ -85,7 +86,7 @@ public class Patient {
      */
 
     @ManyToOne
-    @JoinColumn(name = "clinicId", nullable = false)
+    @JoinColumn(name = "clinic_id", nullable = false)
     private Clinic clinic;
 
     /**
@@ -103,6 +104,16 @@ public class Patient {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "doctor_id")
     private Doctor doctor;
+
+    @Column(name = "invitation_token", unique = true)
+    private String invitationToken;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "account_status", nullable = false)
+    private AccountStatus accountStatus = AccountStatus.INVITATION_SENT;
+
+    // Add the enum (if you didn't create it as a separate file)
+
 
     /**
      * Enum for allowed gender values.

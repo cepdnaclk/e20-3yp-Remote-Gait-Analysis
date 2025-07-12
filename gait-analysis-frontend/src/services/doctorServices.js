@@ -74,3 +74,42 @@ export const getPatientTestSession = (patientId) =>
 // If you want to use that endpoint instead, you can add:
 export const getPatientTestSessionsAlternative = (patientId) =>
   axiosInstance.get(`/api/doctors/me/patients/${patientId}`);
+
+// --------Appointment Doctor Serivice -------------------------------
+// Get appointments by status
+export const getDoctorAppointmentsByStatus = (status) => {
+  return axiosInstance.get(`/api/doctor/appointments/${status}`);
+};
+
+export const getDoctorPendingAppointments = () =>
+  getDoctorAppointmentsByStatus('pending');
+
+export const getDoctorUpcomingAppointments = () =>
+  getDoctorAppointmentsByStatus('upcoming');
+
+export const getDoctorHistoryAppointments = () =>
+  getDoctorAppointmentsByStatus('history');
+
+// Accept an appointment
+export const acceptAppointment = (appointmentId) =>
+  axiosInstance.post(`/api/doctor/appointments/${appointmentId}/accept`);
+
+// Reject an appointment
+export const rejectAppointment = (appointmentId) =>
+  axiosInstance.post(`/api/doctor/appointments/${appointmentId}/reject`);
+
+// Reschedule an appointment
+export const rescheduleAppointment = (appointmentId, newTime) =>
+  axiosInstance.post(`/api/doctor/appointments/${appointmentId}/reschedule`, {
+    newTime,
+  });
+
+// Add/edit a note
+export const addNoteToAppointment = (appointmentId, note) =>
+  axiosInstance.post(`/api/doctor/appointments/${appointmentId}/note`, {
+    note,
+  });
+
+// get detailed response for a appointment
+export const getAppointmentDetails = (id) =>
+  axiosInstance.get(`/api/appointments/${id}`);

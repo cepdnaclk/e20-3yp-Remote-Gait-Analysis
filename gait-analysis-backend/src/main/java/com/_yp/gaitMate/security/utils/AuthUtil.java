@@ -5,6 +5,7 @@ import com._yp.gaitMate.model.Patient;
 import com._yp.gaitMate.repository.PatientRepository;
 import com._yp.gaitMate.security.dto.UserInfoResponse;
 import com._yp.gaitMate.security.mapper.Mapper;
+import com._yp.gaitMate.security.model.AppRole;
 import com._yp.gaitMate.security.model.User;
 import com._yp.gaitMate.security.model.UserDetailsImpl;
 import com._yp.gaitMate.security.repository.UserRepository;
@@ -121,4 +122,14 @@ public class AuthUtil {
 
         return patient;
     }
+
+    public boolean isDoctor() {
+        return loggedInUser().getRoles().stream()
+                .anyMatch(r -> r.getRoleName().equals(AppRole.ROLE_DOCTOR));
+    }
+    public boolean isPatient() {
+        return loggedInUser().getRoles().stream()
+                .anyMatch(r -> r.getRoleName().equals(AppRole.ROLE_PATIENT));
+    }
+
 }
