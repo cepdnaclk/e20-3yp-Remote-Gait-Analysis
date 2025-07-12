@@ -20,6 +20,7 @@ import {
   Step,
   StepLabel,
   Chip,
+  CircularProgress,
 } from "@mui/material";
 import { useState } from "react";
 import { addPatient } from "../../services/clinicAdminServices";
@@ -63,11 +64,14 @@ export default function AddPatientPage({
     severity: "success",
   });
 
+  const [addingPatient, setAddingPatient] = useState(false);
+
   const handleChange = (field) => (e) => {
     setPatient({ ...patient, [field]: e.target.value });
   };
 
   const handleSubmit = async () => {
+    setAddingPatient(true);
     try {
       const payload = {
         ...patient,
@@ -81,6 +85,7 @@ export default function AddPatientPage({
         message: "Patient added successfully",
         severity: "success",
       });
+      setAddingPatient(false);
       setPatient({
         name: "",
         nic: "",
@@ -97,9 +102,10 @@ export default function AddPatientPage({
     } catch (err) {
       setSnackbar({
         open: true,
-        message: "Failed to add patient",
+        message: err.response?.data?.message || "Failed to add patient",
         severity: "error",
       });
+      setAddingPatient(false);
     }
   };
 
@@ -283,6 +289,10 @@ export default function AddPatientPage({
                       label="Age"
                       type="number"
                       value={patient.age}
+                      inputProps={{
+                        min: 5,
+                        max: 120,
+                      }}
                       onChange={handleChange("age")}
                       InputProps={{
                         startAdornment: (
@@ -312,6 +322,10 @@ export default function AddPatientPage({
                       type="number"
                       value={patient.height}
                       onChange={handleChange("height")}
+                      inputProps={{
+                        min: 50,
+                        max: 250,
+                      }}
                       InputProps={{
                         startAdornment: (
                           <InputAdornment position="start">
@@ -339,6 +353,10 @@ export default function AddPatientPage({
                       label="Weight"
                       type="number"
                       value={patient.weight}
+                      inputProps={{
+                        min: 20,
+                        max: 300,
+                      }}
                       onChange={handleChange("weight")}
                       InputProps={{
                         startAdornment: (
@@ -496,9 +514,11 @@ export default function AddPatientPage({
                 <Button
                   variant="contained"
                   size="large"
-                  startIcon={<SaveIcon />}
+                  startIcon={
+                    addingPatient ? <CircularProgress size={20} /> : null
+                  }
                   onClick={handleSubmit}
-                  disabled={!isFormValid()}
+                  disabled={!isFormValid() || addingPatient}
                   sx={{
                     px: 4,
                     py: 1.5,

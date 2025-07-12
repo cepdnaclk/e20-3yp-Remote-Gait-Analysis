@@ -26,6 +26,7 @@ import {
   Container,
   Fade,
   Divider,
+  CircularProgress,
 } from "@mui/material";
 import { useEffect, useState } from "react";
 import { getDoctors, addDoctor } from "../../services/clinicAdminServices";
@@ -60,6 +61,8 @@ export default function DoctorManagementPage({
     specialization: "",
   });
 
+  const [addingDoctor, setAddingDoctor] = useState(false);
+
   useEffect(() => {
     if (!initialDoctors) {
       getDoctors()
@@ -93,7 +96,17 @@ export default function DoctorManagementPage({
     setNewDoctor({ ...newDoctor, [field]: e.target.value });
   };
 
+  const isFormValid = () => {
+    return (
+      newDoctor.name &&
+      newDoctor.email &&
+      newDoctor.specialization &&
+      newDoctor.phoneNumber
+    );
+  };
+
   const handleAddDoctor = async () => {
+    setAddingDoctor(true);
     try {
       await addDoctor(newDoctor);
       setSnackbar({
@@ -101,6 +114,7 @@ export default function DoctorManagementPage({
         message: "Doctor added successfully",
         severity: "success",
       });
+      setAddingDoctor(false);
       setNewDoctor({
         name: "",
         email: "",
@@ -115,9 +129,10 @@ export default function DoctorManagementPage({
         setFilteredDoctors(res.data);
       }
     } catch (err) {
+      setAddingDoctor(false);
       setSnackbar({
         open: true,
-        message: "Failed to add doctor",
+        message: err.response?.data?.message || "Failed to add patient",
         severity: "error",
       });
     }
@@ -464,7 +479,8 @@ export default function DoctorManagementPage({
           <Button
             variant="contained"
             onClick={handleAddDoctor}
-            disabled={!newDoctor.name || !newDoctor.email}
+            disabled={!isFormValid || addingDoctor}
+            startIcon={addingDoctor ? <CircularProgress size={20} /> : null}
             sx={{
               px: 3,
               py: 1,

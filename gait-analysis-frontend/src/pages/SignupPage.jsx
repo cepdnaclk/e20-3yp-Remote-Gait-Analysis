@@ -39,6 +39,7 @@ const SignupPage = () => {
   const [formData, setFormData] = useState({
     username: "",
     password: "",
+    confirmPassword: "",
   });
 
   // UI State
@@ -81,6 +82,7 @@ const SignupPage = () => {
     return (
       formData.username.trim().length >= 3 &&
       formData.password.length >= 6 &&
+      formData.confirmPassword === formData.password &&
       token &&
       accountType
     );
@@ -298,6 +300,35 @@ const SignupPage = () => {
                 required
                 disabled={loading}
                 helperText="Create a secure password (minimum 6 characters)"
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <LockIcon sx={{ color: "text.secondary" }} />
+                    </InputAdornment>
+                  ),
+                }}
+                sx={{
+                  "& .MuiOutlinedInput-root": {
+                    borderRadius: 2,
+                    backgroundColor: "white",
+                  },
+                }}
+              />
+
+              <TextField
+                fullWidth
+                type="password"
+                label="Confirm Password"
+                value={formData.confirmPassword}
+                onChange={handleChange("confirmPassword")}
+                margin="normal"
+                required
+                disabled={loading}
+                helperText="Re-enter your password to confirm"
+                error={
+                  formData.confirmPassword &&
+                  formData.password !== formData.confirmPassword
+                }
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
