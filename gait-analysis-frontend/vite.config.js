@@ -4,6 +4,11 @@ import path from 'node:path'
 
 export default defineConfig({
   plugins: [react()],
+  test: {
+    globals: true,
+    environment: 'jsdom',           // Simulates browser environment
+    setupFiles: './src/test/setup.js',
+  },
   define: {
     global: 'globalThis',
   },
