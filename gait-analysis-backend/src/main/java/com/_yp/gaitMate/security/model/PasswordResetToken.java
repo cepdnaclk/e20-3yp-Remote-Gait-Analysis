@@ -1,6 +1,5 @@
-package com._yp.gaitMate.model;
+package com._yp.gaitMate.security.model;
 
-import com._yp.gaitMate.security.model.User;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -30,9 +29,6 @@ public class PasswordResetToken {
     private LocalDateTime expiryDate;
 
     @Column(nullable = false)
-    private boolean used = false;
-
-    @Column(nullable = false)
     private LocalDateTime createdAt;
 
     // Constructor for creating new tokens
@@ -41,7 +37,6 @@ public class PasswordResetToken {
         this.user = user;
         this.createdAt = LocalDateTime.now();
         this.expiryDate = LocalDateTime.now().plusMinutes(15); // Token expires in 15 minutes
-        this.used = false;
     }
 
     // Helper method to check if token is expired
@@ -51,6 +46,6 @@ public class PasswordResetToken {
 
     // Helper method to check if token is valid (not used and not expired)
     public boolean isValid() {
-        return !used && !isExpired();
+        return !isExpired();
     }
 }
