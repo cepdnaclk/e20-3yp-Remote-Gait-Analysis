@@ -4,4 +4,6 @@ import com._yp.gaitMate.security.model.AccountType;
 
 public interface EmailService {
     void sendInvitationEmail(String toEmail, String invitationToken,  AccountType accountType);
+
+    void sendPasswordResetEmail(String toEmail, String resetToken);
 }

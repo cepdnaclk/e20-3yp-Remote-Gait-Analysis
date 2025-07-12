@@ -22,7 +22,7 @@ public class CreateClinicRequest {
 
     @NotBlank
     @Pattern(regexp = "\\d{10}",
-            message = "must be exactly 10 digits")
+            message = "Phone number must be exactly 10 digits")
     private String phoneNumber;
 
     @Email
