@@ -12,3 +12,16 @@ export const login = async (username, password) => {
 export const invitationSignup = async (signupData) => {
   return axios.post(`${BASE_URL}/api/auth/signup`, signupData);
 };
+
+export const forgotPassword = async (email) => {
+  return axios.post(`${BASE_URL}/api/auth/forgot-password`, {
+    email,
+  });
+};
+
+export const resetPassword = async (token, newPassword) => {
+  return axios.post(`${BASE_URL}/api/auth/reset-password`, {
+    token,
+    newPassword,
+  });
+};
