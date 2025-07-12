@@ -27,7 +27,7 @@ const PatientAppointmentRequest = ({ patient }) => {
   useEffect(() => {
     const fetchAppointments = async () => {
       try {
-        const res = await axios.get("/appointments/my-requests");
+        const res = await axios.get("api/appointments/my-requests");
         setAppointmentHistory(res.data);
       } catch (err) {
         console.error("Failed to fetch appointments", err);
@@ -44,7 +44,7 @@ const PatientAppointmentRequest = ({ patient }) => {
 
     setLoading(true);
     try {
-      await axios.post("/appointments/request", {
+      await axios.post("api/appointments/request", {
         patientId: patient.id,
         doctorId: patient.doctorId,
         requestedTime,
@@ -57,11 +57,11 @@ const PatientAppointmentRequest = ({ patient }) => {
       setErrorMsg("");
 
       // Refresh history
-      const res = await axios.get("/appointments/my-requests");
+      const res = await axios.get("api/appointments/my-requests");
       setAppointmentHistory(res.data);
     } catch (err) {
       console.error(err);
-      setErrorMsg("Something went wrong. Please try again.");
+      setErrorMsg(err.response.data.message);
     } finally {
       setLoading(false);
     }
@@ -128,7 +128,7 @@ const PatientAppointmentRequest = ({ patient }) => {
                 <CardContent>
                   <Box display="flex" justifyContent="space-between">
                     <Typography variant="subtitle1" fontWeight={600}>
-                      {new Date(appt.requestedTime).toLocaleString()}
+                      {new Date(appt.startTime).toLocaleString()}
                     </Typography>
                     <Chip
                       label={appt.status}
