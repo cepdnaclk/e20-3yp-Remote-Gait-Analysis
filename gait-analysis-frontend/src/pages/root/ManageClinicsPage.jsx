@@ -1,6 +1,6 @@
-// Enhanced ManageClinicsPage with DoctorPatientsPage-like layout, features and pagination
+// Final merged and resolved version of ManageClinicsPage
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
 import {
   Box,
   Typography,
@@ -25,11 +25,10 @@ import {
   InputLabel,
   Select,
   MenuItem,
-  Chip,
-} from '@mui/material';
-import { Search as SearchIcon, Business as BusinessIcon } from '@mui/icons-material';
-import { getClinics, addClinic } from '../../services/rootServices';
-import { useNavigate } from 'react-router-dom';
+} from "@mui/material";
+import { Search as SearchIcon } from "@mui/icons-material";
+import { getClinics, addClinic } from "../../services/rootServices";
+import { useNavigate } from "react-router-dom";
 
 export default function ManageClinicsPage() {
   const navigate = useNavigate();
@@ -41,11 +40,23 @@ export default function ManageClinicsPage() {
   // Pagination state
   const [currentPage, setCurrentPage] = useState(0);
   const [pageSize, setPageSize] = useState(5);
-  const [open, setOpen] = useState(false);
-  const [newClinic, setNewClinic] = useState({ name: '', phoneNumber: '', email: '', username: '', password: '' });
-  const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
 
-  const isFormValid = Object.values(newClinic).every((field) => field.trim() !== '');
+  const [open, setOpen] = useState(false);
+  const [newClinic, setNewClinic] = useState({
+    name: "",
+    phoneNumber: "",
+    email: "",
+  });
+
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: "",
+    severity: "success",
+  });
+
+  const isFormValid = Object.values(newClinic).every(
+    (field) => field.trim() !== ""
+  );
 
   useEffect(() => {
     getClinics()
@@ -54,17 +65,22 @@ export default function ManageClinicsPage() {
         setFilteredClinics(res.data);
       })
       .catch((err) => {
-        console.error('Failed to load clinics', err);
-        setSnackbar({ open: true, message: 'Error loading clinics', severity: 'error' });
+        console.error("Failed to load clinics", err);
+        setSnackbar({
+          open: true,
+          message: "Error loading clinics",
+          severity: "error",
+        });
       })
       .finally(() => setLoading(false));
   }, []);
 
   useEffect(() => {
-    const filtered = clinics.filter(clinic =>
-      clinic.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      clinic.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      clinic.phoneNumber.includes(searchQuery)
+    const filtered = clinics.filter(
+      (clinic) =>
+        clinic.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        clinic.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        clinic.phoneNumber.includes(searchQuery)
     );
     setFilteredClinics(filtered);
     setCurrentPage(0);
@@ -76,15 +92,19 @@ export default function ManageClinicsPage() {
         const updated = [...clinics, res.data];
         setClinics(updated);
         setOpen(false);
-        setNewClinic({ name: '', phoneNumber: '', email: '', username: '', password: '' });
-        setSnackbar({ open: true, message: 'Clinic added successfully', severity: 'success' });
-      })
-      .catch((err) => {
-        console.error('Failed to add clinic', err);
+        setNewClinic({ name: "", phoneNumber: "", email: "" });
         setSnackbar({
           open: true,
-          message: err.response?.data?.message || 'Failed to add clinic',
-          severity: 'error',
+          message: "Clinic added successfully",
+          severity: "success",
+        });
+      })
+      .catch((err) => {
+        console.error("Failed to add clinic", err);
+        setSnackbar({
+          open: true,
+          message: err.response?.data?.message || "Failed to add clinic",
+          severity: "error",
         });
       });
   };
@@ -102,11 +122,19 @@ export default function ManageClinicsPage() {
     setCurrentPage(0);
   };
 
-  const paginatedClinics = filteredClinics.slice(currentPage * pageSize, currentPage * pageSize + pageSize);
+  const paginatedClinics = filteredClinics.slice(
+    currentPage * pageSize,
+    currentPage * pageSize + pageSize
+  );
 
   if (loading) {
     return (
-      <Box display="flex" justifyContent="center" alignItems="center" height="50vh">
+      <Box
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        height="50vh"
+      >
         <CircularProgress />
         <Typography ml={2}>Loading Clinics...</Typography>
       </Box>
@@ -115,9 +143,18 @@ export default function ManageClinicsPage() {
 
   return (
     <Box p={4}>
-      <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
-        <Typography variant="h4" fontWeight={700}>Manage Clinics</Typography>
-        <Button variant="contained" onClick={() => setOpen(true)}>Add Clinic</Button>
+      <Box
+        display="flex"
+        justifyContent="space-between"
+        alignItems="center"
+        mb={3}
+      >
+        <Typography variant="h4" fontWeight={700}>
+          Manage Clinics
+        </Typography>
+        <Button variant="contained" onClick={() => setOpen(true)}>
+          Add Clinic
+        </Button>
       </Box>
 
       <Box display="flex" gap={2} alignItems="flex-end" mb={2}>
@@ -136,7 +173,11 @@ export default function ManageClinicsPage() {
         />
         <FormControl variant="outlined" sx={{ minWidth: 120 }}>
           <InputLabel>Per Page</InputLabel>
-          <Select value={pageSize} onChange={handlePageSizeChange} label="Per Page">
+          <Select
+            value={pageSize}
+            onChange={handlePageSizeChange}
+            label="Per Page"
+          >
             <MenuItem value={5}>5</MenuItem>
             <MenuItem value={10}>10</MenuItem>
             <MenuItem value={20}>20</MenuItem>
@@ -147,7 +188,7 @@ export default function ManageClinicsPage() {
       <TableContainer component={Paper} sx={{ borderRadius: 3 }}>
         <Table>
           <TableHead>
-            <TableRow sx={{ backgroundColor: '#f8fafc' }}>
+            <TableRow sx={{ backgroundColor: "#f8fafc" }}>
               <TableCell sx={{ fontWeight: 700 }}>Clinic Name</TableCell>
               <TableCell sx={{ fontWeight: 700 }}>Phone</TableCell>
               <TableCell sx={{ fontWeight: 700 }}>Email</TableCell>
@@ -156,10 +197,10 @@ export default function ManageClinicsPage() {
           <TableBody>
             {paginatedClinics.map((clinic) => (
               <TableRow
-                key={clinic.id || clinic.username}
+                key={clinic.id || clinic.email}
                 hover
                 onClick={() => navigate(`/root/clinics/${clinic.id}`)}
-                sx={{ cursor: 'pointer' }}
+                sx={{ cursor: "pointer" }}
               >
                 <TableCell>{clinic.name}</TableCell>
                 <TableCell>{clinic.phoneNumber}</TableCell>
@@ -168,29 +209,38 @@ export default function ManageClinicsPage() {
             ))}
             {paginatedClinics.length === 0 && (
               <TableRow>
-                <TableCell colSpan={3} align="center">No clinics found</TableCell>
+                <TableCell colSpan={3} align="center">
+                  No clinics found
+                </TableCell>
               </TableRow>
             )}
           </TableBody>
         </Table>
       </TableContainer>
 
-      <Box mt={3} display="flex" justifyContent="space-between" alignItems="center">
+      <Box
+        mt={3}
+        display="flex"
+        justifyContent="space-between"
+        alignItems="center"
+      >
         <Typography variant="body2">
           Showing {paginatedClinics.length} of {filteredClinics.length} clinics
         </Typography>
         <Box>
-          {[...Array(Math.ceil(filteredClinics.length / pageSize)).keys()].map((page) => (
-            <Button
-              key={page}
-              variant={page === currentPage ? "contained" : "outlined"}
-              size="small"
-              onClick={() => setCurrentPage(page)}
-              sx={{ mx: 0.5 }}
-            >
-              {page + 1}
-            </Button>
-          ))}
+          {[...Array(Math.ceil(filteredClinics.length / pageSize)).keys()].map(
+            (page) => (
+              <Button
+                key={page}
+                variant={page === currentPage ? "contained" : "outlined"}
+                size="small"
+                onClick={() => setCurrentPage(page)}
+                sx={{ mx: 0.5 }}
+              >
+                {page + 1}
+              </Button>
+            )
+          )}
         </Box>
       </Box>
 
@@ -198,21 +248,51 @@ export default function ManageClinicsPage() {
       <Dialog open={open} onClose={() => setOpen(false)}>
         <DialogTitle>Add New Clinic</DialogTitle>
         <DialogContent>
-          <TextField label="Clinic Name" fullWidth margin="normal" value={newClinic.name} onChange={handleChange('name')} />
-          <TextField label="Phone Number" fullWidth margin="normal" value={newClinic.phoneNumber} onChange={handleChange('phoneNumber')} />
-          <TextField label="Email" fullWidth margin="normal" value={newClinic.email} onChange={handleChange('email')} />
-          <TextField label="Username" fullWidth margin="normal" value={newClinic.username} onChange={handleChange('username')} />
-          <TextField label="Password" type="password" fullWidth margin="normal" value={newClinic.password} onChange={handleChange('password')} />
+          <TextField
+            label="Clinic Name"
+            fullWidth
+            margin="normal"
+            value={newClinic.name}
+            onChange={handleChange("name")}
+          />
+          <TextField
+            label="Phone Number"
+            fullWidth
+            margin="normal"
+            value={newClinic.phoneNumber}
+            onChange={handleChange("phoneNumber")}
+          />
+          <TextField
+            label="Email"
+            fullWidth
+            margin="normal"
+            value={newClinic.email}
+            onChange={handleChange("email")}
+          />
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setOpen(false)}>Cancel</Button>
-          <Button variant="contained" onClick={handleAddClinic} disabled={!isFormValid}>Add</Button>
+          <Button
+            variant="contained"
+            onClick={handleAddClinic}
+            disabled={!isFormValid}
+          >
+            Add
+          </Button>
         </DialogActions>
       </Dialog>
 
       {/* Snackbar Notifications */}
-      <Snackbar open={snackbar.open} autoHideDuration={4000} onClose={handleCloseSnackbar}>
-        <Alert onClose={handleCloseSnackbar} severity={snackbar.severity} sx={{ width: '100%' }}>
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={4000}
+        onClose={handleCloseSnackbar}
+      >
+        <Alert
+          onClose={handleCloseSnackbar}
+          severity={snackbar.severity}
+          sx={{ width: "100%" }}
+        >
           {snackbar.message}
         </Alert>
       </Snackbar>
