@@ -67,3 +67,9 @@ microservices:
 frontend:
   base:
     url: ${FRONTEND_BASE_URL}
+
+# NEW: S3 Configuration section
+aws:
+  region: eu-north-1
+  s3:
+    bucket: gait-analysis-reports
