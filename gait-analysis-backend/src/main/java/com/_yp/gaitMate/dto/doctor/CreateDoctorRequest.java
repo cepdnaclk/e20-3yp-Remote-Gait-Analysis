@@ -39,18 +39,18 @@ public class CreateDoctorRequest {
     @NotBlank(message = "Specialization is required")
     private String specialization;
 
-    /**
-     * Username for the doctor's user account.
-     */
-    @NotBlank(message = "Username is required")
-    @Size(min = 4, max = 20)
-    private String username;
-
-    /**
-     * Password for the doctor's user account.
-     */
-    @NotBlank(message = "Password is required")
-    @Size(min = 6, max = 20)
-    private String password;
+//    /**
+//     * Username for the doctor's user account.
+//     */
+//    @NotBlank(message = "Username is required")
+//    @Size(min = 4, max = 20)
+//    private String username;
+//
+//    /**
+//     * Password for the doctor's user account.
+//     */
+//    @NotBlank(message = "Password is required")
+//    @Size(min = 6, max = 20)
+//    private String password;
 }
 
