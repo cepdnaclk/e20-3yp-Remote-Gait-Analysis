@@ -1,9 +1,11 @@
 package com._yp.gaitMate.security.controller;
 
+import com._yp.gaitMate.security.dto.InvitationSignupRequest;
 import com._yp.gaitMate.security.dto.LoginRequest;
 import com._yp.gaitMate.security.dto.SignupRequest;
 import com._yp.gaitMate.security.dto.UserInfoResponse;
 import com._yp.gaitMate.security.service.AuthenticationService;
+import com._yp.gaitMate.security.service.InvitationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
@@ -21,6 +23,15 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class AuthController {
     private final AuthenticationService authenticationService;
+    private final InvitationService invitationService;
+
+
+    @PostMapping("/signup")
+    public ResponseEntity<UserInfoResponse> completeInvitationSignup(
+            @RequestBody @Valid InvitationSignupRequest request) {
+        UserInfoResponse response = invitationService.completeInvitationSignup(request);
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
+    }
 
     @PostMapping("/signin")
     @Operation(

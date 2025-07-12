@@ -10,7 +10,7 @@ import org.springframework.scheduling.annotation.EnableAsync;
 @EnableAsync
 @SpringBootApplication
 @EnableConfigurationProperties(CorsProperties.class)
-@EnableJpaAuditing
+@EnableJpaAuditing(auditorAwareRef = "auditorProvider")
 public class GaitApplication {
 
 	public static void main(String[] args) {

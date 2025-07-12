@@ -51,6 +51,8 @@ import EditIcon from "@mui/icons-material/Edit";
 import SaveIcon from "@mui/icons-material/Save";
 import FeedbackIcon from "@mui/icons-material/Feedback";
 import PersonIcon from "@mui/icons-material/Person";
+//import axiosInstance from '@/services/axiosInstance'; // ✅ Adjust based on your path
+import axiosInstance from "../../services/axiosInstance";
 
 // Register Chart.js components
 ChartJS.register(
@@ -130,80 +132,62 @@ export default function DoctorTestSessionReview() {
     }
   };
 
-  const handleDownload = async () => {
-    if (!session?.results?.pressureResultsPath) {
-      setNotification({
-        open: true,
-        message: "No report available for download",
-        severity: "error"
-      });
-      return;
-    }
 
-    setDownloading(true);
-    
-    try {
-      let downloadUrl = session.results.pressureResultsPath;
-      
-      // Check if URL is expired (presigned URLs have expiration)
-      const testResponse = await fetch(downloadUrl, { method: 'HEAD' });
-      
-      if (!testResponse.ok && testResponse.status === 403) {
-        // URL might be expired, try to get a fresh one
-        try {
-          const refreshResponse = await axios.get(`/api/sessions/${session.sessionId}/report-url`);
-          if (refreshResponse.data.success) {
-            downloadUrl = refreshResponse.data.reportUrl;
-          }
-        } catch (refreshError) {
-          console.warn("Could not refresh URL:", refreshError);
-        }
-      }
-      
-      // Download the file
-      const response = await fetch(downloadUrl);
-      
-      if (!response.ok) {
-        throw new Error(`Failed to download: ${response.statusText}`);
-      }
-      
-      const blob = await response.blob();
-      
-      // Create download link
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      
-      // Generate filename with session info
-      const timestamp = new Date().toISOString().split('T')[0];
-      const filename = `Gait_Analysis_Report_Session_${session.sessionId}_${timestamp}.pdf`;
-      link.download = filename;
-      
-      // Trigger download
-      document.body.appendChild(link);
-      link.click();
-      
-      // Cleanup
-      document.body.removeChild(link);
-      window.URL.revokeObjectURL(url);
-      
-      setNotification({
-        open: true,
-        message: "Report downloaded successfully!",
-        severity: "success"
-      });
-      
-    } catch (error) {
-      console.error("Download failed:", error);
-      setNotification({
-        open: true,
-        message: "Failed to download report. The link may have expired.",
-        severity: "error"
-      });
-    } finally {
-      setDownloading(false);
-    }
-  };
+
+
+
+const handleDownload = async () => {
+  if (!session?.sessionId) {
+    setNotification({
+      open: true,
+      message: "Invalid session ID",
+      severity: "error",
+    });
+    return;
+  }
+
+  setDownloading(true);
+
+  try {
+    // ✅ baseURL is already applied by axiosInstance
+    const response = await axiosInstance.get(`api/sessions/${session.sessionId}/download-report`, {
+      responseType: 'blob',
+    });
+
+    const blob = new Blob([response.data], { type: 'application/pdf' });
+    const url = window.URL.createObjectURL(blob);
+
+    const timestamp = new Date().toISOString().split('T')[0];
+    const filename = `Gait_Analysis_Report_Session_${session.sessionId}_${timestamp}.pdf`;
+
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', filename);
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+
+    window.URL.revokeObjectURL(url);
+
+    setNotification({
+      open: true,
+      message: "✅ Report downloaded successfully!",
+      severity: "success",
+    });
+
+  } catch (error) {
+    console.error("Download failed:", error);
+    setNotification({
+      open: true,
+      message: "❌ Failed to download report. Please try again.",
+      severity: "error",
+    });
+  } finally {
+    setDownloading(false);
+  }
+};
+
+
 
   const handleViewReport = async () => {
     if (!session?.results?.pressureResultsPath) {
@@ -777,20 +761,21 @@ export default function DoctorTestSessionReview() {
                     Raw Sensor Data
                   </Button>
 
-                  <Button
-                    variant="contained"
-                    startIcon={downloading ? <CircularProgress size={16} /> : <DownloadIcon />}
-                    onClick={handleDownload}
-                    disabled={downloading || !session?.results?.pressureResultsPath}
-                    sx={{
-                      background: "linear-gradient(135deg, #48bb78 0%, #38a169 100%)",
-                      "&:hover": {
-                        background: "linear-gradient(135deg, #38a169 0%, #2f855a 100%)",
-                      },
-                    }}
-                  >
-                    {downloading ? 'Downloading...' : 'Download Report'}
-                  </Button>
+                    <Button
+                      variant="contained"
+                      startIcon={downloading ? <CircularProgress size={16} /> : <DownloadIcon />}
+                      onClick={handleDownload}
+                      disabled={downloading || !session?.sessionId}
+                      sx={{
+                        background: "linear-gradient(135deg, #48bb78 0%, #38a169 100%)",
+                        "&:hover": {
+                          background: "linear-gradient(135deg, #38a169 0%, #2f855a 100%)",
+                        },
+                      }}
+                    >
+                      {downloading ? 'Downloading...' : 'Download Report'}
+                    </Button>
+
                 </Box>
 
                 {/* Status indicator */}
