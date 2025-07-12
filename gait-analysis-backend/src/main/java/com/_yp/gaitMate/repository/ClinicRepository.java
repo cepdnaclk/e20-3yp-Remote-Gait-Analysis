@@ -12,4 +12,5 @@ public interface ClinicRepository extends JpaRepository<Clinic, Long> {
 
     Optional<Clinic> findByUser_UserId(Long userId);
 
+    Optional<Clinic> findByInvitationToken(String token);
 }
