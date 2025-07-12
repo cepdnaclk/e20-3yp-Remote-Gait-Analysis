@@ -28,6 +28,8 @@ import DoctorPatientProfilePage from "./pages/doctor/DoctorPatientProfilePage";
 import ContactPage from "./pages/ContactPage";
 import DoctorTestSessionReview from "./pages/doctor/DoctorTestSessionReview";
 import SignupPage from "./pages/SignupPage";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 
 // Create a Query Client instance for managing API data fetching, caching, and state updates
 const queryClient = new QueryClient();
@@ -44,6 +46,9 @@ export default function App() {
           <Route path="/login" element={<Login />} />
 
           <Route path="/signup" element={<SignupPage />} />
+
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
 
           {/* Contact Page Route */}
           <Route path="/contact" element={<ContactPage />} />
