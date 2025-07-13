@@ -39,11 +39,13 @@ import DirectionsWalkIcon from "@mui/icons-material/DirectionsWalk";
 import BalanceIcon from "@mui/icons-material/Balance";
 import SpeedIcon from "@mui/icons-material/Speed";
 import InsightsIcon from "@mui/icons-material/Insights";
+import PatientAppointmentRequest from "../../components/PatientAppointmentRequest";
 
 import { useNavigate } from "react-router-dom";
 import { getPatientProfile, getDashboardStats } from "../../services/patientServices";
 import { useMemo } from "react";
 import PatientTestSessionsList from "../../components/PatientTestSessionList";
+import { useRef } from "react";
 
 // Enhanced Stat Card Component
 const StatCard = ({ title, value, subtitle, icon, gradient, trend }) => (
@@ -334,6 +336,7 @@ const LatestSessionCard = ({ latestSession, setSelectedSection }) => {
 
 export default function PatientDashboard() {
   const navigate = useNavigate();
+  const sessionListRef = useRef();
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [selectedSection, setSelectedSection] = useState("Dashboard");
   const [patient, setPatient] = useState(null);
@@ -366,6 +369,7 @@ export default function PatientDashboard() {
     { text: "Dashboard", icon: <DashboardIcon /> },
     { text: "Profile", icon: <PersonIcon /> },
     { text: "Test Sessions", icon: <AssessmentIcon /> },
+    { text: "Appointments", icon: <CalendarTodayIcon /> },
   ];
 
   const ProfileField = ({ label, value }) => (
@@ -709,6 +713,7 @@ export default function PatientDashboard() {
             {/* Session History */}
             <Box sx={{ mt: 2 }}>
               <PatientTestSessionsList 
+                ref={sessionListRef}
                 embedded={true}
                 initialPageSize={8}
                 showControls={true}
@@ -718,6 +723,12 @@ export default function PatientDashboard() {
           </Container>
         );
 
+      case "Appointments":
+        return <PatientAppointmentRequest patient={patient} />;
+
+
+
+      // DEFAULT view
       default:
         // NEW ANALYTICS DASHBOARD - Replaces the old "Recent Sessions" section
         return (
@@ -774,14 +785,34 @@ export default function PatientDashboard() {
                     <Button
                       variant="contained"
                       size="small"
+                      disabled = {!dashboardStats?.latestSession?.sessionId}
                       sx={{
-                        bgcolor: "rgba(255,255,255,0.2)",
+                        bgcolor: dashboardStats?.latestSession?.sessionId 
+                        ? "rgba(255,255,255,0.2)"
+                        : "grey.400",
                         color: "white",
                         fontWeight: 600,
-                        "&:hover": { bgcolor: "rgba(255,255,255,0.3)" },
+                        "&:hover": { 
+                          bgcolor: dashboardStats?.latestSession?.sessionId
+                          ? "rgba(255,255,255,0.3)"
+                          : "grey.500",
+                        },
                         backdropFilter: "blur(10px)",
                       }}
-                      onClick={() => setSelectedSection("Test Sessions")}
+                      onClick={() => {
+                        const sessionId = dashboardStats?.latestSession?.sessionId;
+                        if (sessionId) {
+                          setSelectedSection("Test Sessions");
+                      
+                          setTimeout(() => {
+                            sessionListRef.current?.scrollToSession(sessionId);
+                          }, 300);
+                      
+                          setTimeout(() => {
+                            sessionListRef.current?.navigateToSession(sessionId);
+                          }, 1500); // let scroll+highlight happen first
+                        }
+                      }}
                     >
                       View Details
                     </Button>
@@ -837,6 +868,8 @@ export default function PatientDashboard() {
                     </Typography>
                   </Box>
                 </Card>
+
+                
               </Grid>
 
               {/* Row 2: NEW Analytics KPI Cards */}

@@ -3,10 +3,13 @@ package com._yp.gaitMate.service.clinicService;
 
 import com._yp.gaitMate.dto.clinic.ClinicInfoResponse;
 import com._yp.gaitMate.dto.clinic.CreateClinicRequest;
+import com._yp.gaitMate.mail.service.EmailService;
 import com._yp.gaitMate.mapper.ClinicMapper;
 import com._yp.gaitMate.model.Clinic;
 import com._yp.gaitMate.repository.ClinicRepository;
 import com._yp.gaitMate.security.dto.SignupRequest;
+import com._yp.gaitMate.security.model.AccountStatus;
+import com._yp.gaitMate.security.model.AccountType;
 import com._yp.gaitMate.security.model.User;
 import com._yp.gaitMate.security.service.AuthenticationService;
 import com._yp.gaitMate.security.utils.AuthUtil;
@@ -37,14 +40,15 @@ class ClinicServiceImplTest {
     @Mock
     private ClinicRepository clinicRepository;
 
-    @Mock
-    private AuthenticationService authService;
+
 
     @Mock
     private ClinicMapper clinicMapper;
 
+
+
     @Mock
-    private AuthUtil authUtil;
+    private EmailService emailService;
 
     private CreateClinicRequest request;
     private Clinic clinic;
@@ -57,8 +61,6 @@ class ClinicServiceImplTest {
                 .name("Sunrise Clinic")
                 .email("clinic@example.com")
                 .phoneNumber("0712345678")
-                .username("sunrise_user")
-                .password("secure123")
                 .build();
 
         dummyUser = new User();
@@ -69,7 +71,9 @@ class ClinicServiceImplTest {
                 .email("clinic@example.com")
                 .phoneNumber("0712345678")
                 .createdAt(LocalDateTime.now())
-                .user(dummyUser)
+                .invitationToken("some-uuid-token")  // Add this
+                .accountStatus(AccountStatus.INVITATION_SENT)  // Add this
+                .user(null)  // Change from dummyUser to null
                 .build();
 
         clinicResponse = ClinicInfoResponse.builder()
@@ -85,10 +89,10 @@ class ClinicServiceImplTest {
     void createClinic_shouldSaveClinic_andReturnMappedResponse() {
         // Mock behavior
         when(clinicRepository.existsByName(request.getName())).thenReturn(false);
-        when(authService.registerUser(any(SignupRequest.class))).thenReturn(dummyUser);
+        //when(authService.registerUser(any(SignupRequest.class))).thenReturn(dummyUser);
         when(clinicRepository.save(any(Clinic.class))).thenReturn(clinic);
         when(clinicMapper.toClinicInfoResponse(clinic)).thenReturn(clinicResponse);
-
+        doNothing().when(emailService).sendInvitationEmail(anyString(), anyString(), any(AccountType.class));
         // Execute
         ClinicInfoResponse result = clinicService.createClinic(request);
 
@@ -99,8 +103,8 @@ class ClinicServiceImplTest {
 
         // Verify interactions
         verify(clinicRepository).existsByName("Sunrise Clinic");
-        verify(authService).registerUser(any(SignupRequest.class));
         verify(clinicRepository).save(any(Clinic.class));
+        verify(emailService).sendInvitationEmail(eq("clinic@example.com"), anyString(), eq(AccountType.CLINIC));
         verify(clinicMapper).toClinicInfoResponse(any(Clinic.class));
     }
 
@@ -115,7 +119,6 @@ class ClinicServiceImplTest {
 
         // Verify
         verify(clinicRepository).existsByName("Sunrise Clinic");
-        verifyNoInteractions(authService, clinicMapper);
         verify(clinicRepository, never()).save(any(Clinic.class));
     }
 
