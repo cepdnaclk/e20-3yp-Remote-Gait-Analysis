@@ -38,11 +38,9 @@ class DoctorControllerTest extends IntegrationTestSupport {
 
             CreateDoctorRequest request = CreateDoctorRequest.builder()
                     .name("Dr. Thilini " + suffix)
-                    .email("thilini" + suffix + "@example.com")
+                    .email("yohansenanayake4321@gmail.com")
                     .phoneNumber("0779333333") // Unique
                     .specialization("Physiotherapist")
-                    .username("drthilini")
-                    .password("securepass")
                     .build();
 
             HttpEntity<String> entity = new HttpEntity<>(
@@ -76,8 +74,6 @@ class DoctorControllerTest extends IntegrationTestSupport {
                     .email("ghost@example.com")
                     .phoneNumber("0700000000")
                     .specialization("Neurology")
-                    .username("ghost")
-                    .password("secret123")
                     .build();
 
             HttpEntity<String> entity = new HttpEntity<>(
@@ -103,8 +99,6 @@ class DoctorControllerTest extends IntegrationTestSupport {
                     .email("drunauth@example.com")
                     .phoneNumber("0788888888")
                     .specialization("Cardiology")
-                    .username("drunauth")
-                    .password("secret")
                     .build();
 
             HttpEntity<String> entity = new HttpEntity<>(
@@ -129,11 +123,9 @@ class DoctorControllerTest extends IntegrationTestSupport {
             // First request
             CreateDoctorRequest req1 = CreateDoctorRequest.builder()
                     .name("Dr. Duplicate")
-                    .email("drdup1@example.com")
+                    .email("yohansenanayake4321@gmail.com")
                     .phoneNumber("0700000001")
                     .specialization("Rehab")
-                    .username("drdupuser1")
-                    .password("pass123")
                     .build();
 
             HttpEntity<String> entity1 = new HttpEntity<>(new ObjectMapper().writeValueAsString(req1), clinicHeaders);
@@ -152,11 +144,9 @@ class DoctorControllerTest extends IntegrationTestSupport {
             // Second request (same name)
             CreateDoctorRequest req2 = CreateDoctorRequest.builder()
                     .name("Dr. Duplicate") // same name
-                    .email("drdup2@example.com")
+                    .email("yohansenanayake4321@gmail.com")
                     .phoneNumber("0700000002")
                     .specialization("Rehab")
-                    .username("drdupuser2")
-                    .password("pass123")
                     .build();
 
             HttpEntity<String> entity2 = new HttpEntity<>(new ObjectMapper().writeValueAsString(req2), clinicHeaders);
