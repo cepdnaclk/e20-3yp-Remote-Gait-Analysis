@@ -30,12 +30,31 @@ spring:
           starttls:
             enable: true # "Use encryption for security"
 
+  cloud:
+    aws:
+      credentials:
+        access-key: ${AWS_ACCESS_ID}
+        secret-key: ${AWS_SECRET_KEY}
+      region:
+        static: eu-north-1
+        auto: false
+      ses:
+        region: ${email.ses.region}   # ✅ SES-specific region override for automatic ses bean
+
+
+# ===== EMAIL CONFIGURATION (Clean and Organized) =====
+email:
+  provider: ses
+  ses:
+    region: us-east-1
+    from-email: noreply@rehabgait.com
+
 jwt:
   secret: ${JWT_SECRET}
   expiration:
     ms: 432000000
 
-
+# ===== IoT Core CONFIG (For your direct AWS SDK usage) =====
 mqtt:
   client:
     endpoint: ${MQTT_CLIENT_ENDPOINT}
@@ -44,16 +63,8 @@ mqtt:
     accessKey: ${AWS_SECRET_KEY}
     accessId: ${AWS_ACCESS_ID}
 
-cloud:
-  aws:
-    credentials:
-      access-key: ${AWS_ACCESS_ID}
-      secret-key: ${AWS_SECRET_KEY}
-    region:
-      static: eu-north-1
-      auto: false
 
-# NEW: S3 Configuration section
+# ===== S3 CONFIG (For your direct AWS SDK usage) =====
 aws:
   region: eu-north-1
   s3:
