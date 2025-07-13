@@ -4,6 +4,7 @@ import com._yp.gaitMate.security.model.AccountType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
@@ -12,8 +13,9 @@ import jakarta.mail.internet.MimeMessage;
 
 @Service
 @RequiredArgsConstructor
+@ConditionalOnProperty(name = "email.provider", havingValue = "gmail")
 @Slf4j
-public class EmailServiceImpl implements EmailService {
+public class EmailServiceGmailImpl implements EmailService {
 
     private final JavaMailSender mailSender;
 
