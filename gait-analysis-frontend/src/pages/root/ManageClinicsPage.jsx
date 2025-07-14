@@ -1,4 +1,4 @@
-// Final merged and resolved version of ManageClinicsPage
+// Updated ManageClinicsPage to handle paginated response
 
 import { useEffect, useState } from "react";
 import {
@@ -25,6 +25,7 @@ import {
   InputLabel,
   Select,
   MenuItem,
+  TablePagination,
 } from "@mui/material";
 import { Search as SearchIcon } from "@mui/icons-material";
 import { getClinics, addClinic } from "../../services/rootServices";
@@ -33,14 +34,15 @@ import { useNavigate } from "react-router-dom";
 export default function ManageClinicsPage() {
   const navigate = useNavigate();
   const [clinics, setClinics] = useState([]);
-  const [filteredClinics, setFilteredClinics] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [addingClinic, setAddingClinic] = useState(false);
 
-  // Pagination state
-  const [currentPage, setCurrentPage] = useState(0);
-  const [pageSize, setPageSize] = useState(5);
+  // Pagination state - now handled by backend
+  const [page, setPage] = useState(0);
+  const [size, setSize] = useState(5);
+  const [totalElements, setTotalElements] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
 
   const [open, setOpen] = useState(false);
   const [newClinic, setNewClinic] = useState({
@@ -59,58 +61,79 @@ export default function ManageClinicsPage() {
     (field) => field.trim() !== ""
   );
 
-  useEffect(() => {
-    getClinics()
-      .then((res) => {
-        setClinics(res.data);
-        setFilteredClinics(res.data);
-      })
-      .catch((err) => {
-        console.error("Failed to load clinics", err);
-        setSnackbar({
-          open: true,
-          message: "Error loading clinics",
-          severity: "error",
-        });
-      })
-      .finally(() => setLoading(false));
-  }, []);
-
-  useEffect(() => {
-    const filtered = clinics.filter(
-      (clinic) =>
-        clinic.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        clinic.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        clinic.phoneNumber.includes(searchQuery)
-    );
-    setFilteredClinics(filtered);
-    setCurrentPage(0);
-  }, [searchQuery, clinics]);
-
-  const handleAddClinic = () => {
-    setAddingClinic(true);
-    addClinic(newClinic)
-      .then((res) => {
-        const updated = [...clinics, res.data];
-        setClinics(updated);
-        setOpen(false);
-        setNewClinic({ name: "", phoneNumber: "", email: "" });
-        setSnackbar({
-          open: true,
-          message: "Clinic added successfully",
-          severity: "success",
-        });
-        setAddingClinic(false);
-      })
-      .catch((err) => {
-        console.error("Failed to add clinic", err);
-        setSnackbar({
-          open: true,
-          message: err.response?.data?.message || "Failed to add clinic",
-          severity: "error",
-        });
-        setAddingClinic(false);
+  // Fetch clinics with pagination and search
+  const fetchClinics = async (pageNum = 0, pageSize = 5, search = "") => {
+    setLoading(true);
+    try {
+      const params = new URLSearchParams({
+        page: pageNum.toString(),
+        size: pageSize.toString(),
       });
+      
+      if (search.trim()) {
+        params.append('search', search.trim());
+      }
+
+      const response = await getClinics(`?${params.toString()}`);
+      const data = response.data;
+      
+      setClinics(data.content || []);
+      setTotalElements(data.totalElements || 0);
+      setTotalPages(data.totalPages || 0);
+      setPage(data.page || 0);
+      setSize(data.size || pageSize);
+    } catch (err) {
+      console.error("Failed to load clinics", err);
+      setSnackbar({
+        open: true,
+        message: "Error loading clinics",
+        severity: "error",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchClinics(page, size, searchQuery);
+  }, [page, size, searchQuery]);
+
+  // Handle search with debouncing
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (page === 0) {
+        fetchClinics(0, size, searchQuery);
+      } else {
+        setPage(0); // Reset to first page when searching
+      }
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
+  const handleAddClinic = async () => {
+    setAddingClinic(true);
+    try {
+      const response = await addClinic(newClinic);
+      setOpen(false);
+      setNewClinic({ name: "", phoneNumber: "", email: "" });
+      setSnackbar({
+        open: true,
+        message: "Clinic added successfully",
+        severity: "success",
+      });
+      // Refresh the current page
+      fetchClinics(page, size, searchQuery);
+    } catch (err) {
+      console.error("Failed to add clinic", err);
+      setSnackbar({
+        open: true,
+        message: err.response?.data?.message || "Failed to add clinic",
+        severity: "error",
+      });
+    } finally {
+      setAddingClinic(false);
+    }
   };
 
   const handleChange = (field) => (e) => {
@@ -121,17 +144,17 @@ export default function ManageClinicsPage() {
     setSnackbar({ ...snackbar, open: false });
   };
 
-  const handlePageSizeChange = (event) => {
-    setPageSize(event.target.value);
-    setCurrentPage(0);
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
   };
 
-  const paginatedClinics = filteredClinics.slice(
-    currentPage * pageSize,
-    currentPage * pageSize + pageSize
-  );
+  const handleChangeRowsPerPage = (event) => {
+    const newSize = parseInt(event.target.value, 10);
+    setSize(newSize);
+    setPage(0);
+  };
 
-  if (loading) {
+  if (loading && clinics.length === 0) {
     return (
       <Box
         display="flex"
@@ -175,18 +198,6 @@ export default function ManageClinicsPage() {
             ),
           }}
         />
-        <FormControl variant="outlined" sx={{ minWidth: 120 }}>
-          <InputLabel>Per Page</InputLabel>
-          <Select
-            value={pageSize}
-            onChange={handlePageSizeChange}
-            label="Per Page"
-          >
-            <MenuItem value={5}>5</MenuItem>
-            <MenuItem value={10}>10</MenuItem>
-            <MenuItem value={20}>20</MenuItem>
-          </Select>
-        </FormControl>
       </Box>
 
       <TableContainer component={Paper} sx={{ borderRadius: 3 }}>
@@ -199,19 +210,26 @@ export default function ManageClinicsPage() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {paginatedClinics.map((clinic) => (
-              <TableRow
-                key={clinic.id || clinic.email}
-                hover
-                onClick={() => navigate(`/root/clinics/${clinic.id}`)}
-                sx={{ cursor: "pointer" }}
-              >
-                <TableCell>{clinic.name}</TableCell>
-                <TableCell>{clinic.phoneNumber}</TableCell>
-                <TableCell>{clinic.email}</TableCell>
+            {loading ? (
+              <TableRow>
+                <TableCell colSpan={3} align="center">
+                  <CircularProgress size={24} />
+                </TableCell>
               </TableRow>
-            ))}
-            {paginatedClinics.length === 0 && (
+            ) : clinics.length > 0 ? (
+              clinics.map((clinic) => (
+                <TableRow
+                  key={clinic.id}
+                  hover
+                  onClick={() => navigate(`/root/clinics/${clinic.id}`)}
+                  sx={{ cursor: "pointer" }}
+                >
+                  <TableCell>{clinic.name}</TableCell>
+                  <TableCell>{clinic.phoneNumber}</TableCell>
+                  <TableCell>{clinic.email}</TableCell>
+                </TableRow>
+              ))
+            ) : (
               <TableRow>
                 <TableCell colSpan={3} align="center">
                   No clinics found
@@ -220,33 +238,21 @@ export default function ManageClinicsPage() {
             )}
           </TableBody>
         </Table>
+        
+        <TablePagination
+          component="div"
+          count={totalElements}
+          page={page}
+          onPageChange={handleChangePage}
+          rowsPerPage={size}
+          onRowsPerPageChange={handleChangeRowsPerPage}
+          rowsPerPageOptions={[5, 10, 20, 50]}
+          labelRowsPerPage="Clinics per page:"
+          labelDisplayedRows={({ from, to, count }) =>
+            `${from}–${to} of ${count !== -1 ? count : `more than ${to}`}`
+          }
+        />
       </TableContainer>
-
-      <Box
-        mt={3}
-        display="flex"
-        justifyContent="space-between"
-        alignItems="center"
-      >
-        <Typography variant="body2">
-          Showing {paginatedClinics.length} of {filteredClinics.length} clinics
-        </Typography>
-        <Box>
-          {[...Array(Math.ceil(filteredClinics.length / pageSize)).keys()].map(
-            (page) => (
-              <Button
-                key={page}
-                variant={page === currentPage ? "contained" : "outlined"}
-                size="small"
-                onClick={() => setCurrentPage(page)}
-                sx={{ mx: 0.5 }}
-              >
-                {page + 1}
-              </Button>
-            )
-          )}
-        </Box>
-      </Box>
 
       {/* Add Clinic Dialog */}
       <Dialog open={open} onClose={() => setOpen(false)}>
