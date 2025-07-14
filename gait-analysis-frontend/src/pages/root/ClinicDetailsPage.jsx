@@ -50,9 +50,31 @@ import {
   
     const fetchClinicData = async () => {
       try {
-        const [clinicsRes, kitsRes] = await Promise.all([getClinics(), getSensorKits()]);
-        const clinicData = clinicsRes.data.find((c) => c.id.toString() === clinicId);
+        // First, try to get the specific clinic - we'll need to search through pages or use a direct API call
+        let clinicData = null;
+        
+        // Option 1: Try to fetch clinic with a large page size to get all clinics
+        // You might want to add a direct API endpoint like /api/clinics/{id} for better performance
+        const clinicsRes = await getClinics('?page=0&size=1000'); // Large size to get all clinics
+        
+        if (clinicsRes.data && clinicsRes.data.content) {
+          clinicData = clinicsRes.data.content.find((c) => c.id.toString() === clinicId);
+        }
+        
+        if (!clinicData) {
+          // If not found in first 1000, the clinic might not exist
+          console.error('Clinic not found');
+          setSnackbar({ 
+            open: true, 
+            message: 'Clinic not found', 
+            severity: 'error' 
+          });
+          navigate('/root/dashboard');
+          return;
+        }
   
+        const kitsRes = await getSensorKits();
+        
         // Show only AVAILABLE and IN_USE kits assigned to this clinic
         const assigned = kitsRes.data.filter(
           (k) =>
@@ -68,6 +90,11 @@ import {
         setAvailableKits(available);
       } catch (err) {
         console.error('Error loading clinic data', err);
+        setSnackbar({ 
+          open: true, 
+          message: 'Error loading clinic data', 
+          severity: 'error' 
+        });
       }
     };
   
@@ -105,15 +132,34 @@ import {
   
     const handleCloseSnackbar = () => setSnackbar({ ...snackbar, open: false });
   
-    if (!clinic) return <Typography p={4}>Loading clinic details...</Typography>;
+    if (!clinic) return (
+      <Box p={4} sx={{
+        background: "linear-gradient(1deg, #e3e7ed 0%, #aab6d3 100%)",
+        minHeight: "100vh",
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center'
+      }}>
+        <Typography>Loading clinic details...</Typography>
+      </Box>
+    );
   
     return (
-      <Box p={4} sx ={{
-        background:  "linear-gradient(1deg, #e3e7ed 0%, #aab6d3 100%)",
-        minheight: "100vh"}}
+      <Box p={4} sx={{
+        background: "linear-gradient(1deg, #e3e7ed 0%, #aab6d3 100%)",
+        minHeight: "100vh"
+      }}>
+        {/* Back Button */}
+        <Button 
+          variant="outlined" 
+          onClick={() => navigate('/root/dashboard')}
+          sx={{ mb: 2 }}
         >
+          ← Back to Dashboard
+        </Button>
+
         {/* Clinic Profile Card */}
-        <Paper elevation={3}  sx={{ p: 3, mb: 4, borderRadius: 4, boxShadow: 5 }}>
+        <Paper elevation={3} sx={{ p: 3, mb: 4, borderRadius: 4, boxShadow: 5 }}>
           <Typography variant="h5" gutterBottom fontWeight="bold">{clinic.name}</Typography>
           <Divider sx={{ mb: 2 }} />
           <Grid container spacing={2}>
@@ -134,7 +180,7 @@ import {
         </Paper>
   
         {/* Assigned Sensor Kits */}
-        <Paper elevation={3} sx={{ p: 3, mb: 4 , borderRadius: 4, boxShadow: 5 }}>
+        <Paper elevation={3} sx={{ p: 3, mb: 4, borderRadius: 4, boxShadow: 5 }}>
           <Typography variant="h6" fontWeight="bold" gutterBottom>Sensor Kits Assigned to This Clinic</Typography>
           <Table size="small">
             <TableHead>
@@ -178,7 +224,7 @@ import {
         </Paper>
   
         {/* Assign New Kits */}
-        <Paper elevation={3} sx={{ p: 3 , borderRadius: 4, boxShadow: 5 }}>
+        <Paper elevation={3} sx={{ p: 3, borderRadius: 4, boxShadow: 5 }}>
           <Typography variant="h6" fontWeight="bold" gutterBottom>Assign New Sensor Kits to This Clinic</Typography>
           <FormControl fullWidth sx={{ mt: 2 }}>
             <InputLabel>Select Kits</InputLabel>
@@ -236,4 +282,3 @@ import {
       </Box>
     );
   }
-  
