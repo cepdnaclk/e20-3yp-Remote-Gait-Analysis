@@ -60,6 +60,10 @@ public class ClinicServiceImpl implements ClinicService {
             throw new ApiException("Clinic name already exists");
         }
 
+        if (clinicRepository.existsByEmail(clinicRequest.getEmail())) {
+            throw new ApiException("Email is already taken");
+        }
+
 
         /* DEPRECATED
         // 1. Register user with ROLE_CLINIC using authService

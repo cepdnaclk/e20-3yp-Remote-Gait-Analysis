@@ -38,7 +38,7 @@ class DoctorControllerTest extends IntegrationTestSupport {
 
             CreateDoctorRequest request = CreateDoctorRequest.builder()
                     .name("Dr. Thilini " + suffix)
-                    .email("thilini" + suffix + "@example.com")
+                    .email("yohansenanayake4321@gmail.com")
                     .phoneNumber("0779333333") // Unique
                     .specialization("Physiotherapist")
                     .build();
@@ -123,7 +123,7 @@ class DoctorControllerTest extends IntegrationTestSupport {
             // First request
             CreateDoctorRequest req1 = CreateDoctorRequest.builder()
                     .name("Dr. Duplicate")
-                    .email("drdup1@example.com")
+                    .email("yohansenanayake4321@gmail.com")
                     .phoneNumber("0700000001")
                     .specialization("Rehab")
                     .build();
@@ -144,7 +144,7 @@ class DoctorControllerTest extends IntegrationTestSupport {
             // Second request (same name)
             CreateDoctorRequest req2 = CreateDoctorRequest.builder()
                     .name("Dr. Duplicate") // same name
-                    .email("drdup2@example.com")
+                    .email("yohansenanayake4321@gmail.com")
                     .phoneNumber("0700000002")
                     .specialization("Rehab")
                     .build();

@@ -4,6 +4,7 @@ import com._yp.gaitMate.dto.ApiResponse;
 import com._yp.gaitMate.s3.exception.PresignedUrlRefreshException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -23,7 +24,7 @@ public class GlobalExceptionHandler {
                 .forEach(error -> {
                     var fieldName = ((FieldError) error).getField();
                     var errorMessage = error.getDefaultMessage();
-                    response.put("message", fieldName+" "+ errorMessage);
+                    response.put("message", errorMessage);
                 });
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
@@ -51,6 +52,13 @@ public class GlobalExceptionHandler {
         ApiResponse apiResponse = new ApiResponse(e.getMessage(), false);
         return new ResponseEntity<>(apiResponse, HttpStatus.BAD_REQUEST);
     }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ApiResponse> handleAccessDeniedException(AccessDeniedException e) {
+        ApiResponse apiResponse = new ApiResponse(e.getMessage(), false);
+        return new ResponseEntity<>(apiResponse, HttpStatus.FORBIDDEN);
+    }
+
 
 
 }

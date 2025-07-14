@@ -78,7 +78,7 @@ public class Patient {
      * Associated user account.
      */
     @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "userId")
+    @JoinColumn(name = "user_id")
     private User user;
 
     /**
@@ -86,7 +86,7 @@ public class Patient {
      */
 
     @ManyToOne
-    @JoinColumn(name = "clinicId", nullable = false)
+    @JoinColumn(name = "clinic_id", nullable = false)
     private Clinic clinic;
 
     /**

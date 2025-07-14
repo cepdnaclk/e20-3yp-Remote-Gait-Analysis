@@ -30,13 +30,30 @@ spring:
           starttls:
             enable: true # "Use encryption for security"
 
+  cloud:
+    aws:
+      credentials:
+        access-key: ${MQTT_AWS_ACCESS_ID}
+        secret-key: ${MQTT_AWS_ACCESS_KEY}
+      region:
+        static: eu-north-1
+        auto: false
+      ses:
+        region: ${email.ses.region}   # ✅ SES-specific region override for automatic ses bean
+
+# ===== EMAIL CONFIGURATION (Clean and Organized) =====
+email:
+  provider: ses
+  ses:
+    region: us-east-1
+    from-email: noreply@rehabgait.com
 
 jwt:
   secret: ${JWT_SECRET}
   expiration:
     ms: 432000000
 
-
+# ===== IoT Core CONFIG (For your direct AWS SDK usage) =====
 mqtt:
   client:
     endpoint: ${MQTT_CLIENT_ENDPOINT}
@@ -45,15 +62,11 @@ mqtt:
     accessKey: ${MQTT_AWS_ACCESS_KEY}
     accessId: ${MQTT_AWS_ACCESS_ID}
 
-cloud:
-  aws:
-    credentials:
-      access-key: ${MQTT_AWS_ACCESS_ID}
-      secret-key: ${MQTT_AWS_ACCESS_KEY}
-    region:
-      static: eu-north-1
-      auto: false
-
+# ===== S3 CONFIG (For your direct AWS SDK usage) =====
+aws:
+  region: eu-north-1
+  s3:
+    bucket: gait-analysis-reports
 
 app:
   sqs:
@@ -64,12 +77,8 @@ microservices:
     processing:
       url: http://localhost:8000/process-session
 
+# For Invitation & Password Reset Email sending
 frontend:
   base:
     url: ${FRONTEND_BASE_URL}
 
-# NEW: S3 Configuration section
-aws:
-  region: eu-north-1
-  s3:
-    bucket: gait-analysis-reports

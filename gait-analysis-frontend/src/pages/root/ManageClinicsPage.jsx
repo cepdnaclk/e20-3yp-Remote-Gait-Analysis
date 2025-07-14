@@ -36,6 +36,7 @@ export default function ManageClinicsPage() {
   const [filteredClinics, setFilteredClinics] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
+  const [addingClinic, setAddingClinic] = useState(false);
 
   // Pagination state
   const [currentPage, setCurrentPage] = useState(0);
@@ -87,6 +88,7 @@ export default function ManageClinicsPage() {
   }, [searchQuery, clinics]);
 
   const handleAddClinic = () => {
+    setAddingClinic(true);
     addClinic(newClinic)
       .then((res) => {
         const updated = [...clinics, res.data];
@@ -98,6 +100,7 @@ export default function ManageClinicsPage() {
           message: "Clinic added successfully",
           severity: "success",
         });
+        setAddingClinic(false);
       })
       .catch((err) => {
         console.error("Failed to add clinic", err);
@@ -106,6 +109,7 @@ export default function ManageClinicsPage() {
           message: err.response?.data?.message || "Failed to add clinic",
           severity: "error",
         });
+        setAddingClinic(false);
       });
   };
 
@@ -275,9 +279,10 @@ export default function ManageClinicsPage() {
           <Button
             variant="contained"
             onClick={handleAddClinic}
-            disabled={!isFormValid}
+            disabled={!isFormValid || addingClinic}
+            startIcon={addingClinic ? <CircularProgress size={20} /> : null}
           >
-            Add
+            {addingClinic ? "Adding..." : "Add"}
           </Button>
         </DialogActions>
       </Dialog>

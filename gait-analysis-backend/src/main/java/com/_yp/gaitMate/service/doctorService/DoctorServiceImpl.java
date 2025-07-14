@@ -48,6 +48,10 @@ public class DoctorServiceImpl implements DoctorService{
             throw new ApiException("Doctor name already exists");
         }
 
+        if (doctorRepository.existsByEmail(request.getEmail())) {
+            throw new ApiException("Email is already taken");
+        }
+
         Clinic clinic = authUtil.getLoggedInClinic();
 
         /* DEPRECATED - Old user creation
