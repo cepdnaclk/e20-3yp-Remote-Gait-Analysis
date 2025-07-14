@@ -1,8 +1,8 @@
 package com._yp.gaitMate.service.clinicService;
-import com._yp.gaitMate.dto.doctor.DoctorInfoResponse; // ✅ import DTO
+import com._yp.gaitMate.dto.page.PageResponseDto;
 import com._yp.gaitMate.mail.service.EmailService;
 import com._yp.gaitMate.mapper.DoctorMapper;       // ✅ import mapper
-import com._yp.gaitMate.model.Doctor;
+import com._yp.gaitMate.mapper.PageMapper;
 import com._yp.gaitMate.repository.DoctorRepository; // ✅ import repo
 
 import com._yp.gaitMate.dto.clinic.ClinicInfoResponse;
@@ -13,23 +13,18 @@ import com._yp.gaitMate.mapper.ClinicMapper;
 import com._yp.gaitMate.model.Clinic;
 import com._yp.gaitMate.repository.ClinicRepository;
 
-import com._yp.gaitMate.security.dto.SignupRequest;
 import com._yp.gaitMate.security.model.AccountStatus;
 import com._yp.gaitMate.security.model.AccountType;
-import com._yp.gaitMate.security.model.AppRole;
-import com._yp.gaitMate.security.model.User;
 import com._yp.gaitMate.security.service.AuthenticationService;
 import com._yp.gaitMate.security.utils.AuthUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -45,7 +40,7 @@ public class ClinicServiceImpl implements ClinicService {
     private final ClinicMapper clinicMapper;
     private final AuthUtil authUtil;
     private final EmailService emailService;
-
+    private final PageMapper pageMapper;
 
 
     // ✅ Inject missing beans
@@ -123,11 +118,19 @@ public class ClinicServiceImpl implements ClinicService {
     }
 
 
+//    @Override
+//    public List<ClinicInfoResponse> getAllClinics() {
+//        return clinicRepository.findAll().stream()
+//                .map(clinicMapper::toClinicInfoResponse)
+//                .toList();
+//    }
+
     @Override
-    public List<ClinicInfoResponse> getAllClinics() {
-        return clinicRepository.findAll().stream()
-                .map(clinicMapper::toClinicInfoResponse)
-                .toList();
+    public PageResponseDto<ClinicInfoResponse> getAllClinics(Pageable pageable) {
+        Page<Clinic> clinicPage = clinicRepository.findAll(pageable);
+        Page<ClinicInfoResponse> responsePage = clinicPage.map(clinicMapper::toClinicInfoResponse);
+        return pageMapper.toPageResponse(responsePage);
     }
+
 }
 
