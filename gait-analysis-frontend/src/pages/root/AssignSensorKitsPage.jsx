@@ -36,10 +36,21 @@ const AssignSensorKitsPage = () => {
 
   const loadData = async () => {
     try {
-      const [clinicRes, kitRes] = await Promise.all([getClinics(), getSensorKits()]);
-      setClinics(clinicRes.data || []);
+      // Fetch all clinics with a large page size to get all available clinics
+      // You might want to implement a backend endpoint to get all clinics without pagination
+      const [clinicRes, kitRes] = await Promise.all([
+        getClinics("?page=0&size=1000"), // Large size to get all clinics
+        getSensorKits()
+      ]);
+      
+      // Handle paginated response for clinics
+      const clinicsData = clinicRes.data?.content || [];
+      setClinics(clinicsData);
+      
+      // Filter kits to show only IN_STOCK ones
       setKits(kitRes.data?.filter((k) => k.status === "IN_STOCK") || []);
     } catch (error) {
+      console.error("Error loading data:", error);
       showSnackbar("Failed to load data", "error");
     } finally {
       setLoading(false);
@@ -63,6 +74,7 @@ const AssignSensorKitsPage = () => {
       setSelectedKits([]);
       await loadData();
     } catch (error) {
+      console.error("Assignment error:", error);
       showSnackbar(error?.response?.data?.message || "Assignment failed", "error");
     } finally {
       setAssigning(false);
