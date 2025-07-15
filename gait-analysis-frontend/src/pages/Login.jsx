@@ -283,7 +283,7 @@ export default function Login() {
                   {[
                     {
                       icon: <SecurityIcon />,
-                      text: "HIPAA Compliant Security",
+                      text: "Secure Platform",
                       desc: "Bank-level encryption and compliance",
                     },
                     {
