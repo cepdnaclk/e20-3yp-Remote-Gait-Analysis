@@ -28,6 +28,7 @@ public class PatientMapper {
                 .sensorKitId(patient.getSensorKit().getId())
                 .nic(patient.getNic())
                 .doctorName(patient.getDoctor().getName())
+                .accountStatus(patient.getAccountStatus().name())
                 .build();
     }
 }
