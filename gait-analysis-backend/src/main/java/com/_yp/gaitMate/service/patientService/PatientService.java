@@ -14,7 +14,7 @@ public interface PatientService {
 
     PageResponseDto<PatientInfoResponse> getPatientsOfLoggedInDoctor(Pageable pageable);
 
-    List<PatientInfoResponse> getPatientsOfLoggedInClinic();
+    PageResponseDto<PatientInfoResponse> getPatientsOfLoggedInClinic(Pageable pageable);
 
     PatientInfoResponse getMyPatientProfile();
 }

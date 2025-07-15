@@ -47,18 +47,24 @@ export default function ClinicAdminDashboard() {
   const [doctors, setDoctors] = useState([]);
   const [patients, setPatients] = useState([]);
   const [kits, setKits] = useState([]);
+  const [totalDoctors, setTotalDoctors] = useState(0);
+  const [totalPatients, setTotalPatients] = useState(0);
   const [loading, setLoading] = useState(true);
 
   const fetchData = async () => {
     try {
+      // Fetch first page to get totals and some data for dashboard
       const [doctorRes, patientRes, kitRes] = await Promise.all([
-        getDoctors(),
-        getPatients(),
+        getDoctors({ page: 0, size: 10 }),
+        getPatients({ page: 0, size: 10 }),
         getAvailableSensorKits(),
       ]);
-      setDoctors(doctorRes.data);
-      setPatients(patientRes.data);
+      
+      setDoctors(doctorRes.data.content);
+      setPatients(patientRes.data.content);
       setKits(kitRes.data);
+      setTotalDoctors(doctorRes.data.totalElements);
+      setTotalPatients(patientRes.data.totalElements);
     } catch (err) {
       console.error("Error fetching clinic admin data", err);
     } finally {
@@ -204,9 +210,9 @@ export default function ClinicAdminDashboard() {
   const renderContent = () => {
     switch (selectedSection) {
       case "Doctors":
-        return <DoctorManagementPage doctors={doctors} refreshData={fetchData} />;
+        return <DoctorManagementPage refreshData={fetchData} />;
       case "Patients":
-        return <PatientManagementPage patients={patients} refreshData={fetchData} />;
+        return <PatientManagementPage refreshData={fetchData} />;
       case "Add Patient":
         return (
           <AddPatientPage
@@ -223,7 +229,7 @@ export default function ClinicAdminDashboard() {
               <Grid item xs={12} sm={6} md={4}>
                 <StatCard
                   title="Total Doctors"
-                  value={doctors.length}
+                  value={totalDoctors}
                   icon={<LocalHospitalIcon sx={{ fontSize: 32 }} />}
                   gradient="linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)"
                   trend="+2 this month"
@@ -233,7 +239,7 @@ export default function ClinicAdminDashboard() {
               <Grid item xs={12} sm={6} md={4}>
                 <StatCard
                   title="Total Patients"
-                  value={patients.length}
+                  value={totalPatients}
                   icon={<PeopleIcon sx={{ fontSize: 32 }} />}
                   gradient="linear-gradient(135deg, #10b981 0%, #059669 100%)"
                   trend="+8 this week"
@@ -253,7 +259,7 @@ export default function ClinicAdminDashboard() {
 
             <Grid container spacing={3} alignItems={'stretch'}>
               {/* Quick Actions */}
-              <Grid item xs={12} md={8}  sx={{ display: 'flex', flexDirection: 'column' }}>
+              <Grid item xs={12} md={8} sx={{ display: 'flex', flexDirection: 'column' }}>
                 <Card
                   sx={{
                     p: 4,
@@ -312,7 +318,6 @@ export default function ClinicAdminDashboard() {
                         icon={<PersonAddIcon sx={{ fontSize: 24 }} />}
                         onClick={() => setSelectedSection("Add Patient")}
                         color="#f59e0b"
-                        
                       />
                     </Grid>
                     
@@ -330,7 +335,7 @@ export default function ClinicAdminDashboard() {
               </Grid>
 
               {/* Recent Activity / Summary */}
-              <Grid item xs={12} md={4}  sx={{ display: 'flex', flexDirection: 'column' }}>
+              <Grid item xs={12} md={4} sx={{ display: 'flex', flexDirection: 'column' }}>
                 <Card
                   sx={{
                     p: 4,
@@ -381,7 +386,7 @@ export default function ClinicAdminDashboard() {
                         Doctor-Patient Ratio
                       </Typography>
                       <Typography variant="body2" fontWeight="600">
-                        1:{Math.round(patients.length / doctors.length || 0)}
+                        1:{Math.round(totalPatients / totalDoctors || 0)}
                       </Typography>
                     </Box>
                     

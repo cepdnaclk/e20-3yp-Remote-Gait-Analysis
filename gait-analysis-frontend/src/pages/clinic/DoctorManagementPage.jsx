@@ -27,6 +27,11 @@ import {
   Fade,
   Divider,
   CircularProgress,
+  Pagination,
+  MenuItem,
+  Select,
+  FormControl,
+  InputLabel,
 } from "@mui/material";
 import { useEffect, useState } from "react";
 import { getDoctors, addDoctor } from "../../services/clinicAdminServices";
@@ -35,24 +40,26 @@ import LocalHospitalIcon from "@mui/icons-material/LocalHospital";
 import EmailIcon from "@mui/icons-material/Email";
 import PhoneIcon from "@mui/icons-material/Phone";
 import BadgeIcon from "@mui/icons-material/Badge";
-import AccountCircleIcon from "@mui/icons-material/AccountCircle";
-import LockIcon from "@mui/icons-material/Lock";
 import SearchIcon from "@mui/icons-material/Search";
 import MedicalServicesIcon from "@mui/icons-material/MedicalServices";
 
-export default function DoctorManagementPage({
-  doctors: initialDoctors,
-  refreshData,
-}) {
-  const [doctors, setDoctors] = useState(initialDoctors || []);
-  const [filteredDoctors, setFilteredDoctors] = useState(initialDoctors || []);
+export default function DoctorManagementPage({ refreshData }) {
+  const [doctors, setDoctors] = useState([]);
+  const [filteredDoctors, setFilteredDoctors] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [open, setOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [snackbar, setSnackbar] = useState({
     open: false,
     message: "",
     severity: "success",
   });
+
+  // Pagination states
+  const [page, setPage] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
+  const [totalElements, setTotalElements] = useState(0);
+  const [pageSize, setPageSize] = useState(10);
 
   const [newDoctor, setNewDoctor] = useState({
     name: "",
@@ -63,34 +70,64 @@ export default function DoctorManagementPage({
 
   const [addingDoctor, setAddingDoctor] = useState(false);
 
-  useEffect(() => {
-    if (!initialDoctors) {
-      getDoctors()
-        .then((res) => {
-          setDoctors(res.data);
-          setFilteredDoctors(res.data);
-        })
-        .catch(() => {
-          setSnackbar({
-            open: true,
-            message: "Failed to load doctors",
-            severity: "error",
-          });
-        });
-    } else {
-      setFilteredDoctors(initialDoctors);
+  const fetchDoctors = async (currentPage = 0, currentSize = 10, search = "") => {
+    setLoading(true);
+    try {
+      const params = {
+        page: currentPage,
+        size: currentSize,
+      };
+      
+      if (search) {
+        params.search = search;
+      }
+      
+      const response = await getDoctors(params);
+      const { content, totalPages, totalElements } = response.data;
+      
+      setDoctors(content);
+      setFilteredDoctors(content);
+      setTotalPages(totalPages);
+      setTotalElements(totalElements);
+      setPage(currentPage);
+    } catch (error) {
+      console.error("Error fetching doctors:", error);
+      setSnackbar({
+        open: true,
+        message: "Failed to load doctors",
+        severity: "error",
+      });
+    } finally {
+      setLoading(false);
     }
-  }, [initialDoctors]);
+  };
 
   useEffect(() => {
-    const filtered = doctors.filter(
-      (doctor) =>
-        doctor.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        doctor.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        doctor.specialization.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-    setFilteredDoctors(filtered);
-  }, [searchTerm, doctors]);
+    fetchDoctors();
+  }, []);
+
+  // Handle search with debounce
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      if (searchTerm !== "") {
+        fetchDoctors(0, pageSize, searchTerm);
+      } else {
+        fetchDoctors(page, pageSize);
+      }
+    }, 500);
+
+    return () => clearTimeout(timeoutId);
+  }, [searchTerm]);
+
+  const handlePageChange = (event, newPage) => {
+    fetchDoctors(newPage - 1, pageSize, searchTerm);
+  };
+
+  const handlePageSizeChange = (event) => {
+    const newSize = event.target.value;
+    setPageSize(newSize);
+    fetchDoctors(0, newSize, searchTerm);
+  };
 
   const handleChange = (field) => (e) => {
     setNewDoctor({ ...newDoctor, [field]: e.target.value });
@@ -114,7 +151,6 @@ export default function DoctorManagementPage({
         message: "Doctor added successfully",
         severity: "success",
       });
-      setAddingDoctor(false);
       setNewDoctor({
         name: "",
         email: "",
@@ -122,19 +158,20 @@ export default function DoctorManagementPage({
         specialization: "",
       });
       setOpen(false);
+      
+      // Refresh the current page
+      await fetchDoctors(page, pageSize, searchTerm);
+      
+      // Also refresh the dashboard data if callback provided
       if (refreshData) refreshData();
-      else {
-        const res = await getDoctors();
-        setDoctors(res.data);
-        setFilteredDoctors(res.data);
-      }
     } catch (err) {
-      setAddingDoctor(false);
       setSnackbar({
         open: true,
-        message: err.response?.data?.message || "Failed to add patient",
+        message: err.response?.data?.message || "Failed to add doctor",
         severity: "error",
       });
+    } finally {
+      setAddingDoctor(false);
     }
   };
 
@@ -258,18 +295,19 @@ export default function DoctorManagementPage({
               Doctor Management
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              Manage healthcare professionals and their information
+              Manage healthcare professionals and their information ({totalElements} total)
             </Typography>
           </Box>
         </Box>
 
-        {/* Search and Add Button */}
+        {/* Search and Controls */}
         <Box
           sx={{
             display: "flex",
             gap: 2,
             alignItems: "center",
             flexWrap: "wrap",
+            mb: 3,
           }}
         >
           <TextField
@@ -293,6 +331,25 @@ export default function DoctorManagementPage({
               ),
             }}
           />
+
+          <FormControl sx={{ minWidth: 120 }}>
+            <InputLabel>Per Page</InputLabel>
+            <Select
+              value={pageSize}
+              label="Per Page"
+              onChange={handlePageSizeChange}
+              sx={{
+                borderRadius: 2,
+                backgroundColor: "white",
+                boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
+              }}
+            >
+              <MenuItem value={5}>5</MenuItem>
+              <MenuItem value={10}>10</MenuItem>
+              <MenuItem value={20}>20</MenuItem>
+              <MenuItem value={50}>50</MenuItem>
+            </Select>
+          </FormControl>
 
           <Button
             variant="contained"
@@ -319,37 +376,84 @@ export default function DoctorManagementPage({
         </Box>
       </Box>
 
-      {/* Content */}
-      {filteredDoctors.length > 0 ? (
-        <Grid container spacing={3}>
-          {filteredDoctors.map((doctor) => (
-            <Grid item xs={12} sm={6} lg={4} key={doctor.id}>
-              <DoctorCard doctor={doctor} />
-            </Grid>
-          ))}
-        </Grid>
-      ) : (
-        <Card
-          sx={{
-            p: 6,
-            textAlign: "center",
-            background: "rgba(148, 163, 184, 0.05)",
-            border: "1px dashed rgba(148, 163, 184, 0.3)",
-            borderRadius: 3,
-          }}
+      {/* Loading State */}
+      {loading ? (
+        <Box
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          height="50vh"
         >
-          <MedicalServicesIcon
-            sx={{ fontSize: 64, color: "text.secondary", mb: 2 }}
-          />
-          <Typography variant="h6" color="text.secondary" sx={{ mb: 1 }}>
-            {searchTerm ? "No doctors found" : "No doctors available"}
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            {searchTerm
-              ? `No doctors match your search for "${searchTerm}"`
-              : "Start by adding your first doctor to the system"}
-          </Typography>
-        </Card>
+          <Box sx={{ textAlign: "center" }}>
+            <CircularProgress size={48} thickness={4} />
+            <Typography variant="h6" sx={{ mt: 2, color: "text.secondary" }}>
+              Loading doctors...
+            </Typography>
+          </Box>
+        </Box>
+      ) : (
+        <>
+          {/* Content */}
+          {filteredDoctors.length > 0 ? (
+            <>
+              <Grid container spacing={3} sx={{ mb: 4 }}>
+                {filteredDoctors.map((doctor) => (
+                  <Grid item xs={12} sm={6} lg={4} key={doctor.id}>
+                    <DoctorCard doctor={doctor} />
+                  </Grid>
+                ))}
+              </Grid>
+
+              {/* Pagination */}
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  mt: 4,
+                  gap: 2,
+                }}
+              >
+                <Typography variant="body2" color="text.secondary">
+                  Showing {page * pageSize + 1}-{Math.min((page + 1) * pageSize, totalElements)} of {totalElements} doctors
+                </Typography>
+                <Pagination
+                  count={totalPages}
+                  page={page + 1}
+                  onChange={handlePageChange}
+                  color="primary"
+                  sx={{
+                    "& .MuiPaginationItem-root": {
+                      borderRadius: 2,
+                    },
+                  }}
+                />
+              </Box>
+            </>
+          ) : (
+            <Card
+              sx={{
+                p: 6,
+                textAlign: "center",
+                background: "rgba(148, 163, 184, 0.05)",
+                border: "1px dashed rgba(148, 163, 184, 0.3)",
+                borderRadius: 3,
+              }}
+            >
+              <MedicalServicesIcon
+                sx={{ fontSize: 64, color: "text.secondary", mb: 2 }}
+              />
+              <Typography variant="h6" color="text.secondary" sx={{ mb: 1 }}>
+                {searchTerm ? "No doctors found" : "No doctors available"}
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                {searchTerm
+                  ? `No doctors match your search for "${searchTerm}"`
+                  : "Start by adding your first doctor to the system"}
+              </Typography>
+            </Card>
+          )}
+        </>
       )}
 
       {/* Add Doctor Dialog */}
@@ -479,7 +583,7 @@ export default function DoctorManagementPage({
           <Button
             variant="contained"
             onClick={handleAddDoctor}
-            disabled={!isFormValid || addingDoctor}
+            disabled={!isFormValid() || addingDoctor}
             startIcon={addingDoctor ? <CircularProgress size={20} /> : null}
             sx={{
               px: 3,
