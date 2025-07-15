@@ -1,60 +1,51 @@
+<div align="center">
+  <img src="/docs/images/logo.png" alt="Rehab Gait Logo" width="100">
+  <h1 style="display: inline-block; margin-left: 20px;">RehabGait | Remote Gait Analysis System</h1>
+  <h3> Empowering Every Step Toward Recovery.</h3>
+</div>
+
 ___
-# Remote Gait Analysis
-___
 
-![Logo](docs/images/logo.png "This is the logo")
+<div align="center">
 
+[![Contributors][contributors-shield]](https://github.com/cepdnaclk/e20-3yp-Remote-Gait-Analysis/graphs/contributors)&ensp;
+[![Network Graph][forks-shield]](https://github.com/cepdnaclk/e20-3yp-Remote-Gait-Analysis/network)&ensp;
+[![Stargazers][stars-shield]](https://github.com/cepdnaclk/e19-3yp-beehive-monitoring-system/stargazers)&ensp;
+[![Issues][issues-shield]](https://github.com/cepdnaclk/e20-3yp-Remote-Gait-Analysis/issues)
 
-# e20-3yp-remote-gait-analysis
+</div>
 
-An advanced gait monitoring solution combining wearable technology and intuitive visualizations to support physiotherapists in enhancing patient mobility
+<!-- MARKDOWN LINKS & IMAGES -->
+<!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
+[contributors-shield]: https://img.shields.io/github/contributors/cepdnaclk/e19-3yp-beehive-monitoring-system.svg?style=for-the-badge
+[forks-shield]: https://img.shields.io/github/forks/cepdnaclk/e19-3yp-beehive-monitoring-system.svg?style=for-the-badge
+[stars-shield]: https://img.shields.io/github/stars/cepdnaclk/e19-3yp-beehive-monitoring-system.svg?style=for-the-badge
+[issues-shield]: https://img.shields.io/github/issues/cepdnaclk/e19-3yp-beehive-monitoring-system.svg?style=for-the-badge
 
-### Enable GitHub Pages
+---
 
-You can put the things to be shown in GitHub pages into the _docs/_ folder. Both html and md file formats are supported. You need to go to settings and enable GitHub pages and select _main_ branch and _docs_ folder from the dropdowns, as shown in the below image.
+## Introduction
 
+<img src="/docs/images/remote-healthcare.jpg" width="300" height="200">
 
-### Special Configurations
+An advanced gait monitoring solution combining wearable technology and intuitive visualizations to support physiotherapists in enhancing patient mobility.
 
-These projects will be automatically added into [https://projects.ce.pdn.ac.lk](). If you like to show more details about your project on this site, you can fill the parameters in the file, _/docs/index.json_
+## Solution
 
-```
-{
-  "title": "Remote Gait Analysis,
-  "team": [
-    {
-      "name": "L.R.H.I. Bandara",
-      "email": "e20037@eng.pdn.ac.lk",
-      "eNumber": "E/20/037"
-    },
-    {
-      "name": "C.A. Rupasinghe",
-      "email": "e20342@eng.pdn.ac.lk",
-      "eNumber": "E/20/342"
-    },
-    {
-      "name": "S.D.Y.V Senanayake",
-      "email": "e20363@eng.pdn.ac.lk",
-      "eNumber": "E/20/363"
-    },
-    {
-      "name": "C.K. Senaratne",
-      "email": "e20365@eng.pdn.ac.lk",
-      "eNumber": "E/20/365"
-    }
-  ],
-  "supervisors": [
-    {
-      "name": "Dr. Isuru Nawinne",
-      "email": "isurunawinne@eng.pdn.ac.lk"
-    }
-  ],
-  "tags": ["Web", "Embedded Systems"]
-}
-```
+## Features
 
-Once you filled this _index.json_ file, please verify the syntax is correct. (You can use [this](https://jsonlint.com/) tool).
+## Sensor
 
-### Page Theme
+<div align="left">
+  <p>👥 <b>Contributors:</b> 
+    <li><a href="https://github.com/haritha037">Haritha Bandara</a></li> 
+    <li><a href="https://github.com/Chama28228">Chamath Rupasinghe</a></li> 
+    <li><a href="https://github.com/Yohansenanayake">Yohan Senanayake</a></li> 
+    <li><a href="https://github.com/chamodi27">Chamodi Senaratne</a></li> 
+     </p>
+  <p>🌐 Visit the <a href="https://cepdnaclk.github.io/e20-3yp-Remote-Gait-Analysis/">Project Website</a> for more information 🌐</p>
+  <p>📃 Read the <a href=https://github.com/cepdnaclk/e19-3yp-beehive-monitoring-system/wiki/Home>Technical Design Manual</a> for more information 📃</p>
+  <p>📚 Found a bug or want to contribute? 📚</p> 
+  <p>⭐️ Star this repository if you find it helpful! ⭐️</p>
+</div>
 
-A custom theme integrated with this GitHub Page, which is based on [github.com/cepdnaclk/eYY-project-theme](https://github.com/cepdnaclk/eYY-project-theme). If you like to remove this default theme, you can remove the file, _docs/\_config.yml_ and use HTML based website.
