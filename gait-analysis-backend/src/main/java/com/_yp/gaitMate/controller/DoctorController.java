@@ -124,13 +124,27 @@ public class DoctorController {
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
+//    @GetMapping("/clinics/me/doctors")
+//    @PreAuthorize("hasRole('CLINIC')")
+//    @Operation(summary = "Get doctors of the logged-in clinic")
+//    public ResponseEntity<List<DoctorInfoResponse>> getDoctorsOfLoggedInClinic() {
+//        List<DoctorInfoResponse> doctors = doctorService.getDoctorsOfLoggedInClinic();
+//        return new ResponseEntity<>(doctors, HttpStatus.OK);
+//    }
+
     @GetMapping("/clinics/me/doctors")
     @PreAuthorize("hasRole('CLINIC')")
-    @Operation(summary = "Get doctors of the logged-in clinic")
-    public ResponseEntity<List<DoctorInfoResponse>> getDoctorsOfLoggedInClinic() {
-        List<DoctorInfoResponse> doctors = doctorService.getDoctorsOfLoggedInClinic();
-        return new ResponseEntity<>(doctors, HttpStatus.OK);
+    @Operation(summary = "Get paginated doctors of the logged-in clinic")
+    public ResponseEntity<PageResponseDto<DoctorInfoResponse>> getDoctorsOfLoggedInClinic(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        Pageable pageable = PageRequest.of(page, size);
+        PageResponseDto<DoctorInfoResponse> response = doctorService.getDoctorsOfLoggedInClinic(pageable);
+        return ResponseEntity.ok(response);
     }
+
+
 
     @GetMapping("/doctors/me/patients")
     @PreAuthorize("hasRole('DOCTOR')")

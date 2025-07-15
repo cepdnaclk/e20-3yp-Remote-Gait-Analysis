@@ -12,50 +12,112 @@ import {
   Grid,
   Container,
   Fade,
-  Paper,
+  Pagination,
+  MenuItem,
+  Select,
+  FormControl,
+  InputLabel,
 } from "@mui/material";
 import { useEffect, useState } from "react";
 import { getPatients } from "../../services/clinicAdminServices";
 import PeopleIcon from "@mui/icons-material/People";
 import PersonIcon from "@mui/icons-material/Person";
 import LocalHospitalIcon from "@mui/icons-material/LocalHospital";
-import DevicesIcon from "@mui/icons-material/Devices";
 import SearchIcon from "@mui/icons-material/Search";
 import CakeIcon from "@mui/icons-material/Cake";
-import WcIcon from "@mui/icons-material/Wc";
 import SensorOccupiedIcon from "@mui/icons-material/SensorOccupied";
 
-export default function PatientManagementPage({ patients: initialPatients, refreshData }) {
-  const [patients, setPatients] = useState(initialPatients || []);
-  const [filteredPatients, setFilteredPatients] = useState(initialPatients || []);
+export default function PatientManagementPage({ refreshData }) {
+  const [patients, setPatients] = useState([]);
+  const [filteredPatients, setFilteredPatients] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const [loading, setLoading] = useState(!initialPatients);
+  const [loading, setLoading] = useState(true);
   const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "success" });
 
-  useEffect(() => {
-    if (!initialPatients) {
-      getPatients()
-        .then((res) => {
-          setPatients(res.data);
-          setFilteredPatients(res.data);
-        })
-        .catch(() => {
-          setSnackbar({ open: true, message: "Failed to load patients", severity: "error" });
-        })
-        .finally(() => setLoading(false));
-    } else {
-      setFilteredPatients(initialPatients);
+  // Pagination states
+  const [page, setPage] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
+  const [totalElements, setTotalElements] = useState(0);
+  const [pageSize, setPageSize] = useState(10);
+
+  // Statistics
+  const [stats, setStats] = useState({
+    totalPatients: 0,
+    assignedToDoctors: 0,
+    withSensorKits: 0,
+    averageAge: 0,
+  });
+
+  const fetchPatients = async (currentPage = 0, currentSize = 10, search = "") => {
+    setLoading(true);
+    try {
+      const params = {
+        page: currentPage,
+        size: currentSize,
+      };
+      
+      if (search) {
+        params.search = search;
+      }
+      
+      const response = await getPatients(params);
+      const { content, totalPages, totalElements } = response.data;
+      
+      setPatients(content);
+      setFilteredPatients(content);
+      setTotalPages(totalPages);
+      setTotalElements(totalElements);
+      setPage(currentPage);
+
+      // Calculate statistics from current page data
+      // Note: For accurate stats, you might want to fetch this separately from backend
+      const assignedToDoctors = content.filter(p => p.doctorName).length;
+      const withSensorKits = content.filter(p => p.sensorKitId).length;
+      const averageAge = content.length > 0 
+        ? Math.round(content.reduce((sum, p) => sum + p.age, 0) / content.length)
+        : 0;
+
+      setStats({
+        totalPatients: totalElements,
+        assignedToDoctors,
+        withSensorKits,
+        averageAge,
+      });
+      
+    } catch (error) {
+      console.error("Error fetching patients:", error);
+      setSnackbar({ open: true, message: "Failed to load patients", severity: "error" });
+    } finally {
+      setLoading(false);
     }
-  }, [initialPatients]);
+  };
 
   useEffect(() => {
-    const filtered = patients.filter((patient) =>
-      patient.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (patient.doctorName || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
-      patient.gender.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-    setFilteredPatients(filtered);
-  }, [searchTerm, patients]);
+    fetchPatients();
+  }, []);
+
+  // Handle search with debounce
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      if (searchTerm !== "") {
+        fetchPatients(0, pageSize, searchTerm);
+      } else {
+        fetchPatients(page, pageSize);
+      }
+    }, 500);
+
+    return () => clearTimeout(timeoutId);
+  }, [searchTerm]);
+
+  const handlePageChange = (event, newPage) => {
+    fetchPatients(newPage - 1, pageSize, searchTerm);
+  };
+
+  const handlePageSizeChange = (event) => {
+    const newSize = event.target.value;
+    setPageSize(newSize);
+    fetchPatients(0, newSize, searchTerm);
+  };
 
   const handleCloseSnackbar = () => setSnackbar({ ...snackbar, open: false });
 
@@ -194,25 +256,6 @@ export default function PatientManagementPage({ patients: initialPatients, refre
     </Fade>
   );
 
-  if (loading) {
-    return (
-      <Box
-        display="flex"
-        justifyContent="center"
-        alignItems="center"
-        height="50vh"
-        sx={{ bgcolor: "transparent" }}
-      >
-        <Box sx={{ textAlign: "center" }}>
-          <CircularProgress size={48} thickness={4} />
-          <Typography variant="h6" sx={{ mt: 2, color: "text.secondary" }}>
-            Loading patients...
-          </Typography>
-        </Box>
-      </Box>
-    );
-  }
-
   return (
     <Container maxWidth="xl" sx={{ px: 0 }}>
       {/* Header */}
@@ -233,143 +276,221 @@ export default function PatientManagementPage({ patients: initialPatients, refre
               Patient Management
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              Monitor and manage patient information and assignments
+              Monitor and manage patient information and assignments ({totalElements} total)
             </Typography>
           </Box>
         </Box>
 
-        {/* Search */}
-        <TextField
-          placeholder="Search patients by name, doctor, or gender..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
+        {/* Search and Controls */}
+        <Box
           sx={{
-            maxWidth: 500,
-            "& .MuiOutlinedInput-root": {
-              borderRadius: 2,
-              backgroundColor: "white",
-              boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
-            },
-          }}
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <SearchIcon sx={{ color: "text.secondary" }} />
-              </InputAdornment>
-            ),
-          }}
-        />
-      </Box>
-
-      {/* Statistics */}
-      <Grid container spacing={3} sx={{ mb: 4 }}>
-        <Grid item xs={12} sm={6} md={3}>
-          <Card
-            sx={{
-              p: 3,
-              background: "linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)",
-              color: "white",
-              borderRadius: 3,
-              boxShadow: "0 8px 24px rgba(59, 130, 246, 0.3)",
-            }}
-          >
-            <Typography variant="h4" fontWeight="800">
-              {filteredPatients.length}
-            </Typography>
-            <Typography variant="body2" sx={{ opacity: 0.9 }}>
-              Total Patients
-            </Typography>
-          </Card>
-        </Grid>
-        
-        <Grid item xs={12} sm={6} md={3}>
-          <Card
-            sx={{
-              p: 3,
-              background: "linear-gradient(135deg, #10b981 0%, #059669 100%)",
-              color: "white",
-              borderRadius: 3,
-              boxShadow: "0 8px 24px rgba(16, 185, 129, 0.3)",
-            }}
-          >
-            <Typography variant="h4" fontWeight="800">
-              {filteredPatients.filter(p => p.doctorName).length}
-            </Typography>
-            <Typography variant="body2" sx={{ opacity: 0.9 }}>
-              Assigned to Doctors
-            </Typography>
-          </Card>
-        </Grid>
-        
-        <Grid item xs={12} sm={6} md={3}>
-          <Card
-            sx={{
-              p: 3,
-              background: "linear-gradient(135deg, #f59e0b 0%, #d97706 100%)",
-              color: "white",
-              borderRadius: 3,
-              boxShadow: "0 8px 24px rgba(245, 158, 11, 0.3)",
-            }}
-          >
-            <Typography variant="h4" fontWeight="800">
-              {filteredPatients.filter(p => p.sensorKitId).length}
-            </Typography>
-            <Typography variant="body2" sx={{ opacity: 0.9 }}>
-              With Sensor Kits
-            </Typography>
-          </Card>
-        </Grid>
-        
-        <Grid item xs={12} sm={6} md={3}>
-          <Card
-            sx={{
-              p: 3,
-              background: "linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)",
-              color: "white",
-              borderRadius: 3,
-              boxShadow: "0 8px 24px rgba(139, 92, 246, 0.3)",
-            }}
-          >
-            <Typography variant="h4" fontWeight="800">
-              {Math.round(filteredPatients.reduce((sum, p) => sum + p.age, 0) / filteredPatients.length) || 0}
-            </Typography>
-            <Typography variant="body2" sx={{ opacity: 0.9 }}>
-              Average Age
-            </Typography>
-          </Card>
-        </Grid>
-      </Grid>
-
-      {/* Patient Cards */}
-      {filteredPatients.length > 0 ? (
-        <Grid container spacing={3}>
-          {filteredPatients.map((patient) => (
-            <Grid item xs={12} sm={6} lg={4} key={patient.id}>
-              <PatientCard patient={patient} />
-            </Grid>
-          ))}
-        </Grid>
-      ) : (
-        <Card
-          sx={{
-            p: 6,
-            textAlign: "center",
-            background: "rgba(148, 163, 184, 0.05)",
-            border: "1px dashed rgba(148, 163, 184, 0.3)",
-            borderRadius: 3,
+            display: "flex",
+            gap: 2,
+            alignItems: "center",
+            flexWrap: "wrap",
+            mb: 3,
           }}
         >
-          <PersonIcon sx={{ fontSize: 64, color: "text.secondary", mb: 2 }} />
-          <Typography variant="h6" color="text.secondary" sx={{ mb: 1 }}>
-            {searchTerm ? "No patients found" : "No patients registered"}
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            {searchTerm 
-              ? `No patients match your search for "${searchTerm}"`
-              : "Patient records will appear here once they are registered"
-            }
-          </Typography>
-        </Card>
+          <TextField
+            placeholder="Search patients by name, doctor, or gender..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            sx={{
+              flex: 1,
+              minWidth: 300,
+              "& .MuiOutlinedInput-root": {
+                borderRadius: 2,
+                backgroundColor: "white",
+                boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
+              },
+            }}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon sx={{ color: "text.secondary" }} />
+                </InputAdornment>
+              ),
+            }}
+          />
+
+          <FormControl sx={{ minWidth: 120 }}>
+            <InputLabel>Per Page</InputLabel>
+            <Select
+              value={pageSize}
+              label="Per Page"
+              onChange={handlePageSizeChange}
+              sx={{
+                borderRadius: 2,
+                backgroundColor: "white",
+                boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
+              }}
+            >
+              <MenuItem value={5}>5</MenuItem>
+              <MenuItem value={10}>10</MenuItem>
+              <MenuItem value={20}>20</MenuItem>
+              <MenuItem value={50}>50</MenuItem>
+            </Select>
+          </FormControl>
+        </Box>
+      </Box>
+
+      {/* Loading State */}
+      {loading ? (
+        <Box
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          height="50vh"
+          sx={{ bgcolor: "transparent" }}
+        >
+          <Box sx={{ textAlign: "center" }}>
+            <CircularProgress size={48} thickness={4} />
+            <Typography variant="h6" sx={{ mt: 2, color: "text.secondary" }}>
+              Loading patients...
+            </Typography>
+          </Box>
+        </Box>
+      ) : (
+        <>
+          {/* Statistics */}
+          <Grid container spacing={3} sx={{ mb: 4 }}>
+            <Grid item xs={12} sm={6} md={3}>
+              <Card
+                sx={{
+                  p: 3,
+                  background: "linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)",
+                  color: "white",
+                  borderRadius: 3,
+                  boxShadow: "0 8px 24px rgba(59, 130, 246, 0.3)",
+                }}
+              >
+                <Typography variant="h4" fontWeight="800">
+                  {stats.totalPatients}
+                </Typography>
+                <Typography variant="body2" sx={{ opacity: 0.9 }}>
+                  Total Patients
+                </Typography>
+              </Card>
+            </Grid>
+            
+            <Grid item xs={12} sm={6} md={3}>
+              <Card
+                sx={{
+                  p: 3,
+                  background: "linear-gradient(135deg, #10b981 0%, #059669 100%)",
+                  color: "white",
+                  borderRadius: 3,
+                  boxShadow: "0 8px 24px rgba(16, 185, 129, 0.3)",
+                }}
+              >
+                <Typography variant="h4" fontWeight="800">
+                  {stats.assignedToDoctors}
+                </Typography>
+                <Typography variant="body2" sx={{ opacity: 0.9 }}>
+                  Assigned to Doctors
+                </Typography>
+              </Card>
+            </Grid>
+            
+            <Grid item xs={12} sm={6} md={3}>
+              <Card
+                sx={{
+                  p: 3,
+                  background: "linear-gradient(135deg, #f59e0b 0%, #d97706 100%)",
+                  color: "white",
+                  borderRadius: 3,
+                  boxShadow: "0 8px 24px rgba(245, 158, 11, 0.3)",
+                }}
+              >
+                <Typography variant="h4" fontWeight="800">
+                  {stats.withSensorKits}
+                </Typography>
+                <Typography variant="body2" sx={{ opacity: 0.9 }}>
+                  With Sensor Kits
+                </Typography>
+              </Card>
+            </Grid>
+            
+            <Grid item xs={12} sm={6} md={3}>
+              <Card
+                sx={{
+                  p: 3,
+                  background: "linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)",
+                  color: "white",
+                  borderRadius: 3,
+                  boxShadow: "0 8px 24px rgba(139, 92, 246, 0.3)",
+                }}
+              >
+                <Typography variant="h4" fontWeight="800">
+                  {stats.averageAge}
+                </Typography>
+                <Typography variant="body2" sx={{ opacity: 0.9 }}>
+                  Average Age
+                </Typography>
+              </Card>
+            </Grid>
+          </Grid>
+
+          {/* Patient Cards */}
+          {filteredPatients.length > 0 ? (
+            <>
+              <Grid container spacing={3} sx={{ mb: 4 }}>
+                {filteredPatients.map((patient) => (
+                  <Grid item xs={12} sm={6} lg={4} key={patient.id} mb={5}>
+                    <PatientCard patient={patient} />
+                  </Grid>
+                ))}
+              </Grid>
+
+              {/* Pagination */}
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  mt: 4,
+                  gap: 2,
+                }}
+              >
+                <Typography variant="body2" color="text.secondary">
+                  Showing {page * pageSize + 1}-{Math.min((page + 1) * pageSize, totalElements)} of {totalElements} patients
+                </Typography>
+                <Pagination
+                  count={totalPages}
+                  page={page + 1}
+                  onChange={handlePageChange}
+                  color="primary"
+                  sx={{
+                    "& .MuiPaginationItem-root": {
+                      borderRadius: 2,
+                    },
+                  }}
+                />
+              </Box>
+            </>
+          ) : (
+            <Card
+              sx={{
+                p: 6,
+                textAlign: "center",
+                background: "rgba(148, 163, 184, 0.05)",
+                border: "1px dashed rgba(148, 163, 184, 0.3)",
+                borderRadius: 3,
+              }}
+            >
+              <PersonIcon sx={{ fontSize: 64, color: "text.secondary", mb: 2 }} />
+              <Typography variant="h6" color="text.secondary" sx={{ mb: 1 }}>
+                {searchTerm ? "No patients found" : "No patients registered"}
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                {searchTerm 
+                  ? `No patients match your search for "${searchTerm}"`
+                  : "Patient records will appear here once they are registered"
+                }
+              </Typography>
+            </Card>
+          )}
+        </>
       )}
 
       <Snackbar 
