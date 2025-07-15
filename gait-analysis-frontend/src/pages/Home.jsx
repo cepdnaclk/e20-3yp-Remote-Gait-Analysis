@@ -643,7 +643,6 @@ const Home = () => {
               size="large"
               component={Link}
               to="/contact"
-              startIcon={<ContactMailIcon />}
               sx={{
                 px: 5,
                 py: 2,
