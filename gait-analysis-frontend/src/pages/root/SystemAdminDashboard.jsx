@@ -216,7 +216,7 @@ export default function SystemAdminDashboard() {
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [selectedSection, setSelectedSection] = useState("Dashboard");
-  const [clinics, setClinics] = useState([]);
+  const [totalClinics, setTotalClinics] = useState(0);
   const [kits, setKits] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -224,10 +224,12 @@ export default function SystemAdminDashboard() {
     const fetchData = async () => {
       try {
         const [clinicsRes, kitsRes] = await Promise.all([
-          getClinics(),
+          getClinics("?page=0&size=1"), // Fetch just one item to get totalElements
           getSensorKits(),
         ]);
-        setClinics(clinicsRes.data || []);
+        
+        // Extract totalElements from paginated response
+        setTotalClinics(clinicsRes.data?.totalElements || 0);
         setKits(kitsRes.data || []);
       } catch (err) {
         console.error("Error fetching data", err);
@@ -274,7 +276,7 @@ export default function SystemAdminDashboard() {
     datasets: [
       {
         label: "Active Clinics",
-        data: [1, 2, 3, 2, 2, clinics.length],
+        data: [1, 2, 3, 2, 2, totalClinics],
         borderColor: "#3b82f6",
         backgroundColor: "rgba(59,130,246,0.1)",
         tension: 0.4,
@@ -312,7 +314,7 @@ export default function SystemAdminDashboard() {
         <Grid item xs={12} sm={6} md={3}>
           <StatCard
             title="Total Clinics"
-            value={clinics.length}
+            value={totalClinics}
             icon={<BusinessIcon sx={{ fontSize: 32 }} />}
             gradient="linear-gradient(135deg,rgb(59, 191, 134) 0%,rgb(11, 119, 83) 100%)"
             trend="+12%"

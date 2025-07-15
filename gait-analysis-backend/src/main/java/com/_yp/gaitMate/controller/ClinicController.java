@@ -3,6 +3,7 @@ import com._yp.gaitMate.dto.doctor.DoctorInfoResponse;
 
 import com._yp.gaitMate.dto.clinic.ClinicInfoResponse;
 import com._yp.gaitMate.dto.clinic.CreateClinicRequest;
+import com._yp.gaitMate.dto.page.PageResponseDto;
 import com._yp.gaitMate.service.clinicService.ClinicService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -12,6 +13,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -217,58 +220,71 @@ public class ClinicController {
     }
 
 
+//    @GetMapping("/clinics")
+//    @Operation(
+//            summary = "Get all clinics (Any authenticated user)",
+//            description = "Returns a list of all registered clinics. Accessible to any authenticated user.",
+//            responses = {
+//                    @ApiResponse(
+//                            responseCode = "200",
+//                            description = "List of clinics returned",
+//                            content = @Content(
+//                                    mediaType = "application/json",
+//                                    array = @ArraySchema(schema = @Schema(implementation = ClinicInfoResponse.class)),
+//                                    examples = @ExampleObject(
+//                                            value = "[\n" +
+//                                                    "  {\n" +
+//                                                    "    \"id\": 1,\n" +
+//                                                    "    \"name\": \"Central Physiotherapy Clinic\",\n" +
+//                                                    "    \"email\": \"contact@centralclinic.com\",\n" +
+//                                                    "    \"phoneNumber\": \"0712345678\",\n" +
+//                                                    "    \"createdAt\": \"2025-05-11T20:46:31.123\"\n" +
+//                                                    "  },\n" +
+//                                                    "  {\n" +
+//                                                    "    \"id\": 2,\n" +
+//                                                    "    \"name\": \"Westend Therapy Center\",\n" +
+//                                                    "    \"email\": \"info@westendtherapy.lk\",\n" +
+//                                                    "    \"phoneNumber\": \"0776543210\",\n" +
+//                                                    "    \"createdAt\": \"2025-04-02T15:22:10.456\"\n" +
+//                                                    "  }\n" +
+//                                                    "]"
+//                                    )
+//                            )
+//                    ),
+//                    @ApiResponse(
+//                            responseCode = "401",
+//                            description = "Unauthorized",
+//                            content = @Content(
+//                                    mediaType = "application/json",
+//                                    examples = @ExampleObject(
+//                                            value = "{\n" +
+//                                                    "  \"path\": \"/api/clinics\",\n" +
+//                                                    "  \"error\": \"Unauthorized\",\n" +
+//                                                    "  \"message\": \"Full authentication is required to access this resource\",\n" +
+//                                                    "  \"status\": 401\n" +
+//                                                    "}"
+//                                    )
+//                            )
+//                    )
+//            }
+//    )
+//    public ResponseEntity<List<ClinicInfoResponse>> getAllClinics() {
+//        List<ClinicInfoResponse> clinics = clinicService.getAllClinics();
+//        return ResponseEntity.ok(clinics);
+//    }
+
     @GetMapping("/clinics")
-    @Operation(
-            summary = "Get all clinics (Any authenticated user)",
-            description = "Returns a list of all registered clinics. Accessible to any authenticated user.",
-            responses = {
-                    @ApiResponse(
-                            responseCode = "200",
-                            description = "List of clinics returned",
-                            content = @Content(
-                                    mediaType = "application/json",
-                                    array = @ArraySchema(schema = @Schema(implementation = ClinicInfoResponse.class)),
-                                    examples = @ExampleObject(
-                                            value = "[\n" +
-                                                    "  {\n" +
-                                                    "    \"id\": 1,\n" +
-                                                    "    \"name\": \"Central Physiotherapy Clinic\",\n" +
-                                                    "    \"email\": \"contact@centralclinic.com\",\n" +
-                                                    "    \"phoneNumber\": \"0712345678\",\n" +
-                                                    "    \"createdAt\": \"2025-05-11T20:46:31.123\"\n" +
-                                                    "  },\n" +
-                                                    "  {\n" +
-                                                    "    \"id\": 2,\n" +
-                                                    "    \"name\": \"Westend Therapy Center\",\n" +
-                                                    "    \"email\": \"info@westendtherapy.lk\",\n" +
-                                                    "    \"phoneNumber\": \"0776543210\",\n" +
-                                                    "    \"createdAt\": \"2025-04-02T15:22:10.456\"\n" +
-                                                    "  }\n" +
-                                                    "]"
-                                    )
-                            )
-                    ),
-                    @ApiResponse(
-                            responseCode = "401",
-                            description = "Unauthorized",
-                            content = @Content(
-                                    mediaType = "application/json",
-                                    examples = @ExampleObject(
-                                            value = "{\n" +
-                                                    "  \"path\": \"/api/clinics\",\n" +
-                                                    "  \"error\": \"Unauthorized\",\n" +
-                                                    "  \"message\": \"Full authentication is required to access this resource\",\n" +
-                                                    "  \"status\": 401\n" +
-                                                    "}"
-                                    )
-                            )
-                    )
-            }
-    )
-    public ResponseEntity<List<ClinicInfoResponse>> getAllClinics() {
-        List<ClinicInfoResponse> clinics = clinicService.getAllClinics();
-        return ResponseEntity.ok(clinics);
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Get all clinics with pagination")
+    public ResponseEntity<PageResponseDto<ClinicInfoResponse>> getAllClinics(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        Pageable pageable = PageRequest.of(page, size);
+        PageResponseDto<ClinicInfoResponse> response = clinicService.getAllClinics(pageable);
+        return ResponseEntity.ok(response);
     }
+
 
 
 

@@ -2,11 +2,13 @@ package com._yp.gaitMate.service.doctorService;
 
 import com._yp.gaitMate.dto.doctor.CreateDoctorRequest;
 import com._yp.gaitMate.dto.doctor.DoctorInfoResponse;
+import com._yp.gaitMate.dto.page.PageResponseDto;
 import com._yp.gaitMate.dto.patient.PatientInfoResponse;
 import com._yp.gaitMate.exception.ApiException;
 import com._yp.gaitMate.exception.ResourceNotFoundException;
 import com._yp.gaitMate.mail.service.EmailService;
 import com._yp.gaitMate.mapper.DoctorMapper;
+import com._yp.gaitMate.mapper.PageMapper;
 import com._yp.gaitMate.model.Clinic;
 import com._yp.gaitMate.model.Doctor;
 import com._yp.gaitMate.model.Patient;
@@ -22,6 +24,8 @@ import com._yp.gaitMate.security.utils.AuthUtil;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -37,6 +41,7 @@ public class DoctorServiceImpl implements DoctorService{
     private final AuthenticationService authService;
     private final DoctorMapper doctorMapper;
     private final AuthUtil authUtil;
+    private final PageMapper pageMapper;
 
     private final EmailService emailService;
 
@@ -97,16 +102,28 @@ public class DoctorServiceImpl implements DoctorService{
 
 
 
+//    @Override
+//    public List<DoctorInfoResponse> getDoctorsOfLoggedInClinic() {
+//        Clinic clinic = authUtil.getLoggedInClinic();
+//
+//        List<Doctor> doctors = doctorRepository.findByClinic(clinic);
+//
+//        return doctors.stream()
+//                .map(doctorMapper::toDoctorInfoResponse)
+//                .toList();
+//    }
+
     @Override
-    public List<DoctorInfoResponse> getDoctorsOfLoggedInClinic() {
+    public PageResponseDto<DoctorInfoResponse> getDoctorsOfLoggedInClinic(Pageable pageable) {
         Clinic clinic = authUtil.getLoggedInClinic();
 
-        List<Doctor> doctors = doctorRepository.findByClinic(clinic);
+        Page<Doctor> doctorPage = doctorRepository.findByClinic(clinic, pageable);
 
-        return doctors.stream()
-                .map(doctorMapper::toDoctorInfoResponse)
-                .toList();
+        Page<DoctorInfoResponse> mappedPage = doctorPage.map(doctorMapper::toDoctorInfoResponse);
+
+        return pageMapper.toPageResponse(mappedPage);
     }
+
 
 
     //*********************** P R I V A T E  M E T H O D S ************************************

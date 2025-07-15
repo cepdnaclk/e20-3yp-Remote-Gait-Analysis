@@ -27,10 +27,33 @@ import TrendingUpIcon from "@mui/icons-material/TrendingUp";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import InfoIcon from "@mui/icons-material/Info";
 import LoginIcon from "@mui/icons-material/Login";
+import ContactMailIcon from "@mui/icons-material/ContactMail";
 
-// Import images
+// Import images - make sure these paths are correct
 import MainImage from "../assets/images/gait.jpg";
 import LogoImage from "../assets/images/logo-modified.png";
+
+// Define keyframes for animations
+const floatAnimation = {
+  '@keyframes float': {
+    '0%, 100%': { 
+      transform: 'translateY(0px) rotate(0deg)' 
+    },
+    '50%': { 
+      transform: 'translateY(-20px) rotate(5deg)' 
+    },
+  },
+  '@keyframes fadeIn': {
+    'from': { 
+      opacity: 0, 
+      transform: 'translateY(30px)' 
+    },
+    'to': { 
+      opacity: 1, 
+      transform: 'translateY(0)' 
+    },
+  }
+};
 
 // Mock Navbar component
 const Navbar = () => (
@@ -66,15 +89,16 @@ const Navbar = () => (
           RehabGait
         </Typography>
         <Typography variant="caption" color="#666" sx={{ lineHeight: 1 }}>
-          Medical Analytics
+          Empowering Every Step Towards Recovery
         </Typography>
       </Box>
-      
     </Box>
 
     <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
       <Button
         startIcon={<InfoIcon />}
+        component={Link}
+        to="/about"
         sx={{ 
           color: "#666", 
           fontWeight: 600,
@@ -83,6 +107,20 @@ const Navbar = () => (
       >
         About Us
       </Button>
+
+      <Button
+        startIcon={<ContactMailIcon />}
+        component={Link}
+        to="/contact"
+        sx={{ 
+          color: "#666", 
+          fontWeight: 600,
+          display: { xs: "none", sm: "flex" }
+        }}
+      >
+        Contact Us
+      </Button>
+
       <Button
         variant="contained"
         startIcon={<LoginIcon />}
@@ -102,7 +140,7 @@ const Navbar = () => (
   </Box>
 );
 
-export default function Home() {
+const Home = () => {
   const userTypes = [
     {
       title: "Doctors",
@@ -137,14 +175,14 @@ export default function Home() {
     },
     {
       title: "Data Visualization",
-      desc: "Interactive dashboards and comprehensive reports with AI-powered insights for better diagnosis",
+      desc: "Interactive dashboards and comprehensive reports for better diagnosis",
       icon: <ShowChartIcon fontSize="large" />,
       color: "#388E3C",
       stats: "Advanced Analytics"
     },
     {
       title: "Secure & Cloud-Based",
-      desc: "HIPAA-compliant cloud infrastructure ensures patient data security with 99.9% uptime guarantee",
+      desc: "Cloud infrastructure ensures patient data security with 99.9% uptime guarantee",
       icon: <CloudDoneIcon fontSize="large" />,
       color: "#7B1FA2",
       stats: "Bank-Level Security"
@@ -160,24 +198,28 @@ export default function Home() {
 
   const benefits = [
     {
-    icon: <VerifiedUserIcon />,
-    text: "Secure",
-    subtext: "Fully secure and encrypted data flow",
-  },
-  {
-    icon: <TrendingUpIcon />,
-    text: "Medical-Grade Accuracy",
-    subtext: "Clinically validated for reliable insights",
-  },
-  {
-    icon: <AccessTimeIcon />,
-    text: "50% Faster",
-    subtext: "Accelerated recovery tracking and feedback",
-  },
+      icon: <VerifiedUserIcon />,
+      text: "Secure",
+      subtext: "Fully secure and encrypted data flow",
+    },
+    {
+      icon: <TrendingUpIcon />,
+      text: "Medical-Grade Accuracy",
+      subtext: "Clinically validated for reliable insights",
+    },
+    {
+      icon: <AccessTimeIcon />,
+      text: "50% Faster",
+      subtext: "Accelerated recovery tracking and feedback",
+    },
   ];
 
   return (
-    <Box sx={{ width: "100%", overflowX: "hidden" }}>
+    <Box sx={{ 
+      width: "100%", 
+      overflowX: "hidden",
+      ...floatAnimation 
+    }}>
       <Navbar />
 
       {/* Hero Section */}
@@ -190,7 +232,7 @@ export default function Home() {
           flexDirection: "column",
           justifyContent: "center",
           alignItems: "center",
-          paddingTop: "100px", // Increased padding to prevent navbar overlap
+          paddingTop: "100px",
           paddingBottom: "60px",
           overflow: "hidden",
         }}
@@ -581,6 +623,75 @@ export default function Home() {
         </Container>
       </Box>
 
+      {/* Contact CTA Section */}
+      <Box sx={{ 
+        background: "linear-gradient(135deg, #E3F2FD 0%, #BBDEFB 100%)", 
+        py: 8,
+        textAlign: "center",
+        borderTop: "1px solid rgba(0, 0, 0, 0.05)"
+      }}>
+        <Container maxWidth="md">
+          <Typography variant="h4" fontWeight="700" color="#1A237E" sx={{ mb: 2 }}>
+            Ready to Transform Patient Care?
+          </Typography>
+          <Typography variant="h6" color="#546E7A" sx={{ mb: 4, lineHeight: 1.6 }}>
+            Get in touch with our team to learn how RehabGait can benefit your practice and improve patient outcomes
+          </Typography>
+          <Box sx={{ display: "flex", gap: 3, justifyContent: "center", flexWrap: "wrap" }}>
+            <Button
+              variant="contained"
+              size="large"
+              component={Link}
+              to="/contact"
+              startIcon={<ContactMailIcon />}
+              sx={{
+                px: 5,
+                py: 2,
+                fontSize: "1.1rem",
+                background: "linear-gradient(135deg, #1976D2 0%, #1565C0 100%)",
+                fontWeight: 600,
+                borderRadius: 3,
+                boxShadow: "0 8px 25px rgba(25, 118, 210, 0.3)",
+                "&:hover": {
+                  background: "linear-gradient(135deg, #1565C0 0%, #0D47A1 100%)",
+                  transform: "translateY(-2px)",
+                  boxShadow: "0 12px 30px rgba(25, 118, 210, 0.4)",
+                },
+                transition: "all 0.3s ease",
+              }}
+            >
+              Contact Our Team
+            </Button>
+            
+            <Button
+              variant="outlined"
+              size="large"
+              component={Link}
+              to="/about"
+              sx={{
+                px: 5,
+                py: 2,
+                fontSize: "1.1rem",
+                fontWeight: 600,
+                borderRadius: 3,
+                color: "#1976D2",
+                borderColor: "#1976D2",
+                borderWidth: 2,
+                "&:hover": {
+                  borderColor: "#1565C0",
+                  backgroundColor: "rgba(25, 118, 210, 0.1)",
+                  transform: "translateY(-2px)",
+                  borderWidth: 2,
+                },
+                transition: "all 0.3s ease",
+              }}
+            >
+              Learn More
+            </Button>
+          </Box>
+        </Container>
+      </Box>
+
       {/* Footer */}
       <Box 
         sx={{ 
@@ -601,19 +712,8 @@ export default function Home() {
           </Box>
         </Container>
       </Box>
-
-      {/* CSS Animations */}
-      <style jsx>{`
-        @keyframes float {
-          0%, 100% { transform: translateY(0px) rotate(0deg); }
-          50% { transform: translateY(-20px) rotate(5deg); }
-        }
-
-        @keyframes fadeIn {
-          from { opacity: 0; transform: translateY(30px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-      `}</style>
     </Box>
   );
-}
+};
+
+export default Home;
