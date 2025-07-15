@@ -84,7 +84,7 @@ We offer a complete end-to-end solution:
 
 ## 📐 System Architecture
 
-<img src="/docs/images/architecture-diagrams/arch-diagram.png" width="650" alt="RehabGait System Architecture" />
+<img src="/docs/images/architecture-diagrams/arch diagram.png" width="500" alt="RehabGait System Architecture" />
 
 The RehabGait system combines wearable sensors, secure IoT communication, cloud processing, and a user-friendly web interface.
 
