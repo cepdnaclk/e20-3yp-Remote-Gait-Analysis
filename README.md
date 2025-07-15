@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="/docs/images/logo1.png" alt="Rehab Gait Logo" width="100">
+  <img src="/docs/images/logo1.png" alt="Rehab Gait Logo" width="350" height="250">
   <h1 style="display: inline-block; margin-left: 20px;">RehabGait | Remote Gait Analysis System</h1>
 </div>
 
