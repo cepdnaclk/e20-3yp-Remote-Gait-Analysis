@@ -229,7 +229,7 @@ const SignupPage = () => {
               </Typography>
 
               <Typography variant="body1" color="text.secondary" sx={{ mb: 2 }}>
-                Welcome to GaitMate! Set up your account credentials below.
+                Welcome to RehabGait! Set up your account credentials below.
               </Typography>
 
               <Chip
