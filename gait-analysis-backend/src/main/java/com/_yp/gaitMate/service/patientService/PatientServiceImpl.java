@@ -159,17 +159,28 @@ public class PatientServiceImpl implements PatientService{
     }
 
 
+//    @Override
+//    public List<PatientInfoResponse> getPatientsOfLoggedInClinic() {
+//        Clinic clinic = authUtil.getLoggedInClinic();
+//        List<Patient> patients = patientRepository.findByClinic(clinic);
+//
+//        List<PatientInfoResponse> response = patients.stream()
+//                .map(patientMapper::toPatientInfoResponse)
+//                .toList();
+//
+//        return response;
+//    }
+
     @Override
-    public List<PatientInfoResponse> getPatientsOfLoggedInClinic() {
+    public PageResponseDto<PatientInfoResponse> getPatientsOfLoggedInClinic(Pageable pageable) {
         Clinic clinic = authUtil.getLoggedInClinic();
-        List<Patient> patients = patientRepository.findByClinic(clinic);
+        Page<Patient> patientPage = patientRepository.findByClinic(clinic, pageable);
 
-        List<PatientInfoResponse> response = patients.stream()
-                .map(patientMapper::toPatientInfoResponse)
-                .toList();
+        Page<PatientInfoResponse> mappedPage = patientPage.map(patientMapper::toPatientInfoResponse);
 
-        return response;
+        return pageMapper.toPageResponse(mappedPage);
     }
+
 
     @Override
     public PatientInfoResponse getMyPatientProfile() {

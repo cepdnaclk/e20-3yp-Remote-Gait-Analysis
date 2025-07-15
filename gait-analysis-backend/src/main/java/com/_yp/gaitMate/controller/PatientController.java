@@ -1,5 +1,6 @@
 package com._yp.gaitMate.controller;
 
+import com._yp.gaitMate.dto.page.PageResponseDto;
 import com._yp.gaitMate.dto.patient.CreatePatientRequest;
 import com._yp.gaitMate.dto.patient.PatientDashboardStatsDto;
 import com._yp.gaitMate.dto.patient.PatientInfoResponse;
@@ -14,6 +15,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.NotImplementedException;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -138,15 +141,28 @@ public class PatientController {
     }
 
 
+//    @GetMapping("/clinics/me/patients")
+//    @PreAuthorize("hasRole('CLINIC')")
+//    @Operation(summary = "Get the logged in clinic's patients")
+//    public ResponseEntity<List<PatientInfoResponse>> getPatientsOfLoggedInClinic() {
+//
+//        List<PatientInfoResponse> patients = patientService.getPatientsOfLoggedInClinic();
+//
+//        return ResponseEntity.ok(patients);
+//    }
+
     @GetMapping("/clinics/me/patients")
     @PreAuthorize("hasRole('CLINIC')")
-    @Operation(summary = "Get the logged in clinic's patients")
-    public ResponseEntity<List<PatientInfoResponse>> getPatientsOfLoggedInClinic() {
-
-        List<PatientInfoResponse> patients = patientService.getPatientsOfLoggedInClinic();
-
+    @Operation(summary = "Get paginated patients of the logged-in clinic")
+    public ResponseEntity<PageResponseDto<PatientInfoResponse>> getPatientsOfLoggedInClinic(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        Pageable pageable = PageRequest.of(page, size);
+        PageResponseDto<PatientInfoResponse> patients = patientService.getPatientsOfLoggedInClinic(pageable);
         return ResponseEntity.ok(patients);
     }
+
 
     @GetMapping("patients/me")
     @PreAuthorize("hasRole('PATIENT')")
