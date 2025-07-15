@@ -81,13 +81,19 @@ We offer a complete end-to-end solution:
 
 ---
 
+
 ## 📐 System Architecture
 
-```mermaid
-graph TD
-A[Sensor Node (ESP32)] --> B[AWS IoT Core (MQTT)]
-B --> C[Lambda Functions]
-C --> D[DynamoDB]
-C --> E[Python Analytics Service]
-E --> F[S3 + PostgreSQL]
-F --> G[Web App (React + Spring Boot)]
+<img src="/docs/images/architecture-diagrams/arch-diagram.png" width="650" alt="RehabGait System Architecture" />
+
+The RehabGait system combines wearable sensors, secure IoT communication, cloud processing, and a user-friendly web interface.
+
+- **Sensor Node** collects data from the insole pressure array and IMU sensor.
+- Data is transmitted via **UART** to a **WiFi Node**, which publishes it to **AWS IoT Core** using **MQTT**.
+- **AWS IoT Core** routes the data to:
+  - A **Time-Series Database** for real-time storage.
+  - A **Processing Queue** consumed by a **Python Microservice**, which analyzes gait patterns and generates visual reports.
+- The **Main Backend** (Spring Boot) handles user roles, data management, and report retrieval.
+- The **Frontend** (React + MUI) provides role-specific dashboards and live session monitoring via **WebSocket** and **HTTP**.
+
+
