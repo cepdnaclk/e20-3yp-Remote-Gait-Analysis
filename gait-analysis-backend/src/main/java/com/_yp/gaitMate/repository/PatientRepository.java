@@ -25,7 +25,7 @@ public interface PatientRepository extends JpaRepository<Patient, Long> {
 
 //    Optional<Patient> findByUser_UserId(Long userUserId);
 
-    List<Patient> findByClinic(Clinic clinic);
+    Page<Patient> findByClinic(Clinic clinic , Pageable pageable);
 
     Optional<Patient> findByInvitationToken(String token);
 
