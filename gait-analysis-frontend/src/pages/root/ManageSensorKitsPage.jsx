@@ -56,9 +56,17 @@ export default function ManageSensorKitsPage() {
 
   const fetchData = async () => {
     try {
-      const [kitRes, clinicRes] = await Promise.all([getSensorKits(), getClinics()]);
-      setKits(kitRes.data);
-      setClinics(clinicRes.data);
+      const [kitRes, clinicRes] = await Promise.all([
+        getSensorKits(), 
+        getClinics("?page=0&size=1000") // Fetch all clinics with large page size
+      ]);
+      
+      setKits(kitRes.data || []);
+      
+      // Handle paginated response for clinics
+      const clinicsData = clinicRes.data?.content || [];
+      setClinics(clinicsData);
+      
     } catch (err) {
       console.error('Error loading data', err);
       setSnackbar({ open: true, message: 'Failed to load data', severity: 'error' });
@@ -73,6 +81,7 @@ export default function ManageSensorKitsPage() {
       setSnackbar({ open: true, message: 'Sensor kit assigned', severity: 'success' });
       fetchData();
     } catch (err) {
+      console.error('Assignment error:', err);
       setSnackbar({ open: true, message: 'Assignment failed', severity: 'error' });
     }
   };
@@ -89,6 +98,7 @@ export default function ManageSensorKitsPage() {
       setNewKit({ serialNo: '', firmwareVersion: '' });
       fetchData();
     } catch (err) {
+      console.error('Add kit error:', err);
       setSnackbar({ open: true, message: 'Failed to add sensor kit', severity: 'error' });
     }
   };
@@ -117,6 +127,22 @@ export default function ManageSensorKitsPage() {
 
   const totalPages = Math.ceil(filteredKits.length / pageSize);
   const paginatedKits = filteredKits.slice((page - 1) * pageSize, page * pageSize);
+
+  if (loading) {
+    return (
+      <Box 
+        display="flex" 
+        flexDirection="column"
+        justifyContent="center" 
+        alignItems="center" 
+        height="400px"
+        gap={2}
+      >
+        <CircularProgress size={40} />
+        <Typography color="text.secondary">Loading sensor kits...</Typography>
+      </Box>
+    );
+  }
 
   return (
     <Box p={4}>
@@ -182,46 +208,59 @@ export default function ManageSensorKitsPage() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {paginatedKits.map((kit) => (
-              <TableRow key={kit.serialNo}>
-                <TableCell>{kit.serialNo}</TableCell>
-                <TableCell>{kit.firmwareVersion}</TableCell>
-                <TableCell>
-                  <Chip
-                    label={kit.status}
-                    color={getStatusChipColor(kit.status)}
-                    size="small"
-                    sx={{ fontWeight: 600 }}
-                  />
-                </TableCell>
-                <TableCell>
-                  {kit.clinicId
-                    ? clinics.find((c) => c.id === kit.clinicId)?.name || 'Assigned'
-                    : (['AVAILABLE', 'IN_USE'].includes(kit.status) ? 'Assigned' : '-')}
-                </TableCell>
-
-
-                <TableCell>
-                  {kit.status === 'IN_STOCK' && (
-                    <Select
-                      displayEmpty
-                      value=""
-                      onChange={(e) => handleAssign(kit.id, e.target.value)}
-                      sx={{ minWidth: 150 }}
-                    >
-                      <MenuItem disabled value="">
-                        Assign to Clinic
-                      </MenuItem>
-                      {clinics.map((clinic) => (
-                        <MenuItem key={clinic.id} value={clinic.id}>
-                          {clinic.name}
+            {paginatedKits.length > 0 ? (
+              paginatedKits.map((kit) => (
+                <TableRow key={kit.serialNo || kit.id}>
+                  <TableCell>{kit.serialNo}</TableCell>
+                  <TableCell>{kit.firmwareVersion}</TableCell>
+                  <TableCell>
+                    <Chip
+                      label={kit.status}
+                      color={getStatusChipColor(kit.status)}
+                      size="small"
+                      sx={{ fontWeight: 600 }}
+                    />
+                  </TableCell>
+                  <TableCell>
+                    {kit.clinicId
+                      ? clinics.find((c) => c.id === kit.clinicId)?.name || 'Assigned'
+                      : (['AVAILABLE', 'IN_USE'].includes(kit.status) ? 'Assigned' : '-')}
+                  </TableCell>
+                  <TableCell>
+                    {kit.status === 'IN_STOCK' && (
+                      <Select
+                        displayEmpty
+                        value=""
+                        onChange={(e) => handleAssign(kit.id, e.target.value)}
+                        sx={{ minWidth: 150 }}
+                      >
+                        <MenuItem disabled value="">
+                          Assign to Clinic
                         </MenuItem>
-                      ))}
-                    </Select>
-                  )}
+                        {clinics.length > 0 ? (
+                          clinics.map((clinic) => (
+                            <MenuItem key={clinic.id} value={clinic.id}>
+                              {clinic.name}
+                            </MenuItem>
+                          ))
+                        ) : (
+                          <MenuItem disabled>No clinics available</MenuItem>
+                        )}
+                      </Select>
+                    )}
+                  </TableCell>
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={5} align="center">
+                  {searchQuery || statusFilter !== 'ALL' 
+                    ? 'No sensor kits match your filters' 
+                    : 'No sensor kits found'
+                  }
                 </TableCell>
               </TableRow>
-            ))}
+            )}
           </TableBody>
         </Table>
       </TableContainer>
