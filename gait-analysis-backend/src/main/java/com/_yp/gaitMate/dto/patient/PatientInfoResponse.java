@@ -22,5 +22,6 @@ public class PatientInfoResponse {
     private String doctorName;
     private Long sensorKitId;
     private String nic;
+    private String accountStatus;
 }
 

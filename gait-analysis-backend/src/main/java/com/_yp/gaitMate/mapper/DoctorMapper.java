@@ -15,6 +15,7 @@ public class DoctorMapper {
                 .specialization(doctor.getSpecialization())
                 .createdAt(doctor.getCreatedAt().toString())
                 .profilePicture(doctor.getProfilePicture())
+                .accountStatus(doctor.getAccountStatus().name())
                 .build();
     }
 }
