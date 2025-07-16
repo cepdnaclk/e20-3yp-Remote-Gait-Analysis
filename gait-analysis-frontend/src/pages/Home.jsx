@@ -131,7 +131,7 @@ const Navbar = () => (
           fontWeight: 600,
           borderRadius: 2,
           px: 3,
-          "&:hover": { backgroundColor: "#1565C0" },
+          "&:hover": { backgroundColor: "#a7c3e4ff" },
         }}
       >
         Login
