@@ -11,12 +11,20 @@ import {
   TextField,
   Grid,
   Container,
-  Fade,
-  Pagination,
   MenuItem,
   Select,
   FormControl,
   InputLabel,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  TablePagination,
+  IconButton,
+  Tooltip,
 } from "@mui/material";
 import { useEffect, useState } from "react";
 import { getPatients } from "../../services/clinicAdminServices";
@@ -26,10 +34,13 @@ import LocalHospitalIcon from "@mui/icons-material/LocalHospital";
 import SearchIcon from "@mui/icons-material/Search";
 import CakeIcon from "@mui/icons-material/Cake";
 import SensorOccupiedIcon from "@mui/icons-material/SensorOccupied";
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import EditIcon from "@mui/icons-material/Edit";
+import ClearIcon from "@mui/icons-material/Clear";
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 
 export default function PatientManagementPage({ refreshData }) {
   const [patients, setPatients] = useState([]);
-  const [filteredPatients, setFilteredPatients] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(true);
   const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "success" });
@@ -64,13 +75,11 @@ export default function PatientManagementPage({ refreshData }) {
       const { content, totalPages, totalElements } = response.data;
       
       setPatients(content);
-      setFilteredPatients(content);
       setTotalPages(totalPages);
       setTotalElements(totalElements);
       setPage(currentPage);
 
       // Calculate statistics from current page data
-      // Note: For accurate stats, you might want to fetch this separately from backend
       const assignedToDoctors = content.filter(p => p.doctorName).length;
       const withSensorKits = content.filter(p => p.sensorKitId).length;
       const averageAge = content.length > 0 
@@ -99,36 +108,47 @@ export default function PatientManagementPage({ refreshData }) {
   // Handle search with debounce
   useEffect(() => {
     const timeoutId = setTimeout(() => {
-      if (searchTerm !== "") {
-        fetchPatients(0, pageSize, searchTerm);
-      } else {
-        fetchPatients(page, pageSize);
-      }
+      fetchPatients(0, pageSize, searchTerm);
     }, 500);
 
     return () => clearTimeout(timeoutId);
-  }, [searchTerm]);
+  }, [searchTerm, pageSize]);
 
   const handlePageChange = (event, newPage) => {
-    fetchPatients(newPage - 1, pageSize, searchTerm);
+    fetchPatients(newPage, pageSize, searchTerm);
+  };
+
+  const getNameBasedColor = (name) => {
+    const colors = [
+      "#94a3b8", // Slate
+      "#64748b", // Slate dark
+      "#6b7280", // Gray
+      "#78716c", // Stone
+      "#ef4444", // Red (muted)
+      "#f97316", // Orange (muted)
+      "#eab308", // Yellow (muted)
+      "#22c55e", // Green (muted)
+      "#06b6d4", // Cyan (muted)
+      "#3b82f6", // Blue (muted)
+      "#8b5cf6", // Purple (muted)
+      "#ec4899", // Pink (muted)
+    ];
+    
+    // Generate consistent color based on name
+    let hash = 0;
+    for (let i = 0; i < name.length; i++) {
+      hash = name.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    return colors[Math.abs(hash) % colors.length];
   };
 
   const handlePageSizeChange = (event) => {
-    const newSize = event.target.value;
+    const newSize = parseInt(event.target.value, 10);
     setPageSize(newSize);
     fetchPatients(0, newSize, searchTerm);
   };
 
   const handleCloseSnackbar = () => setSnackbar({ ...snackbar, open: false });
-
-  const getGenderColor = (gender) => {
-    const colors = {
-      "Male": "#3b82f6",
-      "Female": "#ec4899", 
-      "Other": "#8b5cf6",
-    };
-    return colors[gender] || "#6b7280";
-  };
 
   const getAgeGroup = (age) => {
     if (age < 18) return "Pediatric";
@@ -137,124 +157,22 @@ export default function PatientManagementPage({ refreshData }) {
   };
 
   const getAgeGroupColor = (age) => {
-    if (age < 18) return "#f59e0b";
-    if (age < 65) return "#10b981";
-    return "#8b5cf6";
+    if (age < 18) return "warning";
+    if (age < 65) return "success";
+    return "secondary";
   };
 
-  const PatientCard = ({ patient }) => (
-    <Fade in={true}>
-      <Card
-        sx={{
-          p: 3,
-          height: "100%",
-          background: "linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)",
-          border: "1px solid rgba(226, 232, 240, 0.8)",
-          borderRadius: 3,
-          boxShadow: "0 4px 16px rgba(0,0,0,0.08)",
-          transition: "all 0.3s ease",
-          "&:hover": {
-            transform: "translateY(-4px)",
-            boxShadow: "0 12px 32px rgba(0,0,0,0.15)",
-          },
-        }}
-      >
-        <Box sx={{ display: "flex", alignItems: "flex-start", gap: 3, mb: 3 }}>
-          <Avatar
-            sx={{
-              width: 56,
-              height: 56,
-              background: `linear-gradient(135deg, ${getGenderColor(patient.gender)}15 0%, ${getGenderColor(patient.gender)}25 100%)`,
-              color: getGenderColor(patient.gender),
-              fontSize: 20,
-              fontWeight: 700,
-            }}
-          >
-            {patient.name.split(' ').map(n => n[0]).join('').toUpperCase()}
-          </Avatar>
-          
-          <Box sx={{ flex: 1 }}>
-            <Typography variant="h6" fontWeight="700" sx={{ mb: 1, color: "text.primary" }}>
-              {patient.name}
-            </Typography>
-            
-            <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
-              <Chip
-                label={patient.gender}
-                size="small"
-                sx={{
-                  bgcolor: `${getGenderColor(patient.gender)}15`,
-                  color: getGenderColor(patient.gender),
-                  fontWeight: 600,
-                  borderRadius: 2,
-                }}
-              />
-              
-              <Chip
-                label={getAgeGroup(patient.age)}
-                size="small"
-                sx={{
-                  bgcolor: `${getAgeGroupColor(patient.age)}15`,
-                  color: getAgeGroupColor(patient.age),
-                  fontWeight: 600,
-                  borderRadius: 2,
-                }}
-              />
-            </Box>
-          </Box>
-        </Box>
-        
-        {/* Patient Details */}
-        <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-          <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
-            <CakeIcon sx={{ fontSize: 18, color: "text.secondary" }} />
-            <Typography variant="body2" color="text.secondary">
-              <strong>{patient.age}</strong> years old
-            </Typography>
-          </Box>
-          
-          <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
-            <LocalHospitalIcon sx={{ fontSize: 18, color: "text.secondary" }} />
-            <Box>
-              <Typography variant="body2" color="text.secondary">
-                Assigned Doctor
-              </Typography>
-              <Typography variant="body2" fontWeight="600" color="text.primary">
-                {patient.doctorName || "Not assigned"}
-              </Typography>
-            </Box>
-          </Box>
-          
-          <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
-            <SensorOccupiedIcon sx={{ fontSize: 18, color: "text.secondary" }} />
-            <Box>
-              <Typography variant="body2" color="text.secondary">
-                Sensor Kit
-              </Typography>
-              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                <Typography variant="body2" fontWeight="600" color="text.primary">
-                  {patient.sensorKitId ? `ID: ${patient.sensorKitId}` : "Not assigned"}
-                </Typography>
-                {patient.sensorKit?.serialNo && (
-                  <Chip
-                    label="Active"
-                    size="small"
-                    sx={{
-                      bgcolor: "rgba(34, 197, 94, 0.1)",
-                      color: "#16a34a",
-                      fontWeight: 600,
-                      fontSize: 10,
-                      height: 20,
-                    }}
-                  />
-                )}
-              </Box>
-            </Box>
-          </Box>
-        </Box>
-      </Card>
-    </Fade>
-  );
+  const getAccountStatusColor = (status) => {
+    const statusColors = {
+      "ACCOUNT_CREATED": "success",
+      "INVITATION_SENT": "warning",
+    };
+    return statusColors[status] || "default";
+  };
+
+  const clearSearch = () => {
+    setSearchTerm("");
+  };
 
   return (
     <Container maxWidth="xl" sx={{ px: 0 }}>
@@ -310,32 +228,36 @@ export default function PatientManagementPage({ refreshData }) {
                   <SearchIcon sx={{ color: "text.secondary" }} />
                 </InputAdornment>
               ),
+              endAdornment: searchTerm && (
+                <InputAdornment position="end">
+                  <IconButton onClick={clearSearch} size="small">
+                    <ClearIcon />
+                  </IconButton>
+                </InputAdornment>
+              ),
             }}
           />
-
-          <FormControl sx={{ minWidth: 120 }}>
-            <InputLabel>Per Page</InputLabel>
-            <Select
-              value={pageSize}
-              label="Per Page"
-              onChange={handlePageSizeChange}
-              sx={{
-                borderRadius: 2,
-                backgroundColor: "white",
-                boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
-              }}
-            >
-              <MenuItem value={5}>5</MenuItem>
-              <MenuItem value={10}>10</MenuItem>
-              <MenuItem value={20}>20</MenuItem>
-              <MenuItem value={50}>50</MenuItem>
-            </Select>
-          </FormControl>
         </Box>
+
+        {/* Active Search Filter */}
+        {searchTerm && (
+          <Box mb={2}>
+            <Typography variant="body2" color="text.secondary" mb={1}>
+              Active filter:
+            </Typography>
+            <Chip
+              label={`Search: "${searchTerm}"`}
+              size="small"
+              onDelete={clearSearch}
+              color="primary"
+              variant="outlined"
+            />
+          </Box>
+        )}
       </Box>
 
       {/* Loading State */}
-      {loading ? (
+      {loading && patients.length === 0 ? (
         <Box
           display="flex"
           justifyContent="center"
@@ -354,11 +276,11 @@ export default function PatientManagementPage({ refreshData }) {
         <>
           {/* Statistics */}
           <Grid container spacing={3} sx={{ mb: 4 }}>
-            <Grid item xs={12} sm={6} md={3}>
+            <Grid item xs={12} sm={6}>
               <Card
                 sx={{
                   p: 3,
-                  background: "linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)",
+                  background: "linear-gradient(135deg, #0aa9beff 0%, #20638fff 100%)",
                   color: "white",
                   borderRadius: 3,
                   boxShadow: "0 8px 24px rgba(59, 130, 246, 0.3)",
@@ -373,26 +295,7 @@ export default function PatientManagementPage({ refreshData }) {
               </Card>
             </Grid>
             
-            <Grid item xs={12} sm={6} md={3}>
-              <Card
-                sx={{
-                  p: 3,
-                  background: "linear-gradient(135deg, #10b981 0%, #059669 100%)",
-                  color: "white",
-                  borderRadius: 3,
-                  boxShadow: "0 8px 24px rgba(16, 185, 129, 0.3)",
-                }}
-              >
-                <Typography variant="h4" fontWeight="800">
-                  {stats.assignedToDoctors}
-                </Typography>
-                <Typography variant="body2" sx={{ opacity: 0.9 }}>
-                  Assigned to Doctors
-                </Typography>
-              </Card>
-            </Grid>
-            
-            <Grid item xs={12} sm={6} md={3}>
+            <Grid item xs={12} sm={6}>
               <Card
                 sx={{
                   p: 3,
@@ -400,25 +303,6 @@ export default function PatientManagementPage({ refreshData }) {
                   color: "white",
                   borderRadius: 3,
                   boxShadow: "0 8px 24px rgba(245, 158, 11, 0.3)",
-                }}
-              >
-                <Typography variant="h4" fontWeight="800">
-                  {stats.withSensorKits}
-                </Typography>
-                <Typography variant="body2" sx={{ opacity: 0.9 }}>
-                  With Sensor Kits
-                </Typography>
-              </Card>
-            </Grid>
-            
-            <Grid item xs={12} sm={6} md={3}>
-              <Card
-                sx={{
-                  p: 3,
-                  background: "linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)",
-                  color: "white",
-                  borderRadius: 3,
-                  boxShadow: "0 8px 24px rgba(139, 92, 246, 0.3)",
                 }}
               >
                 <Typography variant="h4" fontWeight="800">
@@ -431,65 +315,223 @@ export default function PatientManagementPage({ refreshData }) {
             </Grid>
           </Grid>
 
-          {/* Patient Cards */}
-          {filteredPatients.length > 0 ? (
-            <>
-              <Grid container spacing={3} sx={{ mb: 4 }}>
-                {filteredPatients.map((patient) => (
-                  <Grid item xs={12} sm={6} lg={4} key={patient.id} mb={5}>
-                    <PatientCard patient={patient} />
-                  </Grid>
-                ))}
-              </Grid>
+          {/* Patient Table */}
+          <TableContainer component={Paper} sx={{ borderRadius: 3, boxShadow: "0 4px 16px rgba(0,0,0,0.08)" }}>
+            <Table>
+              <TableHead>
+                <TableRow sx={{ backgroundColor: "#f8fafc" }}>
+                  <TableCell sx={{ fontWeight: 700, fontSize: 14 }}>Patient</TableCell>
+                  <TableCell sx={{ fontWeight: 700, fontSize: 14 }}>Age & Gender</TableCell>
+                  <TableCell sx={{ fontWeight: 700, fontSize: 14 }}>Doctor</TableCell>
+                  <TableCell sx={{ fontWeight: 700, fontSize: 14 }}>Sensor Kit</TableCell>
+                  <TableCell sx={{ fontWeight: 700, fontSize: 14 }}>Account Status</TableCell>
+                  <TableCell sx={{ fontWeight: 700, fontSize: 14 }}>Actions</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {loading ? (
+                  <TableRow>
+                    <TableCell colSpan={6} align="center" sx={{ py: 4 }}>
+                      <CircularProgress size={24} />
+                    </TableCell>
+                  </TableRow>
+                ) : patients.length > 0 ? (
+                  patients.map((patient) => (
+                    <TableRow 
+                      key={patient.id} 
+                      hover 
+                      sx={{ 
+                        "&:hover": { backgroundColor: "rgba(0,0,0,0.02)" },
+                        cursor: "pointer"
+                      }}
+                    >
+                      <TableCell>
+                        <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+                          <Avatar
+                            sx={{
+                              width: 40,
+                              height: 40,
+                              bgcolor: getNameBasedColor(patient.name),
+                              color: "white",
+                              fontSize: 14,
+                              fontWeight: 700,
+                            }}
+                          >
+                            {patient.name.split(' ').map(n => n[0]).join('').toUpperCase()}
+                          </Avatar>
+                          <Box>
+                            <Typography variant="subtitle2" fontWeight={600} sx={{ mb: 0.5 }}>
+                              {patient.name}
+                            </Typography>
+                            <Typography variant="caption" color="text.secondary">
+                              ID: {patient.id}
+                            </Typography>
+                          </Box>
+                        </Box>
+                      </TableCell>
 
-              {/* Pagination */}
-              <Box
-                sx={{
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  mt: 4,
-                  gap: 2,
-                }}
-              >
-                <Typography variant="body2" color="text.secondary">
-                  Showing {page * pageSize + 1}-{Math.min((page + 1) * pageSize, totalElements)} of {totalElements} patients
-                </Typography>
-                <Pagination
-                  count={totalPages}
-                  page={page + 1}
-                  onChange={handlePageChange}
-                  color="primary"
-                  sx={{
-                    "& .MuiPaginationItem-root": {
-                      borderRadius: 2,
-                    },
-                  }}
-                />
-              </Box>
-            </>
-          ) : (
-            <Card
-              sx={{
-                p: 6,
-                textAlign: "center",
-                background: "rgba(148, 163, 184, 0.05)",
-                border: "1px dashed rgba(148, 163, 184, 0.3)",
-                borderRadius: 3,
-              }}
-            >
-              <PersonIcon sx={{ fontSize: 64, color: "text.secondary", mb: 2 }} />
-              <Typography variant="h6" color="text.secondary" sx={{ mb: 1 }}>
-                {searchTerm ? "No patients found" : "No patients registered"}
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                {searchTerm 
-                  ? `No patients match your search for "${searchTerm}"`
-                  : "Patient records will appear here once they are registered"
-                }
-              </Typography>
-            </Card>
-          )}
+                      <TableCell>
+                        <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+                          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                            <CakeIcon sx={{ fontSize: 16, color: "text.secondary" }} />
+                            <Typography variant="body2" fontWeight={600}>
+                              {patient.age} years
+                            </Typography>
+                          </Box>
+                          <Box sx={{ display: "flex", gap: 1 }}>
+                            <Chip
+                              label={patient.gender}
+                              size="small"
+                              sx={{
+                                fontWeight: 600,
+                                fontSize: 11,
+                                height: 24,
+                              }}
+                            />
+                            <Chip
+                              label={getAgeGroup(patient.age)}
+                              size="small"
+                              color={getAgeGroupColor(patient.age)}
+                              variant="outlined"
+                              sx={{ fontSize: 11, height: 24 }}
+                            />
+                          </Box>
+                        </Box>
+                      </TableCell>
+
+                      <TableCell>
+                        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                          <LocalHospitalIcon sx={{ fontSize: 16, color: "text.secondary" }} />
+                          <Box>
+                            <Typography variant="body2" fontWeight={600}>
+                              {patient.doctorName || "Not assigned"}
+                            </Typography>
+                            {!patient.doctorName && (
+                              <Typography variant="caption" color="warning.main">
+                                Needs assignment
+                              </Typography>
+                            )}
+                          </Box>
+                        </Box>
+                      </TableCell>
+
+                      <TableCell>
+                        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                          <SensorOccupiedIcon sx={{ fontSize: 16, color: "text.secondary" }} />
+                          <Box>
+                            {patient.sensorKitId ? (
+                              <>
+                                <Typography variant="body2" fontWeight={600}>
+                                  ID: {patient.sensorKitId}
+                                </Typography>
+                                {patient.sensorKit?.serialNo && (
+                                  <Chip
+                                    label="Active"
+                                    size="small"
+                                    color="success"
+                                    variant="outlined"
+                                    sx={{ fontSize: 10, height: 20, mt: 0.5 }}
+                                  />
+                                )}
+                              </>
+                            ) : (
+                              <>
+                                <Typography variant="body2" color="text.secondary">
+                                  Not assigned
+                                </Typography>
+                                <Typography variant="caption" color="warning.main">
+                                  Needs sensor kit
+                                </Typography>
+                              </>
+                            )}
+                          </Box>
+                        </Box>
+                      </TableCell>
+
+                      <TableCell>
+                        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                          
+                          <Box>
+                            {patient.accountStatus ? (
+                              <Chip
+                                label={patient.accountStatus}
+                                size="small"
+                                color={getAccountStatusColor(patient.accountStatus)}
+                                variant="outlined"
+                                sx={{ 
+                                  fontSize: 11, 
+                                  height: 24,
+                                  fontWeight: 600,
+                                }}
+                              />
+                            ) : (
+                              <Chip
+                                label="Unknown"
+                                size="small"
+                                color="default"
+                                variant="outlined"
+                                sx={{ 
+                                  fontSize: 11, 
+                                  height: 24,
+                                  fontWeight: 600,
+                                }}
+                              />
+                            )}
+                          </Box>
+                        </Box>
+                      </TableCell>
+
+                      <TableCell>
+                        <Box sx={{ display: "flex", gap: 1 }}>
+                          <Tooltip title="View Patient">
+                            <IconButton size="small" color="primary">
+                              <VisibilityIcon fontSize="small" />
+                            </IconButton>
+                          </Tooltip>
+                          <Tooltip title="Edit Patient">
+                            <IconButton size="small" color="secondary">
+                              <EditIcon fontSize="small" />
+                            </IconButton>
+                          </Tooltip>
+                        </Box>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={6} align="center" sx={{ py: 8 }}>
+                      <Box sx={{ textAlign: "center" }}>
+                        <PersonIcon sx={{ fontSize: 64, color: "text.secondary", mb: 2 }} />
+                        <Typography variant="h6" color="text.secondary" sx={{ mb: 1 }}>
+                          {searchTerm ? "No patients found" : "No patients registered"}
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                          {searchTerm 
+                            ? `No patients match your search for "${searchTerm}"`
+                            : "Patient records will appear here once they are registered"
+                          }
+                        </Typography>
+                      </Box>
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+            
+            <TablePagination
+              component="div"
+              count={totalElements}
+              page={page}
+              onPageChange={handlePageChange}
+              rowsPerPage={pageSize}
+              onRowsPerPageChange={handlePageSizeChange}
+              rowsPerPageOptions={[5, 10, 20, 50]}
+              labelRowsPerPage="Patients per page:"
+              labelDisplayedRows={({ from, to, count }) =>
+                `${from}–${to} of ${count !== -1 ? count : `more than ${to}`}`
+              }
+            />
+          </TableContainer>
         </>
       )}
 
