@@ -317,11 +317,11 @@ export default function DoctorDashboard() {
           </Card>
         </Grid>
         <Grid item xs={12} lg={4}>
-          <Card sx={{ p: 3, borderRadius: 3, boxShadow: 3, height: "100%" }}>
+          <Card sx={{ p: 3, borderRadius: 3, boxShadow: 3, height: 348 }}>
             <Typography variant="h6" fontWeight={700} mb={3}>
               Quick Actions
             </Typography>
-            <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+            <Box sx={{ display: "flex", flexDirection: "column", gap: 2, height: "calc(100% - 48px)", justifyContent: "center" }}>
               <QuickActionCard
                 title="Schedule Appointment"
                 description="Book a new patient appointment"
@@ -335,13 +335,6 @@ export default function DoctorDashboard() {
                 icon={<AssignmentIcon />}
                 onClick={() => setSelectedSection("Reports")}
                 color="#10b981"
-              />
-              <QuickActionCard
-                title="Patient Messages"
-                description="Check new patient messages"
-                icon={<ChatIcon />}
-                onClick={() => setSelectedSection("Messages")}
-                color="#f59e0b"
               />
             </Box>
           </Card>
@@ -359,8 +352,6 @@ export default function DoctorDashboard() {
         return <Appointments />;
       case "Reports":
         return <Reports />;
-      case "Messages":
-        return <Messages />;
       case "Settings":
         return <Settings />;
       default:
