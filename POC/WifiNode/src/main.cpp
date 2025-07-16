@@ -4,10 +4,12 @@
 #include <NTPClient.h>
 #include <WiFiUdp.h>
 #include <Arduino.h>
+#include <WiFiManager.h>  // https://github.com/tzapu/WiFiManager
+#include <Preferences.h>
 
 // Configuration
-const char* ssid = "Yohan's Galaxy A52";
-const char* password = "11111111";
+// const char* ssid = "Yohan's Galaxy A52";
+// const char* password = "11111111";
 const char* mqtt_server = "a18e6b70jffugd-ats.iot.eu-north-1.amazonaws.com";
 const String DEVICE_ID = "601";
 
@@ -28,6 +30,9 @@ unsigned long lastAliveSent = 0;
 
 WiFiClientSecure espClient;
 PubSubClient client(espClient);
+
+// To save wifi credentials
+Preferences preferences;
 
 // AWS IoT Certificates
 const char AWS_CERT_CA[] = R"EOF(
@@ -106,15 +111,64 @@ mYFN+v2f6ri4+C7mXZTX49RLmA5OCaZyh0YK/onQ7hX7cUcJBdpMEDtH
 -----END RSA PRIVATE KEY-----
 )EOF";
 
+// void connectWiFi() {
+//   Serial.print("Connecting to WiFi...");
+//   WiFi.begin(ssid, password);
+//   while (WiFi.status() != WL_CONNECTED) {
+//     Serial.print(".");
+//     delay(1000);
+//   }
+//   Serial.println("\nWiFi Connected!");
+// }
+
 void connectWiFi() {
-  Serial.print("Connecting to WiFi...");
-  WiFi.begin(ssid, password);
-  while (WiFi.status() != WL_CONNECTED) {
-    Serial.print(".");
-    delay(1000);
+  WiFi.mode(WIFI_STA);
+  WiFiManager wm;
+
+  // Optional timeout to auto start AP if can't connect
+  //wm.setTimeout(30); // 30s timeout
+
+  // Load previously saved credentials from NVS (Preferences)
+  preferences.begin("wifi", true);
+  String savedSSID = preferences.getString("ssid", "");
+  String savedPASS = preferences.getString("pass", "");
+  preferences.end();
+
+  bool res;
+  if (savedSSID != "" && savedPASS != "") {
+    // Attempt saved connection first
+    WiFi.begin(savedSSID.c_str(), savedPASS.c_str());
+    Serial.print("Trying saved credentials...");
+    unsigned long start = millis();
+    while (WiFi.status() != WL_CONNECTED && millis() - start < 10000) {
+      delay(500);
+      Serial.print(".");
+    }
+    res = WiFi.status() == WL_CONNECTED;
+  } else {
+    res = false;
   }
-  Serial.println("\nWiFi Connected!");
+
+  // If failed, start AP mode for config
+  if (!res) {
+    Serial.println("\nStarting config portal...");
+    if (wm.autoConnect("RehabGait_WifiConfig")) {
+      Serial.println("WiFi Connected.");
+      
+      // Save newly connected credentials to NVS
+      preferences.begin("wifi", false);
+      preferences.putString("ssid", WiFi.SSID());
+      preferences.putString("pass", WiFi.psk());
+      preferences.end();
+    } else {
+      Serial.println("Failed to connect and no config done.");
+      ESP.restart();  // optional fallback
+    }
+  } else {
+    Serial.println("\nWiFi Connected with saved credentials.");
+  }
 }
+
 
 void connectAWS() {
   espClient.setCACert(AWS_CERT_CA);

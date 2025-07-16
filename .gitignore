@@ -22,3 +22,11 @@
 nginx-config.txt
 
 gait-analysis-frontend/.env
+gait-analysis-backend/src/main/resources/cleanup.sql
+gait-analysis-backend/src/main/resources/scenario1_test.sql
+gait-analysis-backend/src/main/resources/scenario1-script.sql
+gait-analysis-backend/src/main/resources/scenario2_test.sql
+gait-analysis-backend/src/main/resources/scenario2-script.sql
+load-testing
+POC/WifiNode/src/main.cpp
+POC/WifiNode/src/2025-07-16 WifiNode Working.txt

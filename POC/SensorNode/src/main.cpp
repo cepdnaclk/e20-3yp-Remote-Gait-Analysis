@@ -9,7 +9,7 @@
 
 Adafruit_BNO055 bno = Adafruit_BNO055();
 
-const int fsrPins[16] = {36, 39, 34, 35, 32, 33, 25, 26, 27, 14, 12, 13, 4, 0, 2, 15};
+const int fsrPins[16] = {36, 39, 34, 35, 32, 33, 25, 26, 27, 14, 12, 13, 4, 4, 2, 15};
 
 // unsigned long syncedTime = 0;
 // unsigned long lastSyncTime = 0;
