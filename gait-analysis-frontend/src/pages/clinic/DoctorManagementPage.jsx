@@ -17,21 +17,20 @@ import {
   Snackbar,
   Alert,
   Card,
-  CardContent,
   Avatar,
   Chip,
   IconButton,
   InputAdornment,
   Grid,
   Container,
-  Fade,
   Divider,
   CircularProgress,
-  Pagination,
+  TablePagination,
   MenuItem,
   Select,
   FormControl,
   InputLabel,
+  Tooltip,
 } from "@mui/material";
 import { useEffect, useState } from "react";
 import { getDoctors, addDoctor } from "../../services/clinicAdminServices";
@@ -42,10 +41,13 @@ import PhoneIcon from "@mui/icons-material/Phone";
 import BadgeIcon from "@mui/icons-material/Badge";
 import SearchIcon from "@mui/icons-material/Search";
 import MedicalServicesIcon from "@mui/icons-material/MedicalServices";
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import EditIcon from "@mui/icons-material/Edit";
+import ClearIcon from "@mui/icons-material/Clear";
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 
 export default function DoctorManagementPage({ refreshData }) {
   const [doctors, setDoctors] = useState([]);
-  const [filteredDoctors, setFilteredDoctors] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -60,6 +62,12 @@ export default function DoctorManagementPage({ refreshData }) {
   const [totalPages, setTotalPages] = useState(0);
   const [totalElements, setTotalElements] = useState(0);
   const [pageSize, setPageSize] = useState(10);
+
+  // Statistics
+  const [stats, setStats] = useState({
+    totalDoctors: 0,
+    specializations: 0,
+  });
 
   const [newDoctor, setNewDoctor] = useState({
     name: "",
@@ -86,10 +94,16 @@ export default function DoctorManagementPage({ refreshData }) {
       const { content, totalPages, totalElements } = response.data;
       
       setDoctors(content);
-      setFilteredDoctors(content);
       setTotalPages(totalPages);
       setTotalElements(totalElements);
       setPage(currentPage);
+
+      // Calculate statistics
+      const uniqueSpecializations = [...new Set(content.map(d => d.specialization))].length;
+      setStats({
+        totalDoctors: totalElements,
+        specializations: uniqueSpecializations,
+      });
     } catch (error) {
       console.error("Error fetching doctors:", error);
       setSnackbar({
@@ -109,22 +123,18 @@ export default function DoctorManagementPage({ refreshData }) {
   // Handle search with debounce
   useEffect(() => {
     const timeoutId = setTimeout(() => {
-      if (searchTerm !== "") {
-        fetchDoctors(0, pageSize, searchTerm);
-      } else {
-        fetchDoctors(page, pageSize);
-      }
+      fetchDoctors(0, pageSize, searchTerm);
     }, 500);
 
     return () => clearTimeout(timeoutId);
-  }, [searchTerm]);
+  }, [searchTerm, pageSize]);
 
   const handlePageChange = (event, newPage) => {
-    fetchDoctors(newPage - 1, pageSize, searchTerm);
+    fetchDoctors(newPage, pageSize, searchTerm);
   };
 
   const handlePageSizeChange = (event) => {
-    const newSize = event.target.value;
+    const newSize = parseInt(event.target.value, 10);
     setPageSize(newSize);
     fetchDoctors(0, newSize, searchTerm);
   };
@@ -177,6 +187,30 @@ export default function DoctorManagementPage({ refreshData }) {
 
   const handleCloseSnackbar = () => setSnackbar({ ...snackbar, open: false });
 
+  const getNameBasedColor = (name) => {
+    const colors = [
+      "#94a3b8", // Slate
+      "#64748b", // Slate dark
+      "#6b7280", // Gray
+      "#78716c", // Stone
+      "#ef4444", // Red (muted)
+      "#f97316", // Orange (muted)
+      "#eab308", // Yellow (muted)
+      "#22c55e", // Green (muted)
+      "#06b6d4", // Cyan (muted)
+      "#3b82f6", // Blue (muted)
+      "#8b5cf6", // Purple (muted)
+      "#ec4899", // Pink (muted)
+    ];
+    
+    // Generate consistent color based on name
+    let hash = 0;
+    for (let i = 0; i < name.length; i++) {
+      hash = name.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    return colors[Math.abs(hash) % colors.length];
+  };
+
   const getSpecializationColor = (specialization) => {
     const colors = {
       Cardiology: "#ef4444",
@@ -190,86 +224,17 @@ export default function DoctorManagementPage({ refreshData }) {
     return colors[specialization] || "#3b82f6";
   };
 
-  const DoctorCard = ({ doctor }) => (
-    <Fade in={true}>
-      <Card
-        sx={{
-          p: 3,
-          height: "100%",
-          background: "linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)",
-          border: "1px solid rgba(226, 232, 240, 0.8)",
-          borderRadius: 3,
-          boxShadow: "0 4px 16px rgba(0,0,0,0.08)",
-          transition: "all 0.3s ease",
-          "&:hover": {
-            transform: "translateY(-4px)",
-            boxShadow: "0 12px 32px rgba(0,0,0,0.15)",
-          },
-        }}
-      >
-        <Box sx={{ display: "flex", alignItems: "flex-start", gap: 3 }}>
-          <Avatar
-            sx={{
-              width: 64,
-              height: 64,
-              background: `linear-gradient(135deg, ${getSpecializationColor(
-                doctor.specialization
-              )}15 0%, ${getSpecializationColor(
-                doctor.specialization
-              )}25 100%)`,
-              color: getSpecializationColor(doctor.specialization),
-              fontSize: 24,
-              fontWeight: 700,
-            }}
-          >
-            {doctor.name
-              .split(" ")
-              .map((n) => n[0])
-              .join("")
-              .toUpperCase()}
-          </Avatar>
+  const getAccountStatusColor = (status) => {
+    const statusColors = {
+      "ACCOUNT_CREATED": "success",
+      "INVITATION_SENT": "warning",
+    };
+    return statusColors[status] || "default";
+  };
 
-          <Box sx={{ flex: 1 }}>
-            <Typography
-              variant="h6"
-              fontWeight="700"
-              sx={{ mb: 1, color: "text.primary" }}
-            >
-              {doctor.name}
-            </Typography>
-
-            <Chip
-              label={doctor.specialization}
-              size="small"
-              sx={{
-                mb: 2,
-                bgcolor: `${getSpecializationColor(doctor.specialization)}15`,
-                color: getSpecializationColor(doctor.specialization),
-                fontWeight: 600,
-                borderRadius: 2,
-              }}
-            />
-
-            <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
-              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                <EmailIcon sx={{ fontSize: 16, color: "text.secondary" }} />
-                <Typography variant="body2" color="text.secondary">
-                  {doctor.email}
-                </Typography>
-              </Box>
-
-              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                <PhoneIcon sx={{ fontSize: 16, color: "text.secondary" }} />
-                <Typography variant="body2" color="text.secondary">
-                  {doctor.phoneNumber}
-                </Typography>
-              </Box>
-            </Box>
-          </Box>
-        </Box>
-      </Card>
-    </Fade>
-  );
+  const clearSearch = () => {
+    setSearchTerm("");
+  };
 
   return (
     <Container maxWidth="xl" sx={{ px: 0 }}>
@@ -329,27 +294,15 @@ export default function DoctorManagementPage({ refreshData }) {
                   <SearchIcon sx={{ color: "text.secondary" }} />
                 </InputAdornment>
               ),
+              endAdornment: searchTerm && (
+                <InputAdornment position="end">
+                  <IconButton onClick={clearSearch} size="small">
+                    <ClearIcon />
+                  </IconButton>
+                </InputAdornment>
+              ),
             }}
           />
-
-          <FormControl sx={{ minWidth: 120 }}>
-            <InputLabel>Per Page</InputLabel>
-            <Select
-              value={pageSize}
-              label="Per Page"
-              onChange={handlePageSizeChange}
-              sx={{
-                borderRadius: 2,
-                backgroundColor: "white",
-                boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
-              }}
-            >
-              <MenuItem value={5}>5</MenuItem>
-              <MenuItem value={10}>10</MenuItem>
-              <MenuItem value={20}>20</MenuItem>
-              <MenuItem value={50}>50</MenuItem>
-            </Select>
-          </FormControl>
 
           <Button
             variant="contained"
@@ -374,15 +327,32 @@ export default function DoctorManagementPage({ refreshData }) {
             Add Doctor
           </Button>
         </Box>
+
+        {/* Active Search Filter */}
+        {searchTerm && (
+          <Box mb={2}>
+            <Typography variant="body2" color="text.secondary" mb={1}>
+              Active filter:
+            </Typography>
+            <Chip
+              label={`Search: "${searchTerm}"`}
+              size="small"
+              onDelete={clearSearch}
+              color="primary"
+              variant="outlined"
+            />
+          </Box>
+        )}
       </Box>
 
       {/* Loading State */}
-      {loading ? (
+      {loading && doctors.length === 0 ? (
         <Box
           display="flex"
           justifyContent="center"
           alignItems="center"
           height="50vh"
+          sx={{ bgcolor: "transparent" }}
         >
           <Box sx={{ textAlign: "center" }}>
             <CircularProgress size={48} thickness={4} />
@@ -393,66 +363,216 @@ export default function DoctorManagementPage({ refreshData }) {
         </Box>
       ) : (
         <>
-          {/* Content */}
-          {filteredDoctors.length > 0 ? (
-            <>
-              <Grid container spacing={3} sx={{ mb: 4 }}>
-                {filteredDoctors.map((doctor) => (
-                  <Grid item xs={12} sm={6} lg={4} key={doctor.id}>
-                    <DoctorCard doctor={doctor} />
-                  </Grid>
-                ))}
-              </Grid>
-
-              {/* Pagination */}
-              <Box
+          {/* Statistics */}
+          <Grid container spacing={3} sx={{ mb: 4 }}>
+            <Grid item xs={12} sm={6}>
+              <Card
                 sx={{
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  mt: 4,
-                  gap: 2,
+                  p: 3,
+                  background: "linear-gradient(135deg, #299368ff 0%, #065d3dff 100%)",
+                  color: "white",
+                  borderRadius: 3,
+                  boxShadow: "0 8px 24px rgba(59, 130, 246, 0.3)",
                 }}
               >
-                <Typography variant="body2" color="text.secondary">
-                  Showing {page * pageSize + 1}-{Math.min((page + 1) * pageSize, totalElements)} of {totalElements} doctors
+                <Typography variant="h4" fontWeight="800">
+                  {stats.totalDoctors}
                 </Typography>
-                <Pagination
-                  count={totalPages}
-                  page={page + 1}
-                  onChange={handlePageChange}
-                  color="primary"
-                  sx={{
-                    "& .MuiPaginationItem-root": {
-                      borderRadius: 2,
-                    },
-                  }}
-                />
-              </Box>
-            </>
-          ) : (
-            <Card
-              sx={{
-                p: 6,
-                textAlign: "center",
-                background: "rgba(148, 163, 184, 0.05)",
-                border: "1px dashed rgba(148, 163, 184, 0.3)",
-                borderRadius: 3,
-              }}
-            >
-              <MedicalServicesIcon
-                sx={{ fontSize: 64, color: "text.secondary", mb: 2 }}
-              />
-              <Typography variant="h6" color="text.secondary" sx={{ mb: 1 }}>
-                {searchTerm ? "No doctors found" : "No doctors available"}
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                {searchTerm
-                  ? `No doctors match your search for "${searchTerm}"`
-                  : "Start by adding your first doctor to the system"}
-              </Typography>
-            </Card>
-          )}
+                <Typography variant="body2" sx={{ opacity: 0.9 }}>
+                  Total Doctors
+                </Typography>
+              </Card>
+            </Grid>
+            
+            <Grid item xs={12} sm={6}>
+              <Card
+                sx={{
+                  p: 3,
+                  background: "linear-gradient(135deg, #5e4992ff 0%, #49228cff 100%)",
+                  color: "white",
+                  borderRadius: 3,
+                  boxShadow: "0 8px 24px rgba(139, 92, 246, 0.3)",
+                }}
+              >
+                <Typography variant="h4" fontWeight="800">
+                  {stats.specializations}
+                </Typography>
+                <Typography variant="body2" sx={{ opacity: 0.9 }}>
+                  Specializations
+                </Typography>
+              </Card>
+            </Grid>
+          </Grid>
+
+          {/* Doctor Table */}
+          <TableContainer component={Paper} sx={{ borderRadius: 3, boxShadow: "0 4px 16px rgba(0,0,0,0.08)" }}>
+            <Table>
+              <TableHead>
+                <TableRow sx={{ backgroundColor: "#f8fafc" }}>
+                  <TableCell sx={{ fontWeight: 700, fontSize: 14 }}>Doctor</TableCell>
+                  <TableCell sx={{ fontWeight: 700, fontSize: 14 }}>Specialization</TableCell>
+                  <TableCell sx={{ fontWeight: 700, fontSize: 14 }}>Contact</TableCell>
+                  <TableCell sx={{ fontWeight: 700, fontSize: 14 }}>Account Status</TableCell>
+                  <TableCell sx={{ fontWeight: 700, fontSize: 14 }}>Actions</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {loading ? (
+                  <TableRow>
+                    <TableCell colSpan={5} align="center" sx={{ py: 4 }}>
+                      <CircularProgress size={24} />
+                    </TableCell>
+                  </TableRow>
+                ) : doctors.length > 0 ? (
+                  doctors.map((doctor) => (
+                    <TableRow 
+                      key={doctor.id} 
+                      hover 
+                      sx={{ 
+                        "&:hover": { backgroundColor: "rgba(0,0,0,0.02)" },
+                        cursor: "pointer"
+                      }}
+                    >
+                      <TableCell>
+                        <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+                          <Avatar
+                            sx={{
+                              width: 40,
+                              height: 40,
+                              bgcolor: getNameBasedColor(doctor.name),
+                              color: "white",
+                              fontSize: 14,
+                              fontWeight: 700,
+                            }}
+                          >
+                            {doctor.name.split(' ').map(n => n[0]).join('').toUpperCase()}
+                          </Avatar>
+                          <Box>
+                            <Typography variant="subtitle2" fontWeight={600} sx={{ mb: 0.5 }}>
+                              {doctor.name}
+                            </Typography>
+                            <Typography variant="caption" color="text.secondary">
+                              ID: {doctor.id}
+                            </Typography>
+                          </Box>
+                        </Box>
+                      </TableCell>
+
+                      <TableCell>
+                        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                          <Box>
+                            {doctor.accountStatus ? (
+                              <Chip
+                                label={doctor.accountStatus}
+                                size="small"
+                                color={getAccountStatusColor(doctor.accountStatus)}
+                                variant="outlined"
+                                sx={{ 
+                                  fontSize: 11, 
+                                  height: 24,
+                                  fontWeight: 600,
+                                }}
+                              />
+                            ) : (
+                              <Chip
+                                label="Unknown"
+                                size="small"
+                                color="default"
+                                variant="outlined"
+                                sx={{ 
+                                  fontSize: 11, 
+                                  height: 24,
+                                  fontWeight: 600,
+                                }}
+                              />
+                            )}
+                          </Box>
+                        </Box>
+                      </TableCell>
+
+                      <TableCell>
+                        <Chip
+                          label={doctor.specialization}
+                          size="small"
+                          sx={{
+                            bgcolor: `${getSpecializationColor(doctor.specialization)}15`,
+                            color: getSpecializationColor(doctor.specialization),
+                            fontWeight: 600,
+                            fontSize: 11,
+                            height: 24,
+                            borderRadius: 2,
+                          }}
+                        />
+                      </TableCell>
+
+                      <TableCell>
+                        <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+                          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                            <EmailIcon sx={{ fontSize: 16, color: "text.secondary" }} />
+                            <Typography variant="body2" color="text.secondary">
+                              {doctor.email}
+                            </Typography>
+                          </Box>
+                          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                            <PhoneIcon sx={{ fontSize: 16, color: "text.secondary" }} />
+                            <Typography variant="body2" color="text.secondary">
+                              {doctor.phoneNumber}
+                            </Typography>
+                          </Box>
+                        </Box>
+                      </TableCell>
+
+                      <TableCell>
+                        <Box sx={{ display: "flex", gap: 1 }}>
+                          <Tooltip title="View Doctor">
+                            <IconButton size="small" color="primary">
+                              <VisibilityIcon fontSize="small" />
+                            </IconButton>
+                          </Tooltip>
+                          <Tooltip title="Edit Doctor">
+                            <IconButton size="small" color="secondary">
+                              <EditIcon fontSize="small" />
+                            </IconButton>
+                          </Tooltip>
+                        </Box>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={5} align="center" sx={{ py: 8 }}>
+                      <Box sx={{ textAlign: "center" }}>
+                        <MedicalServicesIcon sx={{ fontSize: 64, color: "text.secondary", mb: 2 }} />
+                        <Typography variant="h6" color="text.secondary" sx={{ mb: 1 }}>
+                          {searchTerm ? "No doctors found" : "No doctors registered"}
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                          {searchTerm 
+                            ? `No doctors match your search for "${searchTerm}"`
+                            : "Start by adding your first doctor to the system"
+                          }
+                        </Typography>
+                      </Box>
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+            
+            <TablePagination
+              component="div"
+              count={totalElements}
+              page={page}
+              onPageChange={handlePageChange}
+              rowsPerPage={pageSize}
+              onRowsPerPageChange={handlePageSizeChange}
+              rowsPerPageOptions={[5, 10, 20, 50]}
+              labelRowsPerPage="Doctors per page:"
+              labelDisplayedRows={({ from, to, count }) =>
+                `${from}–${to} of ${count !== -1 ? count : `more than ${to}`}`
+              }
+            />
+          </TableContainer>
         </>
       )}
 
