@@ -17,6 +17,7 @@ public class ClinicMapper {
                 .email(clinic.getEmail())
                 .phoneNumber(clinic.getPhoneNumber())
                 .createdAt(clinic.getCreatedAt().toString())
+                .accountStatus(clinic.getAccountStatus().name())
                 .build();
     }
 }

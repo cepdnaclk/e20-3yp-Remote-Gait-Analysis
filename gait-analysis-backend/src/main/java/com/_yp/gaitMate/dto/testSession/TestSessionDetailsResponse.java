@@ -36,7 +36,7 @@ public class TestSessionDetailsResponse {
         private Double avgSwingTime;
         private Double avgStanceTime;
         private List<Double> strideTimes;
-        private String pressureResultsPath;
+        private String pressureResultsPath;  //s3 bucket pdf report url
     }
 
     @Getter

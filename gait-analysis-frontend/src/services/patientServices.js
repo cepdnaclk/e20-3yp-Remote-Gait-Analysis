@@ -35,7 +35,12 @@ export const deletePatient = (id) => {
   return axios.delete(`/api/patients/${id}`);
 };
 
-// GET /api/patients/test-sessions/me — Get all test sessions for a patient
-export const getMyTestSessions = () => {
-  return axios.get("/api/test-sessions/me");
+// GET /api/test-sessions/me — Get all test sessions for a patient (with pagination support)
+export const getMyTestSessions = async (params = {}) => {
+  return axios.get("/api/test-sessions/me", { params });
+};
+
+// Add this new function to patientServices.js
+export const getDashboardStats = () => {
+  return axios.get("/api/patients/me/dashboard-stats");
 };

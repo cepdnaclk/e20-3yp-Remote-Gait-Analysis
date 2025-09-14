@@ -30,4 +30,6 @@ public class DoctorInfoResponse {
     private String profilePicture;
 
     private String createdAt;
+
+    private String accountStatus;
 }

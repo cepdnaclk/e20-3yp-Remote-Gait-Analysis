@@ -1,6 +1,6 @@
 import axiosInstance from './axiosInstance.js';
 
-export const getClinics = () => axiosInstance.get('/api/clinics');
+export const getClinics = (queryParams = '') => axiosInstance.get(`/api/clinics${queryParams}`);
 export const addClinic = (data) => axiosInstance.post('/api/clinics', data);
 
 export const getSensorKits = () => axiosInstance.get('/api/sensor-kits');

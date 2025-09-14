@@ -1,7 +1,8 @@
 package com._yp.gaitMate.service.clinicService;
-import com._yp.gaitMate.dto.doctor.DoctorInfoResponse; // ✅ import DTO
+import com._yp.gaitMate.dto.page.PageResponseDto;
+import com._yp.gaitMate.mail.service.EmailService;
 import com._yp.gaitMate.mapper.DoctorMapper;       // ✅ import mapper
-import com._yp.gaitMate.model.Doctor;
+import com._yp.gaitMate.mapper.PageMapper;
 import com._yp.gaitMate.repository.DoctorRepository; // ✅ import repo
 
 import com._yp.gaitMate.dto.clinic.ClinicInfoResponse;
@@ -12,31 +13,35 @@ import com._yp.gaitMate.mapper.ClinicMapper;
 import com._yp.gaitMate.model.Clinic;
 import com._yp.gaitMate.repository.ClinicRepository;
 
-import com._yp.gaitMate.security.dto.SignupRequest;
-import com._yp.gaitMate.security.model.AppRole;
-import com._yp.gaitMate.security.model.User;
+import com._yp.gaitMate.security.model.AccountStatus;
+import com._yp.gaitMate.security.model.AccountType;
 import com._yp.gaitMate.security.service.AuthenticationService;
 import com._yp.gaitMate.security.utils.AuthUtil;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Set;
+import java.util.UUID;
 
 /**
  * Service class for managing clinic-related operations.
  */
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ClinicServiceImpl implements ClinicService {
 
     private final ClinicRepository clinicRepository;
     private final AuthenticationService authService;
     private final ClinicMapper clinicMapper;
     private final AuthUtil authUtil;
+    private final EmailService emailService;
+    private final PageMapper pageMapper;
+
 
     // ✅ Inject missing beans
     private final DoctorRepository doctorRepository;
@@ -50,6 +55,12 @@ public class ClinicServiceImpl implements ClinicService {
             throw new ApiException("Clinic name already exists");
         }
 
+        if (clinicRepository.existsByEmail(clinicRequest.getEmail())) {
+            throw new ApiException("Email is already taken");
+        }
+
+
+        /* DEPRECATED
         // 1. Register user with ROLE_CLINIC using authService
         SignupRequest signupRequest = SignupRequest.builder()
                 .username(clinicRequest.getUsername())
@@ -59,17 +70,31 @@ public class ClinicServiceImpl implements ClinicService {
                 .build();
 
         User user = authService.registerUser(signupRequest);
+         */
 
-        // 2. Create and save clinic
+        // ✅ Generate invitation token
+        String invitationToken = UUID.randomUUID().toString();
+
+
+
+        // 2. Create and save clinic WITHOUT user (user will be created later)
         Clinic clinic = Clinic.builder()
                 .name(clinicRequest.getName())
                 .email(clinicRequest.getEmail())
                 .phoneNumber(clinicRequest.getPhoneNumber())
                 .createdAt(LocalDateTime.now())
-                .user(user)
+                .invitationToken(invitationToken)
+                .accountStatus(AccountStatus.INVITATION_SENT)
+                .user(null)  // No user yet!
                 .build();
 
         clinic = clinicRepository.save(clinic);
+
+        // Send invitation email
+        emailService.sendInvitationEmail(clinicRequest.getEmail(), invitationToken, AccountType.CLINIC);
+
+        log.info("🏥 Clinic '{}' created successfully. Invitation sent to: {}",
+                clinicRequest.getName(), clinicRequest.getEmail());
 
         return clinicMapper.toClinicInfoResponse(clinic);
     }
@@ -93,11 +118,19 @@ public class ClinicServiceImpl implements ClinicService {
     }
 
 
+//    @Override
+//    public List<ClinicInfoResponse> getAllClinics() {
+//        return clinicRepository.findAll().stream()
+//                .map(clinicMapper::toClinicInfoResponse)
+//                .toList();
+//    }
+
     @Override
-    public List<ClinicInfoResponse> getAllClinics() {
-        return clinicRepository.findAll().stream()
-                .map(clinicMapper::toClinicInfoResponse)
-                .toList();
+    public PageResponseDto<ClinicInfoResponse> getAllClinics(Pageable pageable) {
+        Page<Clinic> clinicPage = clinicRepository.findAll(pageable);
+        Page<ClinicInfoResponse> responsePage = clinicPage.map(clinicMapper::toClinicInfoResponse);
+        return pageMapper.toPageResponse(responsePage);
     }
+
 }
 

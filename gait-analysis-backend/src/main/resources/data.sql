@@ -21,45 +21,45 @@ INSERT INTO user_role(user_id, role_id) VALUES (200, 1);
 INSERT INTO users(user_id, username, email, password)
 VALUES (300, 'clinic1', 'clinic1@example.com', '$2a$12$.VG3p3nMMhv84T7PUGmuMezvB4UJVNt0mcr.QI0bomMbA7wm/eP3i');
 INSERT INTO user_role(user_id, role_id) VALUES (300, 2);
-INSERT INTO clinic(id, name, email, phone_number, created_at, user_id)
-VALUES (301, 'Clinic 1', 'clinic1@example.com', '0712345000', CURRENT_TIMESTAMP, 300);
+INSERT INTO clinic(id, name, email, phone_number, created_at, user_id, invitation_token, account_status)
+VALUES (301, 'Clinic 1', 'clinic1@example.com', '0712345000', CURRENT_TIMESTAMP, 300, NULL, 'ACCOUNT_CREATED');
 
 -- CLINIC 2
 INSERT INTO users(user_id, username, email, password)
 VALUES (301, 'clinic2', 'clinic2@example.com', '$2a$12$.VG3p3nMMhv84T7PUGmuMezvB4UJVNt0mcr.QI0bomMbA7wm/eP3i');
 INSERT INTO user_role(user_id, role_id) VALUES (301, 2);
-INSERT INTO clinic(id, name, email, phone_number, created_at, user_id)
-VALUES (302, 'Clinic 2', 'clinic2@example.com', '0712345111', CURRENT_TIMESTAMP, 301);
+INSERT INTO clinic(id, name, email, phone_number, created_at, user_id, invitation_token, account_status)
+VALUES (302, 'Clinic 2', 'clinic2@example.com', '0712345111', CURRENT_TIMESTAMP, 301, NULL, 'ACCOUNT_CREATED');
 
--- ==============================
---           DOCTORS
--- ==============================
 
 -- Clinic 1 Doctors
 INSERT INTO users(user_id, username, email, password)
 VALUES (302, 'doctor1', 'doctor1@example.com', '$2a$12$.VG3p3nMMhv84T7PUGmuMezvB4UJVNt0mcr.QI0bomMbA7wm/eP3i');
 INSERT INTO user_role(user_id, role_id) VALUES (302, 4);
-INSERT INTO doctor(id, name, email, phone_number, specialization, created_at, clinic_id, user_id)
-VALUES (401, 'Dr. Alice', 'doctor1@example.com', '0771234000', 'Physio', CURRENT_TIMESTAMP, 301, 302);
+INSERT INTO doctor(id, name, email, phone_number, specialization, created_at, clinic_id, user_id, invitation_token, account_status)
+VALUES (401, 'Dr. Alice', 'doctor1@example.com', '0771234000', 'Physio', CURRENT_TIMESTAMP, 301, 302, NULL, 'ACCOUNT_CREATED');
 
 INSERT INTO users(user_id, username, email, password)
 VALUES (303, 'doctor2', 'doctor2@example.com', '$2a$12$.VG3p3nMMhv84T7PUGmuMezvB4UJVNt0mcr.QI0bomMbA7wm/eP3i');
 INSERT INTO user_role(user_id, role_id) VALUES (303, 4);
-INSERT INTO doctor(id, name, email, phone_number, specialization, created_at, clinic_id, user_id)
-VALUES (402, 'Dr. Bob', 'doctor2@example.com', '0771234011', 'Ortho', CURRENT_TIMESTAMP, 301, 303);
+INSERT INTO doctor(id, name, email, phone_number, specialization, created_at, clinic_id, user_id, invitation_token, account_status)
+VALUES (402, 'Dr. Bob', 'doctor2@example.com', '0771234011', 'Ortho', CURRENT_TIMESTAMP, 301, 303, NULL, 'ACCOUNT_CREATED');
 
 -- Clinic 2 Doctors
 INSERT INTO users(user_id, username, email, password)
 VALUES (304, 'doctor3', 'doctor3@example.com', '$2a$12$.VG3p3nMMhv84T7PUGmuMezvB4UJVNt0mcr.QI0bomMbA7wm/eP3i');
 INSERT INTO user_role(user_id, role_id) VALUES (304, 4);
-INSERT INTO doctor(id, name, email, phone_number, specialization, created_at, clinic_id, user_id)
-VALUES (403, 'Dr. Carol', 'doctor3@example.com', '0771234022', 'Neuro', CURRENT_TIMESTAMP, 302, 304);
+INSERT INTO doctor(id, name, email, phone_number, specialization, created_at, clinic_id, user_id, invitation_token, account_status)
+VALUES (403, 'Dr. Carol', 'doctor3@example.com', '0771234022', 'Neuro', CURRENT_TIMESTAMP, 302, 304, NULL, 'ACCOUNT_CREATED');
 
 INSERT INTO users(user_id, username, email, password)
 VALUES (305, 'doctor4', 'doctor4@example.com', '$2a$12$.VG3p3nMMhv84T7PUGmuMezvB4UJVNt0mcr.QI0bomMbA7wm/eP3i');
 INSERT INTO user_role(user_id, role_id) VALUES (305, 4);
-INSERT INTO doctor(id, name, email, phone_number, specialization, created_at, clinic_id, user_id)
-VALUES (404, 'Dr. Dan', 'doctor4@example.com', '0771234033', 'Sports', CURRENT_TIMESTAMP, 302, 305);
+INSERT INTO doctor(id, name, email, phone_number, specialization, created_at, clinic_id, user_id, invitation_token, account_status)
+VALUES (404, 'Dr. Dan', 'doctor4@example.com', '0771234033', 'Sports', CURRENT_TIMESTAMP, 302, 305, NULL, 'ACCOUNT_CREATED');
+
+
+
 
 -- ==============================
 --         SENSOR KITS
@@ -87,67 +87,71 @@ INSERT INTO sensorkit(id, serial_no, firmware_version, status, clinic_id, is_cal
 (615, 1615, 1, 'IN_STOCK', NULL, FALSE),
 (616, 1616, 1, 'IN_STOCK', NULL, FALSE);
 
+
+
 -- ==============================
 --          PATIENTS
 -- ==============================
-
--- 8 patients, 4 per clinic (2 per doctor)
--- IDs: 501–508
--- Users: 306–313
 
 -- Clinic 1 Patients
 -- Doctor 1 (401): patient1, patient2
 INSERT INTO users(user_id, username, email, password)
 VALUES (306, 'patient1', 'patient1@example.com', '$2a$12$.VG3p3nMMhv84T7PUGmuMezvB4UJVNt0mcr.QI0bomMbA7wm/eP3i');
 INSERT INTO user_role(user_id, role_id) VALUES (306, 3);
-INSERT INTO patient(id, name, email, phone_number, age, height, weight, gender, created_at, doctor_id, sensor_kit_id, clinic_id, user_id, nic_number)
-VALUES (501, 'Patient 1', 'patient1@example.com', '0781111100', 22, 165, 60, 'MALE', CURRENT_TIMESTAMP, 401, 601, 301, 306,'12345611');
+INSERT INTO patient(id, name, email, phone_number, age, height, weight, gender, created_at, doctor_id, sensor_kit_id, clinic_id, user_id, nic_number, invitation_token, account_status)
+VALUES (501, 'Patient 1', 'patient1@example.com', '0781111100', 22, 165, 60, 'MALE', CURRENT_TIMESTAMP, 401, 601, 301, 306,'12345611', NULL, 'ACCOUNT_CREATED');
 
 INSERT INTO users(user_id, username, email, password)
 VALUES (307, 'patient2', 'patient2@example.com', '$2a$12$.VG3p3nMMhv84T7PUGmuMezvB4UJVNt0mcr.QI0bomMbA7wm/eP3i');
 INSERT INTO user_role(user_id, role_id) VALUES (307, 3);
-INSERT INTO patient(id, name, email, phone_number, age, height, weight, gender, created_at, doctor_id, sensor_kit_id, clinic_id, user_id, nic_number)
-VALUES (502, 'Patient 2', 'patient2@example.com', '0781111200', 24, 170, 65, 'FEMALE', CURRENT_TIMESTAMP, 401, 602, 301, 307,'12345622');
+INSERT INTO patient(id, name, email, phone_number, age, height, weight, gender, created_at, doctor_id, sensor_kit_id, clinic_id, user_id, nic_number, invitation_token, account_status)
+VALUES (502, 'Patient 2', 'patient2@example.com', '0781111200', 24, 170, 65, 'FEMALE', CURRENT_TIMESTAMP, 401, 602, 301, 307,'12345622', NULL, 'ACCOUNT_CREATED');
 
 -- Doctor 2 (402): patient3, patient4
 INSERT INTO users(user_id, username, email, password)
 VALUES (308, 'patient3', 'patient3@example.com', '$2a$12$.VG3p3nMMhv84T7PUGmuMezvB4UJVNt0mcr.QI0bomMbA7wm/eP3i');
 INSERT INTO user_role(user_id, role_id) VALUES (308, 3);
-INSERT INTO patient(id, name, email, phone_number, age, height, weight, gender, created_at, doctor_id, sensor_kit_id, clinic_id, user_id, nic_number)
-VALUES (503, 'Patient 3', 'patient3@example.com', '0781111300', 26, 172, 68, 'MALE', CURRENT_TIMESTAMP, 402, 603, 301, 308, '1234561');
+INSERT INTO patient(id, name, email, phone_number, age, height, weight, gender, created_at, doctor_id, sensor_kit_id, clinic_id, user_id, nic_number, invitation_token, account_status)
+VALUES (503, 'Patient 3', 'patient3@example.com', '0781111300', 26, 172, 68, 'MALE', CURRENT_TIMESTAMP, 402, 603, 301, 308, '1234561', NULL, 'ACCOUNT_CREATED');
 
 INSERT INTO users(user_id, username, email, password)
 VALUES (309, 'patient4', 'patient4@example.com', '$2a$12$.VG3p3nMMhv84T7PUGmuMezvB4UJVNt0mcr.QI0bomMbA7wm/eP3i');
 INSERT INTO user_role(user_id, role_id) VALUES (309, 3);
-INSERT INTO patient(id, name, email, phone_number, age, height, weight, gender, created_at, doctor_id, sensor_kit_id, clinic_id, user_id, nic_number)
-VALUES (504, 'Patient 4', 'patient4@example.com', '0781111400', 28, 178, 72, 'FEMALE', CURRENT_TIMESTAMP, 402, 604, 301, 309, '1234562');
+INSERT INTO patient(id, name, email, phone_number, age, height, weight, gender, created_at, doctor_id, sensor_kit_id, clinic_id, user_id, nic_number, invitation_token, account_status)
+VALUES (504, 'Patient 4', 'patient4@example.com', '0781111400', 28, 178, 72, 'FEMALE', CURRENT_TIMESTAMP, 402, 604, 301, 309, '1234562', NULL, 'ACCOUNT_CREATED');
 
 -- Clinic 2 Patients
 -- Doctor 3 (403): patient5, patient6
 INSERT INTO users(user_id, username, email, password)
 VALUES (310, 'patient5', 'patient5@example.com', '$2a$12$.VG3p3nMMhv84T7PUGmuMezvB4UJVNt0mcr.QI0bomMbA7wm/eP3i');
 INSERT INTO user_role(user_id, role_id) VALUES (310, 3);
-INSERT INTO patient(id, name, email, phone_number, age, height, weight, gender, created_at, doctor_id, sensor_kit_id, clinic_id, user_id, nic_number)
-VALUES (505, 'Patient 5', 'patient5@example.com', '0781111500', 30, 180, 75, 'MALE', CURRENT_TIMESTAMP, 403, 607, 302, 310, '1234563');
+INSERT INTO patient(id, name, email, phone_number, age, height, weight, gender, created_at, doctor_id, sensor_kit_id, clinic_id, user_id, nic_number, invitation_token, account_status)
+VALUES (505, 'Patient 5', 'patient5@example.com', '0781111500', 30, 180, 75, 'MALE', CURRENT_TIMESTAMP, 403, 607, 302, 310, '1234563', NULL, 'ACCOUNT_CREATED');
 
 INSERT INTO users(user_id, username, email, password)
 VALUES (311, 'patient6', 'patient6@example.com', '$2a$12$.VG3p3nMMhv84T7PUGmuMezvB4UJVNt0mcr.QI0bomMbA7wm/eP3i');
 INSERT INTO user_role(user_id, role_id) VALUES (311, 3);
-INSERT INTO patient(id, name, email, phone_number, age, height, weight, gender, created_at, doctor_id, sensor_kit_id, clinic_id, user_id, nic_number)
-VALUES (506, 'Patient 6', 'patient6@example.com', '0781111600', 32, 175, 70, 'FEMALE', CURRENT_TIMESTAMP, 403, 608, 302, 311, '1234564');
+INSERT INTO patient(id, name, email, phone_number, age, height, weight, gender, created_at, doctor_id, sensor_kit_id, clinic_id, user_id, nic_number, invitation_token, account_status)
+VALUES (506, 'Patient 6', 'patient6@example.com', '0781111600', 32, 175, 70, 'FEMALE', CURRENT_TIMESTAMP, 403, 608, 302, 311, '1234564', NULL, 'ACCOUNT_CREATED');
 
 -- Doctor 4 (404): patient7, patient8
 INSERT INTO users(user_id, username, email, password)
 VALUES (312, 'patient7', 'patient7@example.com', '$2a$12$.VG3p3nMMhv84T7PUGmuMezvB4UJVNt0mcr.QI0bomMbA7wm/eP3i');
 INSERT INTO user_role(user_id, role_id) VALUES (312, 3);
-INSERT INTO patient(id, name, email, phone_number, age, height, weight, gender, created_at, doctor_id, sensor_kit_id, clinic_id, user_id, nic_number)
-VALUES (507, 'Patient 7', 'patient7@example.com', '0781111700', 34, 168, 62, 'MALE', CURRENT_TIMESTAMP, 404, 609, 302, 312, '1234565');
+INSERT INTO patient(id, name, email, phone_number, age, height, weight, gender, created_at, doctor_id, sensor_kit_id, clinic_id, user_id, nic_number, invitation_token, account_status)
+VALUES (507, 'Patient 7', 'patient7@example.com', '0781111700', 34, 168, 62, 'MALE', CURRENT_TIMESTAMP, 404, 609, 302, 312, '1234565', NULL, 'ACCOUNT_CREATED');
 
 INSERT INTO users(user_id, username, email, password)
 VALUES (313, 'patient8', 'patient8@example.com', '$2a$12$.VG3p3nMMhv84T7PUGmuMezvB4UJVNt0mcr.QI0bomMbA7wm/eP3i');
 INSERT INTO user_role(user_id, role_id) VALUES (313, 3);
-INSERT INTO patient(id, name, email, phone_number, age, height, weight, gender, created_at, doctor_id, sensor_kit_id, clinic_id, user_id, nic_number)
-VALUES (508, 'Patient 8', 'patient8@example.com', '0781111800', 36, 166, 64, 'FEMALE', CURRENT_TIMESTAMP, 404, 610, 302, 313, '1234566');
+INSERT INTO patient(id, name, email, phone_number, age, height, weight, gender, created_at, doctor_id, sensor_kit_id, clinic_id, user_id, nic_number, invitation_token, account_status)
+VALUES (508, 'Patient 8', 'patient8@example.com', '0781111800', 36, 166, 64, 'FEMALE', CURRENT_TIMESTAMP, 404, 610, 302, 313, '1234566', NULL, 'ACCOUNT_CREATED');
+
+
+
+
+
+
 
 
 -- ==============================
@@ -229,6 +233,10 @@ INSERT INTO test_session(id, start_time, end_time, status, patient_id, feedback_
 (1004, '2024-02-05 16:00:00', '2024-02-05 16:12:30', 'COMPLETED', 501, 3004),
 (1005, '2024-02-12 11:45:00', '2024-02-12 11:58:20', 'COMPLETED', 501, 3005);
 
+-- Test download session for Patient 1 (501)
+INSERT INTO test_session(id, start_time, end_time, status, patient_id, feedback_id) VALUES
+    (9999, '2024-03-01 09:00:00', '2024-03-01 09:12:00', 'COMPLETED', 501, NULL);
+
 -- Patient 2 (502) - 5 sessions
 INSERT INTO test_session(id, start_time, end_time, status, patient_id, feedback_id) VALUES
 (1006, '2024-01-16 08:30:00', '2024-01-16 08:44:10', 'COMPLETED', 502, 3006),
@@ -291,11 +299,25 @@ INSERT INTO test_session(id, start_time, end_time, status, patient_id, feedback_
 
 -- Results for Patient 1 (501) - Sessions 1001-1005
 INSERT INTO processed_test_results(id, session_id, steps, cadence, avg_heel_force, avg_toe_force, avg_midfoot_force, balance_score, peak_impact, duration_seconds, avg_swing_time, avg_stance_time, pressure_results_path, stride_times) VALUES
-(2001, 1001, 1245, 112.5, 8.2, 6.7, 4.3, 85.2, 245, 930.0, 0.42, 0.58, '/results/patient1/session1_pressure.json', '0.89,0.92,0.88,0.91,0.87,0.93,0.90,0.89,0.91,0.88'),
+(2001, 1001, 1245, 112.5, 8.2, 6.7, 4.3, 85.2, 245, 930.0, 0.42, 0.58, '/results/patient1/session1_pressure.json', '0.80,0.92,0.88,0.91,0.87,0.93,0.90,0.89,0.91,0.88'),
 (2002, 1002, 1320, 115.8, 8.5, 7.1, 4.6, 87.4, 258, 735.0, 0.41, 0.57, '/results/patient1/session2_pressure.json', '0.88,0.90,0.89,0.92,0.87,0.91,0.89,0.90,0.88,0.91'),
 (2003, 1003, 1189, 110.2, 8.0, 6.9, 4.2, 83.1, 242, 885.0, 0.43, 0.59, '/results/patient1/session3_pressure.json', '0.91,0.89,0.93,0.88,0.90,0.87,0.92,0.88,0.90,0.89'),
 (2004, 1004, 1278, 114.3, 8.3, 7.0, 4.5, 86.7, 251, 750.0, 0.42, 0.58, '/results/patient1/session4_pressure.json', '0.87,0.91,0.88,0.90,0.89,0.92,0.87,0.90,0.88,0.91'),
-(2005, 1005, 1356, 117.1, 8.7, 7.3, 4.8, 88.9, 263, 800.0, 0.40, 0.56, '/results/patient1/session5_pressure.json', '0.89,0.87,0.91,0.88,0.90,0.89,0.92,0.87,0.91,0.88');
+(2005, 1005, 1356, 117.1, 8.7, 7.3, 4.8, 88.9, 263, 800.0, 0.40, 0.56, '/results/patient1/session5_pressure.json', '0.80,0.87,0.91,0.88,0.90,0.89,0.92,0.87,0.91,0.88');
+
+-- Test download result for session 1042 (Patient 1)
+INSERT INTO processed_test_results(
+    id, session_id, steps, cadence, avg_heel_force, avg_toe_force, avg_midfoot_force,
+    balance_score, peak_impact, duration_seconds, avg_swing_time, avg_stance_time,
+    pressure_results_path, stride_times, stride_lengths, stride_length
+) VALUES (
+             2040, 9999, 1, 0.0, 309.8, 87.9, 0.0,
+             0.01, 3127, 26.8, 0.16, 0.24,
+             'https://gait-analysis-reports.s3.amazonaws.com/reports/gait_analysis_session_1_20250710_183121.pdf?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAU6VTTF4A25KKWNK3%2F20250710%2Feu-north-1%2Fs3%2Faws4_request&X-Amz-Date=20250710T130124Z&X-Amz-Expires=86400&X-Amz-SignedHeaders=host&X-Amz-Signature=ba8351e7dee7d3bb4508a0d852a56c2514de23c6249c4a044acf1b2651ebcc2abz',
+             '0.4',
+             '1.846,0.315',
+             1.081
+         );
 
 -- Results for Patient 2 (502) - Sessions 1006-1009 (1010 is FAILED, no results)
 INSERT INTO processed_test_results(id, session_id, steps, cadence, avg_heel_force, avg_toe_force, avg_midfoot_force, balance_score, peak_impact, duration_seconds, avg_swing_time, avg_stance_time, pressure_results_path, stride_times) VALUES

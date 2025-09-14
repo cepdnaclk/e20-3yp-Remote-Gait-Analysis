@@ -1,7 +1,11 @@
 package com._yp.gaitMate.controller;
 
+import com._yp.gaitMate.dto.page.PageResponseDto;
 import com._yp.gaitMate.dto.patient.CreatePatientRequest;
+import com._yp.gaitMate.dto.patient.PatientDashboardStatsDto;
 import com._yp.gaitMate.dto.patient.PatientInfoResponse;
+import com._yp.gaitMate.security.utils.AuthUtil;
+import com._yp.gaitMate.service.patientDashboardService.PatientDashboardSerivce;
 import com._yp.gaitMate.service.patientService.PatientService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -11,6 +15,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.NotImplementedException;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -30,6 +36,8 @@ public class PatientController {
     private final PatientService patientService;
     private final PatientRepository patientRepository; // ✅ Add this
     private final PatientMapper patientMapper;
+    private final AuthUtil authUtil;
+    private final PatientDashboardSerivce patientDashboardSerivce;
 
     @PostMapping("/patients")
     @PreAuthorize("hasRole('CLINIC')")
@@ -133,25 +141,28 @@ public class PatientController {
     }
 
 
-    @GetMapping("/doctors/me/patients")
-    @PreAuthorize("hasRole('DOCTOR')")
-    @Operation(summary = "Get the logged in doctor's patients")
-    public ResponseEntity<List<PatientInfoResponse>> getPatientsOfLoggedInDoctor() {
-
-        List<PatientInfoResponse> patients = patientService.getPatientsOfLoggedInDoctor();
-
-        return ResponseEntity.ok(patients);
-    }
+//    @GetMapping("/clinics/me/patients")
+//    @PreAuthorize("hasRole('CLINIC')")
+//    @Operation(summary = "Get the logged in clinic's patients")
+//    public ResponseEntity<List<PatientInfoResponse>> getPatientsOfLoggedInClinic() {
+//
+//        List<PatientInfoResponse> patients = patientService.getPatientsOfLoggedInClinic();
+//
+//        return ResponseEntity.ok(patients);
+//    }
 
     @GetMapping("/clinics/me/patients")
     @PreAuthorize("hasRole('CLINIC')")
-    @Operation(summary = "Get the logged in clinic's patients")
-    public ResponseEntity<List<PatientInfoResponse>> getPatientsOfLoggedInClinic() {
-
-        List<PatientInfoResponse> patients = patientService.getPatientsOfLoggedInClinic();
-
+    @Operation(summary = "Get paginated patients of the logged-in clinic")
+    public ResponseEntity<PageResponseDto<PatientInfoResponse>> getPatientsOfLoggedInClinic(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        Pageable pageable = PageRequest.of(page, size);
+        PageResponseDto<PatientInfoResponse> patients = patientService.getPatientsOfLoggedInClinic(pageable);
         return ResponseEntity.ok(patients);
     }
+
 
     @GetMapping("patients/me")
     @PreAuthorize("hasRole('PATIENT')")
@@ -160,6 +171,18 @@ public class PatientController {
         PatientInfoResponse response = patientService.getMyPatientProfile();
         return ResponseEntity.ok(response);
     }
+
+
+    @GetMapping("/patients/me/dashboard-stats")
+    @PreAuthorize("hasRole('PATIENT')")
+    public ResponseEntity<PatientDashboardStatsDto> getDashboardStatsOfLoggedInPatient(){
+
+        Patient patient = authUtil.getLoggedInPatient();
+        PatientDashboardStatsDto stats = patientDashboardSerivce.getDashboardStatsForCurrentPatient();
+        return ResponseEntity.ok(stats);
+    }
+
+
 
 
 

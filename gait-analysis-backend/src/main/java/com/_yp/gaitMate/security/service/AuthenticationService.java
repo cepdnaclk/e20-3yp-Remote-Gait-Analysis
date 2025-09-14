@@ -1,5 +1,6 @@
 package com._yp.gaitMate.security.service;
 
+import com._yp.gaitMate.security.dto.InvitationSignupRequest;
 import com._yp.gaitMate.security.dto.LoginRequest;
 import com._yp.gaitMate.security.dto.SignupRequest;
 import com._yp.gaitMate.security.dto.UserInfoResponse;
@@ -13,4 +14,5 @@ public interface AuthenticationService {
     UserInfoResponse registerUserAndLogin(SignupRequest signupRequest);
     User registerUser(SignupRequest signupRequest);
     UserInfoResponse getUserDetails(Authentication authentication);
+    UserInfoResponse completeInvitationSignup(InvitationSignupRequest request);
 }

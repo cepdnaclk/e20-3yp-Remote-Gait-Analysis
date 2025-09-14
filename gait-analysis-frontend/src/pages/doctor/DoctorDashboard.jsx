@@ -1,3 +1,5 @@
+// DoctorDashboard.jsx
+
 import { useEffect, useState } from "react";
 import {
   Box,
@@ -12,10 +14,10 @@ import {
   CardContent,
   Grid,
   IconButton,
-  Avatar,
   Chip,
-  Collapse,
   CircularProgress,
+  Paper,
+  Divider,
 } from "@mui/material";
 
 import {
@@ -27,210 +29,475 @@ import {
   Dashboard as DashboardIcon,
   Menu as MenuIcon,
   Logout as LogoutIcon,
+  TrendingUp as TrendingUpIcon,
+  AccessTime as AccessTimeIcon,
+  Assignment as AssignmentIcon,
 } from "@mui/icons-material";
 
-import { useNavigate, Link } from "react-router-dom";
+import { Line } from "react-chartjs-2";
+import { 
+  Chart as ChartJS, 
+  CategoryScale, 
+  LinearScale, 
+  PointElement, 
+  LineElement, 
+  Title, 
+  Tooltip, 
+  Legend 
+} from 'chart.js';
+import { useNavigate, useLocation } from "react-router-dom";
 import { getDoctorPatients } from "../../services/doctorServices";
-//import RecentPatients from "../RecentPatients";
+import Appointments from "../Appointments";
+import Reports from "../../components/Reports";
+import Settings from "../Settings";
 import DoctorPatientsPage from "./DoctorPatientsPage";
 
-import Appointments from "../Appointments";
-import Reports from "../Reports";
-import Messages from "../Messages";
-import Settings from "../Settings";
+ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
+
+// Enhanced StatCard component with better styling
+const StatCard = ({ title, value, icon, gradient, trend }) => (
+  <Card
+    sx={{
+      height: "100%",
+      background: gradient,
+      color: "white",
+      boxShadow: "0 12px 32px rgba(0,0,0,0.15)",
+      borderRadius: 3,
+      position: "relative",
+      overflow: "hidden",
+      "&::before": {
+        content: '""',
+        position: "absolute",
+        top: 0,
+        right: 0,
+        width: "100px",
+        height: "100px",
+        background: "rgba(255,255,255,0.1)",
+        borderRadius: "50%",
+        transform: "translate(30px, -30px)",
+      },
+      "&:hover": {
+        transform: "translateY(-4px)",
+        boxShadow: "0 20px 40px rgba(0,0,0,0.2)",
+      },
+      transition: "all 0.3s ease",
+    }}
+  >
+    <CardContent sx={{ p: 4, position: "relative", zIndex: 1 }}>
+      <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", mb: 3 }}>
+        <Box sx={{ 
+          p: 2, 
+          borderRadius: 2, 
+          backgroundColor: "rgba(255,255,255,0.2)", 
+          backdropFilter: "blur(10px)" 
+        }}>
+          {icon}
+        </Box>
+        {trend && (
+          <Chip
+            label={trend}
+            size="small"
+            sx={{ 
+              bgcolor: "rgba(255,255,255,0.2)", 
+              color: "white", 
+              fontWeight: 600, 
+              backdropFilter: "blur(10px)" 
+            }}
+          />
+        )}
+      </Box>
+      <Typography variant="h3" fontWeight={800} mb={1}>{value}</Typography>
+      <Typography variant="h6" fontWeight={600} opacity={0.9}>{title}</Typography>
+    </CardContent>
+  </Card>
+);
+
+// Quick Action Card component
+const QuickActionCard = ({ title, description, icon, onClick, color }) => (
+  <Card
+    onClick={onClick}
+    sx={{
+      p: 3,
+      cursor: "pointer",
+      background: "linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)",
+      border: "1px solid rgba(226, 232, 240, 0.8)",
+      borderRadius: 3,
+      boxShadow: "0 4px 16px rgba(0,0,0,0.08)",
+      "&:hover": {
+        transform: "translateY(-2px)",
+        boxShadow: "0 12px 32px rgba(0,0,0,0.15)",
+        borderColor: color,
+      },
+      transition: "all 0.3s ease",
+    }}
+  >
+    <Box sx={{ display: "flex", gap: 2 }}>
+      <Box sx={{ p: 2, borderRadius: 2, background: `${color}15`, color }}>
+        {icon}
+      </Box>
+      <Box>
+        <Typography variant="h6" fontWeight={700} mb={1}>{title}</Typography>
+        <Typography variant="body2" color="text.secondary">{description}</Typography>
+      </Box>
+    </Box>
+  </Card>
+);
 
 export default function DoctorDashboard() {
   const navigate = useNavigate();
-  const [patients, setPatients] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [selectedSection, setSelectedSection] = useState("Dashboard");
+  const location = useLocation();
+  const [dashboardStats, setDashboardStats] = useState({
+    totalPatients: 0,
+    todayAppointments: 0,
+    pendingReports: 0
+  });
+  const [isLoadingStats, setIsLoadingStats] = useState(true);
+  const [selectedSection, setSelectedSection] = useState(
+    location.state?.selectedSection || "Dashboard"
+  );
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
+  // Extract doctor name from token
   const token = localStorage.getItem("token");
   let doctorName = "";
-
-  if (token) {
-    const decoded = JSON.parse(atob(token.split(".")[1]));
-    doctorName = decoded.sub;
+  try {
+    if (token) {
+      const decoded = JSON.parse(atob(token.split(".")[1]));
+      doctorName = decoded.sub || decoded.name || "Doctor";
+    }
+  } catch (error) {
+    console.error("Error decoding token:", error);
+    doctorName = "Doctor";
   }
 
+  // Fetch dashboard statistics
   useEffect(() => {
-    const fetchPatients = async () => {
+    const fetchDashboardStats = async () => {
       try {
-        const res = await getDoctorPatients();
-        setPatients(res.data);
+        setIsLoadingStats(true);
+        
+        // Fetch basic patient count for dashboard using axios service
+        const res = await getDoctorPatients({ page: 0, size: 1 });
+        const totalPatients = res.data?.totalElements || 0;
+        
+        // Generate mock data for other stats (replace with real API calls)
+        const todayAppointments = Math.floor(Math.random() * 20) + 5;
+        const pendingReports = Math.floor(Math.random() * 10) + 1;
+        
+        setDashboardStats({
+          totalPatients,
+          todayAppointments,
+          pendingReports
+        });
       } catch (err) {
-        console.error("Failed to load patients", err);
-        setError(err);
+        console.error("Error fetching dashboard stats:", err);
+        // Set default values on error
+        setDashboardStats({
+          totalPatients: 0,
+          todayAppointments: Math.floor(Math.random() * 20) + 5,
+          pendingReports: Math.floor(Math.random() * 10) + 1
+        });
       } finally {
-        setIsLoading(false);
+        setIsLoadingStats(false);
       }
     };
-    fetchPatients();
-  }, []);
+    
+    // Only fetch stats when on dashboard
+    if (selectedSection === "Dashboard") {
+      fetchDashboardStats();
+    }
+  }, [selectedSection]);
 
   const menuItems = [
     { text: "Dashboard", icon: <DashboardIcon /> },
     { text: "Patients", icon: <PeopleIcon /> },
     { text: "Appointments", icon: <CalendarTodayIcon /> },
     { text: "Reports", icon: <DescriptionIcon /> },
-    { text: "Messages", icon: <ChatIcon /> },
     { text: "Settings", icon: <SettingsIcon /> },
   ];
 
+  // Chart configuration
+  const chartData = {
+    labels: ["Week 1", "Week 2", "Week 3", "Week 4"],
+    datasets: [
+      {
+        label: "Appointments",
+        data: [12, 19, 14, 22],
+        borderColor: "#3b82f6",
+        backgroundColor: "rgba(59, 130, 246, 0.1)",
+        tension: 0.4,
+        fill: true,
+      },
+      {
+        label: "New Patients",
+        data: [8, 11, 9, 16],
+        borderColor: "#10b981",
+        backgroundColor: "rgba(16, 185, 129, 0.1)",
+        tension: 0.4,
+        fill: true,
+      },
+    ],
+  };
+
+  const chartOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        position: 'top',
+      },
+      title: {
+        display: true,
+        text: 'Weekly Statistics',
+        font: {
+          size: 16,
+          weight: 'bold'
+        }
+      },
+    },
+    scales: {
+      y: {
+        beginAtZero: true,
+        grid: {
+          color: 'rgba(0,0,0,0.1)',
+        },
+      },
+      x: {
+        grid: {
+          color: 'rgba(0,0,0,0.1)',
+        },
+      },
+    },
+  };
+
+  // Dashboard content
+  const DashboardContent = () => (
+    <Box>
+      {/* Statistics Cards */}
+      <Grid container spacing={3} mb={4}>
+        <Grid item xs={12} sm={6} md={4}>
+          <StatCard
+            title="Total Patients"
+            value={isLoadingStats ? "..." : dashboardStats.totalPatients}
+            icon={<PeopleIcon fontSize="large" />}
+            gradient="linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
+            trend="+12%"
+          />
+        </Grid>
+        <Grid item xs={12} sm={6} md={4}>
+          <StatCard
+            title="Today's Appointments"
+            value={isLoadingStats ? "..." : dashboardStats.todayAppointments}
+            icon={<CalendarTodayIcon fontSize="large" />}
+            gradient="linear-gradient(135deg, #f093fb 0%, #f5576c 100%)"
+            trend="+8%"
+          />
+        </Grid>
+        <Grid item xs={12} sm={6} md={4}>
+          <StatCard
+            title="Pending Reports"
+            value={isLoadingStats ? "..." : dashboardStats.pendingReports}
+            icon={<DescriptionIcon fontSize="large" />}
+            gradient="linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)"
+            trend="-5%"
+          />
+        </Grid>
+      </Grid>
+
+      {/* Chart Section */}
+      <Grid container spacing={3} mb={4}>
+        <Grid item xs={12} lg={8}>
+          <Card sx={{ p: 3, borderRadius: 3, boxShadow: 3 }}>
+            <Typography variant="h6" fontWeight={700} mb={2}>
+              Activity Overview
+            </Typography>
+            <Box sx={{ height: 300 }}>
+              <Line data={chartData} options={chartOptions} />
+            </Box>
+          </Card>
+        </Grid>
+        <Grid item xs={12} lg={4}>
+          <Card sx={{ p: 3, borderRadius: 3, boxShadow: 3, height: 348 }}>
+            <Typography variant="h6" fontWeight={700} mb={3}>
+              Quick Actions
+            </Typography>
+            <Box sx={{ display: "flex", flexDirection: "column", gap: 2, height: "calc(100% - 48px)", justifyContent: "center" }}>
+              <QuickActionCard
+                title="Schedule Appointment"
+                description="Book a new patient appointment"
+                icon={<CalendarTodayIcon />}
+                onClick={() => setSelectedSection("Appointments")}
+                color="#3b82f6"
+              />
+              <QuickActionCard
+                title="View Reports"
+                description="Review pending medical reports"
+                icon={<AssignmentIcon />}
+                onClick={() => setSelectedSection("Reports")}
+                color="#10b981"
+              />
+            </Box>
+          </Card>
+        </Grid>
+      </Grid>
+    </Box>
+  );
+
+  // Main content renderer
   const renderContent = () => {
     switch (selectedSection) {
       case "Patients":
-        return <DoctorPatientsPage patients={patients} isLoading={isLoading} error={error} />;
+        return <DoctorPatientsPage />;
       case "Appointments":
         return <Appointments />;
       case "Reports":
         return <Reports />;
-      case "Messages":
-        return <Messages />;
       case "Settings":
         return <Settings />;
       default:
-        return (
-          <>
-            <Grid container spacing={3} mt={2}>
-              <Grid item xs={12} sm={6} md={4}>
-                <Card sx={{ p: 2, textAlign: "center", background: "radial-gradient(rgb(136, 223, 255),rgb(130, 205, 255))", boxShadow: 3 }}>
-                  <CardContent>
-                    <PeopleIcon fontSize="large" />
-                    <Typography variant="h6" sx={{ fontWeight: 600 }}>Total Patients</Typography>
-                    <Typography variant="h4">{patients?.length || 0}</Typography>
-                  </CardContent>
-                </Card>
-              </Grid>
-              <Grid item xs={12} sm={6} md={4}>
-                <Card sx={{ p: 2, textAlign: "center", background: "radial-gradient(rgb(136, 223, 255),rgb(130, 205, 255))", boxShadow: 3 }}>
-                  <CardContent>
-                    <CalendarTodayIcon fontSize="large" />
-                    <Typography variant="h6" sx={{ fontWeight: 600 }}>Today's Appointments</Typography>
-                    <Typography variant="h4">{Math.floor(Math.random() * 20) + 5}</Typography>
-                  </CardContent>
-                </Card>
-              </Grid>
-              <Grid item xs={12} sm={6} md={4}>
-                <Card sx={{ p: 2, textAlign: "center", background: "radial-gradient(rgb(136, 223, 255),rgb(130, 205, 255))", boxShadow: 3 }}>
-                  <CardContent>
-                    <DescriptionIcon fontSize="large" />
-                    <Typography variant="h6" sx={{ fontWeight: 600 }}>Pending Reports</Typography>
-                    <Typography variant="h4">
-                      <Chip label={`${Math.floor(Math.random() * 10) + 1} Pending`} color="primary" />
-                    </Typography>
-                  </CardContent>
-                </Card>
-              </Grid>
-            </Grid>
-            <Box mt={3}>
-              <DoctorPatientsPage patients={patients} isLoading={isLoading} error={error} />
-            </Box>
-          </>
-        );
+        return <DashboardContent />;
     }
   };
 
-  if (isLoading)
+  // Handle logout
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    navigate("/");
+  };
+
+  // Loading state for initial dashboard load
+  if (isLoadingStats && selectedSection === "Dashboard") {
     return (
       <Box display="flex" justifyContent="center" alignItems="center" height="100vh">
-        <CircularProgress />
-        <Typography sx={{ ml: 2 }}>Loading Patient Data...</Typography>
+        <CircularProgress size={60} />
+        <Typography ml={2} variant="h6">Loading Dashboard...</Typography>
       </Box>
     );
-
-  if (error)
-    return (
-      <Typography color="error" align="center" mt={5}>
-        ❌ Error loading data: {error.message}
-      </Typography>
-    );
+  }
 
   return (
-    <Box sx={{ display: "flex", minHeight: "100vh", background: "#ffffff" }}>
+    <Box sx={{ display: "flex", minHeight: "100vh", bgcolor: "#f8fafc" }}>
+      {/* Sidebar */}
       <Drawer
         variant="permanent"
         sx={{
-          width: sidebarOpen ? 240 : 80,
+          width: sidebarOpen ? 280 : 80,
           flexShrink: 0,
           "& .MuiDrawer-paper": {
-            width: sidebarOpen ? 240 : 80,
-            transition: "width 0.3s",
-            boxSizing: "border-box",
-            background: "linear-gradient(to bottom, rgb(28, 32, 57), rgb(6, 40, 97))",
+            width: sidebarOpen ? 280 : 80,
+            transition: "width 0.3s ease",
+            background: "linear-gradient(180deg, #1e293b 0%, #0f172a 100%)",
             color: "#fff",
+            border: "none",
+            boxShadow: "0 8px 32px rgba(0,0,0,0.12)",
           },
         }}
       >
-        <Box sx={{ padding: 2, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+        {/* Sidebar Header */}
+        <Box sx={{ p: 3, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           {sidebarOpen && (
-            <Typography variant="h6" component={Link} to="/" sx={{ textDecoration: "none", color: "white", fontWeight: "bold" }}>
-              RehabGait
-            </Typography>
+            <Box>
+              <Typography variant="h6" fontWeight={700}>Doctor Panel</Typography>
+              <Typography variant="caption" sx={{ color: "rgba(255,255,255,0.7)" }}>
+                Gait Analysis System
+              </Typography>
+            </Box>
           )}
           <IconButton onClick={() => setSidebarOpen(!sidebarOpen)} sx={{ color: "#fff" }}>
             <MenuIcon />
           </IconButton>
         </Box>
 
-        <Collapse in={sidebarOpen}>
-          <Box sx={{ textAlign: "center", p: 2 }}>
-            <Avatar sx={{ width: 75, height: 75, margin: "auto" }}>
-              {doctorName.charAt(0).toUpperCase()}
-            </Avatar>
-            <Typography variant="body1" mt={1}>
-              Dr. {doctorName}
-            </Typography>
-          </Box>
-        </Collapse>
-
-        <List>
+        {/* Menu Items */}
+        <List sx={{ px: 2, flexGrow: 1 }}>
           {menuItems.map((item) => (
-            <ListItem key={item.text} disablePadding>
+            <ListItem key={item.text} disablePadding sx={{ mb: 1 }}>
               <ListItemButton
                 selected={selectedSection === item.text}
                 onClick={() => setSelectedSection(item.text)}
                 sx={{
-                  "&.Mui-selected": { backgroundColor: "rgba(0,0,0,0.3)", color: "#fff" },
-                  "&:hover": { backgroundColor: "rgba(255,255,255,0.2)" },
+                  borderRadius: 2,
+                  py: 1.5,
+                  "&.Mui-selected": {
+                    backgroundColor: "rgba(59, 130, 246, 0.2)",
+                    color: "#60a5fa",
+                    "& .MuiListItemIcon-root": { color: "#60a5fa" },
+                  },
+                  "&:hover": {
+                    backgroundColor: "rgba(255,255,255,0.1)",
+                    transform: "translateX(4px)",
+                  },
+                  transition: "all 0.2s ease",
                 }}
               >
-                <ListItemIcon sx={{ color: "#fff" }}>{item.icon}</ListItemIcon>
+                <ListItemIcon sx={{ color: "#94a3b8", minWidth: 40 }}>
+                  {item.icon}
+                </ListItemIcon>
                 {sidebarOpen && <ListItemText primary={item.text} />}
               </ListItemButton>
             </ListItem>
           ))}
+        </List>
 
+        {/* Logout Button */}
+        <Box sx={{ p: 2 }}>
+          <Divider sx={{ mb: 2, borderColor: "rgba(255,255,255,0.1)" }} />
           <ListItem disablePadding>
             <ListItemButton
-              onClick={() => {
-                localStorage.removeItem("token");
-                navigate("/");
-              }}
+              onClick={handleLogout}
               sx={{
-                color: "#ffdddd",
-                "&:hover": { backgroundColor: "rgba(255, 0, 0, 0.2)" },
+                borderRadius: 2,
+                py: 1.5,
+                "&:hover": {
+                  backgroundColor: "rgba(239, 68, 68, 0.2)",
+                  transform: "translateX(4px)",
+                },
+                transition: "all 0.2s ease",
               }}
             >
-              <ListItemIcon sx={{ color: "#ffdddd" }}>
+              <ListItemIcon sx={{ color: "#f87171", minWidth: 40 }}>
                 <LogoutIcon />
               </ListItemIcon>
               {sidebarOpen && <ListItemText primary="Logout" />}
             </ListItemButton>
           </ListItem>
-        </List>
+        </Box>
       </Drawer>
 
-      <Box sx={{ flexGrow: 1, padding: 3 }}>
-        <Typography variant="h4" gutterBottom>
-          Welcome Back, Dr. {doctorName}
-        </Typography>
-        <Typography variant="h6" color="text.secondary">
-          Here's what's happening with your patients today!
-        </Typography>
-        <Box mt={3}>{renderContent()}</Box>
+      {/* Main Content */}
+      <Box sx={{ flexGrow: 1, p: 3 }}>
+        <Paper
+          elevation={0}
+          sx={{
+            p: 4,
+            borderRadius: 3,
+            background: "linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)",
+            border: "1px solid rgba(226, 232, 240, 0.8)",
+            minHeight: "calc(100vh - 48px)",
+          }}
+        >
+          {/* Header */}
+          <Box sx={{ mb: 4 }}>
+            <Typography
+              variant="h4"
+              fontWeight={800}
+              sx={{
+                background: "linear-gradient(135deg, #1e293b 0%, #3b82f6 100%)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+                mb: 1,
+              }}
+            >
+              Welcome Back, Dr. {doctorName}
+            </Typography>
+            <Typography variant="h6" color="text.secondary">
+              Here's what's happening with your practice today
+            </Typography>
+          </Box>
+
+          {/* Dynamic Content */}
+          {renderContent()}
+        </Paper>
       </Box>
     </Box>
   );

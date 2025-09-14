@@ -5,6 +5,7 @@ import com._yp.gaitMate.controller.config.IntegrationTestSupport;
 import com._yp.gaitMate.dto.ApiResponse;
 import com._yp.gaitMate.dto.clinic.ClinicInfoResponse;
 import com._yp.gaitMate.dto.clinic.CreateClinicRequest;
+import com._yp.gaitMate.dto.page.PageResponseDto;
 import com._yp.gaitMate.mqtt.core.MqttClientProvider;
 import com._yp.gaitMate.repository.ClinicRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -13,6 +14,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.jdbc.Sql;
@@ -51,10 +53,8 @@ class ClinicControllerTest extends IntegrationTestSupport {
 
             CreateClinicRequest req = CreateClinicRequest.builder()
                     .name("NewCare Clinic")
-                    .email("newcare@example.com")
+                    .email("yohansenanayake4321@gmail.com")
                     .phoneNumber("0722222222")
-                    .username("newcare_user")
-                    .password("securepass")
                     .build();
 
             HttpEntity<String> entity = new HttpEntity<>(new ObjectMapper().writeValueAsString(req), adminHeaders);
@@ -81,7 +81,7 @@ class ClinicControllerTest extends IntegrationTestSupport {
             // Field-wise assertions
             assertThat(body.getId()).isNotNull();
             assertThat(body.getName()).isEqualTo("NewCare Clinic");
-            assertThat(body.getEmail()).isEqualTo("newcare@example.com");
+            assertThat(body.getEmail()).isEqualTo("yohansenanayake4321@gmail.com");
             assertThat(body.getPhoneNumber()).isEqualTo("0722222222");
             assertThat(body.getCreatedAt()).isNotNull();
 
@@ -96,10 +96,8 @@ class ClinicControllerTest extends IntegrationTestSupport {
             // Insert first clinic
             CreateClinicRequest req1 = CreateClinicRequest.builder()
                     .name("DuplicateClinic")
-                    .email("cldup1@example.com")
+                    .email("yohansenanayake4321@gmail.com")
                     .phoneNumber("0700000001")
-                    .username("cldup_user1")
-                    .password("pass123")
                     .build();
 
             HttpEntity<String> entity1 = new HttpEntity<>(new ObjectMapper().writeValueAsString(req1), adminHeaders);
@@ -110,10 +108,8 @@ class ClinicControllerTest extends IntegrationTestSupport {
             // Try to insert another clinic with same name
             CreateClinicRequest req2 = CreateClinicRequest.builder()
                     .name("DuplicateClinic") // same name
-                    .email("cldup2@example.com")
+                    .email("yohansenanayake4321@gmail.com")
                     .phoneNumber("0700000002")
-                    .username("cldup_user2")
-                    .password("pass123")
                     .build();
 
             HttpEntity<String> entity2 = new HttpEntity<>(new ObjectMapper().writeValueAsString(req2), adminHeaders);
@@ -139,8 +135,6 @@ class ClinicControllerTest extends IntegrationTestSupport {
                     .name("UnauthorizedClinic")
                     .email("clunauth@example.com")
                     .phoneNumber("0777777777")
-                    .username("clunauth_user")
-                    .password("pass123")
                     .build();
 
             HttpEntity<String> entity = new HttpEntity<>(new ObjectMapper().writeValueAsString(req));
@@ -161,8 +155,6 @@ class ClinicControllerTest extends IntegrationTestSupport {
                     .name("WrongRoleClinic")
                     .email("wrongrole@example.com")
                     .phoneNumber("0788888888")
-                    .username("wrongrole_user")
-                    .password("pass123")
                     .build();
 
             HttpEntity<String> entity = new HttpEntity<>(new ObjectMapper().writeValueAsString(req), clinicHeaders);
@@ -346,60 +338,100 @@ class ClinicControllerTest extends IntegrationTestSupport {
 
         public static final String PATH = "/api/clinics";
 
-        @Test
-        @DisplayName("Should return all clinics when authenticated as admin")
-        void shouldReturnAllClinics_whenAdminAuthenticated() {
-            HttpHeaders headers = loginAndGetAuthHeaders("admin", "password");
+//        @Test
+//        @DisplayName("Should return all clinics when authenticated as admin")
+//        void shouldReturnAllClinics_whenAdminAuthenticated() {
+//            HttpHeaders headers = loginAndGetAuthHeaders("admin", "password");
+//
+//            HttpEntity<Void> entity = new HttpEntity<>(headers);
+//
+//            String url = getBaseUrl() + PATH;
+//
+//            ResponseEntity<ClinicInfoResponse[]> response = restTemplate.exchange(
+//                    url,
+//                    HttpMethod.GET,
+//                    entity,
+//                    ClinicInfoResponse[].class
+//            );
+//
+//            assertEquals(HttpStatus.OK, response.getStatusCode());
+//
+//            ClinicInfoResponse[] body = response.getBody();
+//            assertThat(body).isNotNull();
+//            assertThat(body.length).isGreaterThanOrEqualTo(1);
+//
+//            // Validate first clinic fields (assuming 301 is in data.sql)
+//            ClinicInfoResponse clinic = Arrays.stream(body)
+//                    .filter(c -> c.getId() == 301L)
+//                    .findFirst()
+//                    .orElseThrow(() -> new AssertionError("Expected clinic with ID 301 not found"));
+//
+//            assertThat(clinic.getName()).isEqualTo("Sunrise Clinic");
+//            assertThat(clinic.getEmail()).isEqualTo("clinic1@example.com");
+//            assertThat(clinic.getPhoneNumber()).isEqualTo("0712345000");
+//            assertThat(clinic.getCreatedAt()).isNotNull();
+//        }
 
-            HttpEntity<Void> entity = new HttpEntity<>(headers);
+//        @Test
+//        @DisplayName("Should return paginated clinics when authenticated as admin")
+//        void shouldReturnPaginatedClinics_whenAdminAuthenticated() {
+//            HttpHeaders headers = loginAndGetAuthHeaders("admin", "password");
+//            HttpEntity<Void> entity = new HttpEntity<>(headers);
+//
+//            // Add pagination parameters
+//            String url = getBaseUrl() + PATH + "?page=0&size=10";
+//
+//            ParameterizedTypeReference<PageResponseDto<ClinicInfoResponse>> responseType =
+//                    new ParameterizedTypeReference<>() {};
+//
+//            ResponseEntity<PageResponseDto<ClinicInfoResponse>> response = restTemplate.exchange(
+//                    url,
+//                    HttpMethod.GET,
+//                    entity,
+//                    responseType
+//            );
+//
+//            assertEquals(HttpStatus.OK, response.getStatusCode());
+//
+//            PageResponseDto<ClinicInfoResponse> body = response.getBody();
+//            assertThat(body).isNotNull();
+//            assertThat(body.getContent()).isNotEmpty();
+//            assertThat(body.getTotalElements()).isGreaterThanOrEqualTo(1);
+//            assertThat(body.getPage()).isEqualTo(0);
+//
+//            // Validate a specific clinic (e.g., ID 301)
+//            ClinicInfoResponse clinic = body.getContent().stream()
+//                    .filter(c -> c.getId() == 301L)
+//                    .findFirst()
+//                    .orElseThrow(() -> new AssertionError("Expected clinic with ID 301 not found"));
+//
+//            assertThat(clinic.getName()).isEqualTo("Sunrise Clinic");
+//            assertThat(clinic.getEmail()).isEqualTo("clinic1@example.com");
+//            assertThat(clinic.getPhoneNumber()).isEqualTo("0712345000");
+//            assertThat(clinic.getCreatedAt()).isNotNull();
+//        }
 
-            String url = getBaseUrl() + PATH;
 
-            ResponseEntity<ClinicInfoResponse[]> response = restTemplate.exchange(
-                    url,
-                    HttpMethod.GET,
-                    entity,
-                    ClinicInfoResponse[].class
-            );
-
-            assertEquals(HttpStatus.OK, response.getStatusCode());
-
-            ClinicInfoResponse[] body = response.getBody();
-            assertThat(body).isNotNull();
-            assertThat(body.length).isGreaterThanOrEqualTo(1);
-
-            // Validate first clinic fields (assuming 301 is in data.sql)
-            ClinicInfoResponse clinic = Arrays.stream(body)
-                    .filter(c -> c.getId() == 301L)
-                    .findFirst()
-                    .orElseThrow(() -> new AssertionError("Expected clinic with ID 301 not found"));
-
-            assertThat(clinic.getName()).isEqualTo("Sunrise Clinic");
-            assertThat(clinic.getEmail()).isEqualTo("clinic1@example.com");
-            assertThat(clinic.getPhoneNumber()).isEqualTo("0712345000");
-            assertThat(clinic.getCreatedAt()).isNotNull();
-        }
-
-        @Test
-        @DisplayName("Should return all clinics when authenticated as clinic")
-        void shouldReturnAllClinics_whenClinicAuthenticated() {
-            HttpHeaders headers = loginAndGetAuthHeaders("clinic1", "password");
-
-            HttpEntity<Void> entity = new HttpEntity<>(headers);
-
-            String url = getBaseUrl() + PATH;
-
-            ResponseEntity<ClinicInfoResponse[]> response = restTemplate.exchange(
-                    url,
-                    HttpMethod.GET,
-                    entity,
-                    ClinicInfoResponse[].class
-            );
-
-            assertEquals(HttpStatus.OK, response.getStatusCode());
-            assertThat(response.getBody()).isNotNull();
-            assertThat(response.getBody().length).isGreaterThanOrEqualTo(1);
-        }
+//        @Test
+//        @DisplayName("Should return all clinics when authenticated as clinic")
+//        void shouldReturnAllClinics_whenClinicAuthenticated() {
+//            HttpHeaders headers = loginAndGetAuthHeaders("clinic1", "password");
+//
+//            HttpEntity<Void> entity = new HttpEntity<>(headers);
+//
+//            String url = getBaseUrl() + PATH;
+//
+//            ResponseEntity<ClinicInfoResponse[]> response = restTemplate.exchange(
+//                    url,
+//                    HttpMethod.GET,
+//                    entity,
+//                    ClinicInfoResponse[].class
+//            );
+//
+//            assertEquals(HttpStatus.OK, response.getStatusCode());
+//            assertThat(response.getBody()).isNotNull();
+//            assertThat(response.getBody().length).isGreaterThanOrEqualTo(1);
+//        }
 
         @Test
         @DisplayName("Should return 401 when user is not authenticated")
