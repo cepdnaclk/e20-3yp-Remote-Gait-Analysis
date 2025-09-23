@@ -37,7 +37,7 @@ spring:
         access-key: ${MQTT_AWS_ACCESS_ID}
         secret-key: ${MQTT_AWS_ACCESS_KEY}
       region:
-        static: eu-north-1  # Default for SQS, IoT, etc.
+        static: us-east-1  # Default for SQS, IoT, etc.
         auto: false
       ses:
         region: ${email.ses.region}   # ✅ SES-specific region override for automatic ses bean
@@ -68,13 +68,13 @@ mqtt:
 
 # ===== S3 CONFIG (For your direct AWS SDK usage) =====
 aws:
-  region: eu-north-1
+  region: us-east-1
   s3:
-    bucket: gait-analysis-reports
+    bucket: rehabgait-reports-lk
 
 app:
   sqs:
-    queue-name: rehabgait-processing-request-dev2
+    queue-name: iot-data-queue
   cors:
     allowed-origin: http://localhost:5173
 
