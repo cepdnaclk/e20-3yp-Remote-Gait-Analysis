@@ -46,10 +46,10 @@ useEffect(() => {
 
     // 🔁 Determine progress based on backend rules
     let progress = 0;
-    if (gyro >=0) progress += 25;
-    if (mag >=0) progress += 25;
-    if (sys >= 0) progress += 25;
-    if (accel >= 0) progress += 25;
+    if (gyro >0) progress += 25;
+    if (mag >0) progress += 25;
+    if (sys >0) progress += 25;
+    if (accel >0) progress += 25;
 
     // ✅ Always show progress, even if calibration hasn't been started
     setCalibrationProgress(progress);
