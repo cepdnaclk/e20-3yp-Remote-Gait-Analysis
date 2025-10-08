@@ -68,11 +68,11 @@ mqtt:
 aws:
   region: eu-north-1
   s3:
-    bucket: gait-analysis-reports
+    bucket: rehabgait-reports-lk
 
 app:
   sqs:
-    queue-name: ${SQS_QUEUE_NAME:rehabgait-processing-request-dev}
+    queue-name: ${SQS_QUEUE_NAME:iot-data-queue}
   cors:
     allowed-origin: https://rehabgait.com
 

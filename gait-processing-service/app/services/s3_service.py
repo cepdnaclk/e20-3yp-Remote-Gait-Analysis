@@ -18,7 +18,7 @@ class S3Service:
     Uses IAM user with access keys (same pattern as SQS)
     """
     
-    def __init__(self, bucket_name: str = "gait-analysis-reports"):
+    def __init__(self, bucket_name: str = "rehabgait-reports-lk"):
         """
         Initialize S3 service with access keys from environment
         

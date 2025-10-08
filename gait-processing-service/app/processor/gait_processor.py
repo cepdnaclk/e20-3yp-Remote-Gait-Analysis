@@ -15,7 +15,7 @@ from app.services.s3_service import create_s3_service
 
 class GaitProcessor:
     def __init__(self, enable_plots: bool = True, enable_pdf_report: bool = True, 
-                 s3_bucket: str = "gait-analysis-reports"):
+                 s3_bucket: str = "rehabgait-reports-lk"):
         # Initialize with your tested calibration factors
         self.analyzer = ProductionGaitAnalyzer(calibration_factors={
             'ZUPT Method': 1.201,      # From your 17% error session

@@ -27,7 +27,7 @@ const PatientTestSession = () => {
 
   const [deviceAlive, setDeviceAlive] = useState(false);
   const [results, setResults] = useState(null);
-  const [calibrationStatus, setCalibrationStatus] = useState(null);
+  const [calibrationStatus, setCalibrationStatus] = useState(true);
   const [orientationCaptured, setOrientationCaptured] = useState(false);
   const [sensorData, setSensorData] = useState(null);
   const [sessionId, setSessionId] = useState(null);
@@ -71,10 +71,12 @@ const PatientTestSession = () => {
       onDeviceAlive: (data) => setDeviceAlive(data.status === true),
 
       onCalibration: (data) => {
+        //setCalibrationStatus(true);
         setCalibrationStatus(data);
 
         // ✅ Only update calibration progress if user has started calibration
         if (calibrationRequested) {
+          //setCalibrationStatus(true);
           setCalibrationStatus(data);
         } else {
           // Device just sent a calibration snapshot

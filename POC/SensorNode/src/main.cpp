@@ -25,7 +25,7 @@ float initialYaw = 0, initialPitch = 0, initialRoll = 0;
 void sendCalibrationStatus() {
   uint8_t sysCal, gyroCal, accelCal, magCal;
   bno.getCalibration(&sysCal, &gyroCal, &accelCal, &magCal);
-  bool complete = (sysCal > 0 && gyroCal == 3 && accelCal > 0 && magCal == 3);
+  bool complete = (sysCal >0 && gyroCal > 0 && accelCal >0 && magCal >0 );
 
   // unsigned long ts = syncedTime + (millis() - lastSyncTime) / 1000;
   uint64_t ts = syncedTime + (millis() - lastSyncTime);
