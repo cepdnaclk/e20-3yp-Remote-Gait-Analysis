@@ -29,5 +29,6 @@
                 "email": "isurunawinne@eng.pdn.ac.lk"
             }
         ],
-        "tags": ["Web", "Embedded Systems", "IoT"]
+        "tags": ["Web", "Embedded Systems", "IoT"],
+    "thumbnail": "thumbnail.jpg"
 }
